@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      character_jutsus: {
+        Row: {
+          character_id: string
+          created_at: string
+          id: string
+          jutsu_id: string
+        }
+        Insert: {
+          character_id: string
+          created_at?: string
+          id?: string
+          jutsu_id: string
+        }
+        Update: {
+          character_id?: string
+          created_at?: string
+          id?: string
+          jutsu_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "character_jutsus_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "character_sheets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "character_jutsus_jutsu_id_fkey"
+            columns: ["jutsu_id"]
+            isOneToOne: false
+            referencedRelation: "jutsus"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       character_sheets: {
         Row: {
           acrobacia: number
@@ -179,6 +215,33 @@ export type Database = {
           vida?: number
           vida_max?: number
           vontade_ninja?: number
+        }
+        Relationships: []
+      }
+      jutsus: {
+        Row: {
+          created_at: string
+          id: string
+          imagem_url: string | null
+          informacoes: string
+          ip_address: string
+          nome: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          imagem_url?: string | null
+          informacoes?: string
+          ip_address: string
+          nome: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          imagem_url?: string | null
+          informacoes?: string
+          ip_address?: string
+          nome?: string
         }
         Relationships: []
       }
