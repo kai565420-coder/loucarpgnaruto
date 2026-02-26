@@ -313,18 +313,20 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
       {/* Perícias */}
       <div className="mt-3">
         <div className="retro-section-title text-xs">Perícias</div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="retro-panel p-2">
           {pericias.map(({ grupo, items }) => (
-            <div key={grupo} className="retro-panel p-2">
+            <div key={grupo} className="mb-3">
               <div className="text-accent font-bold text-[11px] border-b border-border pb-1 mb-1">
                 {grupo}
               </div>
-              {items.map(({ key, label }) => (
-                <div key={key} className="flex justify-between text-[11px] items-center py-[1px]">
-                  <span className="retro-label">{label}</span>
-                  {renderValue(key)}
-                </div>
-              ))}
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                {items.map(({ key, label }) => (
+                  <div key={key} className="flex items-center text-[11px] py-[2px]">
+                    <span className="retro-label shrink-0 w-[140px]">{label}:</span>
+                    {renderValue(key)}
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
