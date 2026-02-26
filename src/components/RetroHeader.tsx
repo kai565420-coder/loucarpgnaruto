@@ -4,7 +4,7 @@ const RetroHeader = () => {
       <div className="max-w-[1000px] mx-auto flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="text-sm text-primary-foreground tracking-wider">
-            ⚔️ NARUTO RPG ⚔️
+            E a Louça RPG
           </span>
         </div>
         <div className="text-xs text-primary-foreground opacity-80">
