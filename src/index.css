@@ -162,6 +162,10 @@
     text-align: center;
   }
 
+  #lovable-badge {
+    display: none !important;
+  }
+
   .retro-link {
     color: hsl(var(--retro-orange));
     text-decoration: none;
