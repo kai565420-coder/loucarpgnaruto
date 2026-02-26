@@ -254,13 +254,13 @@ const CharacterForm = ({ ip, onCreated }: CharacterFormProps) => {
             <div className="text-accent font-bold text-xs mb-1 border-b border-border pb-1">
               {grupo}
             </div>
-            <div className="grid grid-cols-2 gap-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {items.map(({ key, label }) => (
-                <div key={key} className="flex items-center gap-2">
-                  <label className="retro-label text-[11px] w-[160px] shrink-0">{label}:</label>
+                <div key={key} className="grid grid-cols-[minmax(0,1fr)_72px] items-center gap-2">
+                  <label className="retro-label text-[11px] leading-tight break-words">{label}:</label>
                   <input
                     type="number"
-                    className="retro-input w-16 text-center"
+                    className="retro-input w-full text-center"
                     value={(form as any)[key]}
                     onChange={(e) => handleNumberChange(key, e.target.value)}
                   />
