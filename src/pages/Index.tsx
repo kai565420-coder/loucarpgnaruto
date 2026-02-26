@@ -4,6 +4,7 @@ import RetroSidebar from "@/components/RetroSidebar";
 import RetroFooter from "@/components/RetroFooter";
 import CharacterList from "@/components/CharacterList";
 import CharacterForm from "@/components/CharacterForm";
+import JutsuForm from "@/components/JutsuForm";
 import { useUserIp } from "@/hooks/useUserIp";
 
 const Index = () => {
@@ -18,7 +19,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col relative">
-      {/* Background image with low opacity */}
       <div
         className="fixed inset-0 z-0 bg-center bg-no-repeat bg-cover opacity-10 pointer-events-none"
         style={{ backgroundImage: "url('/images/naruto-bg.png')" }}
@@ -27,15 +27,12 @@ const Index = () => {
       <div className="relative z-10 flex flex-col min-h-screen">
         <RetroHeader />
 
-        {/* Status bar - no IP shown */}
         <div className="bg-card border-b border-border px-4 py-1 text-[10px] text-muted-foreground flex justify-end max-w-[1000px] mx-auto w-full">
           <span>Sistema de Fichas v1.0</span>
         </div>
 
-        {/* Main content */}
         <div className="flex-1 flex max-w-[1000px] mx-auto w-full py-3 px-2 gap-3">
           <RetroSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-
 
           <main className="flex-1 min-w-0">
             {loading ? (
@@ -46,6 +43,8 @@ const Index = () => {
               <CharacterList ip={ip || "unknown"} refreshKey={refreshKey} />
             ) : activeTab === "criar" ? (
               <CharacterForm ip={ip || "unknown"} onCreated={handleCreated} />
+            ) : activeTab === "criar-jutsu" ? (
+              <JutsuForm ip={ip || "unknown"} onCreated={() => setActiveTab("fichas")} />
             ) : activeTab === "sobre" ? (
               <div className="retro-panel p-4">
                 <div className="retro-section-title">📖 Sobre o Sistema</div>
