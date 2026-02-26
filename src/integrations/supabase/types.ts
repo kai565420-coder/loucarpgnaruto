@@ -19,6 +19,7 @@ export type Database = {
           acrobacia: number
           analise_combate: number
           chakra: number
+          chakra_max: number
           classe: string
           concentracao: number
           conhecimento_clas: number
@@ -43,11 +44,11 @@ export type Database = {
           inventario: string
           ip_address: string
           kenjutsu: number
-          maestria_agua: number
-          maestria_fogo: number
-          maestria_raio: number
-          maestria_terra: number
-          maestria_vento: number
+          maestria_agua: string
+          maestria_fogo: string
+          maestria_raio: string
+          maestria_terra: string
+          maestria_vento: string
           moldagem_elemental: number
           ninjutsu_medico: number
           nome: string
@@ -57,6 +58,7 @@ export type Database = {
           resistencia_genjutsu: number
           sabotagem: number
           sanidade: number
+          sanidade_max: number
           sensorial: number
           shurikenjutsu: number
           sobrevivencia: number
@@ -65,12 +67,14 @@ export type Database = {
           tolerancia_dor: number
           updated_at: string
           vida: number
+          vida_max: number
           vontade_ninja: number
         }
         Insert: {
           acrobacia?: number
           analise_combate?: number
           chakra?: number
+          chakra_max?: number
           classe?: string
           concentracao?: number
           conhecimento_clas?: number
@@ -95,11 +99,11 @@ export type Database = {
           inventario?: string
           ip_address: string
           kenjutsu?: number
-          maestria_agua?: number
-          maestria_fogo?: number
-          maestria_raio?: number
-          maestria_terra?: number
-          maestria_vento?: number
+          maestria_agua?: string
+          maestria_fogo?: string
+          maestria_raio?: string
+          maestria_terra?: string
+          maestria_vento?: string
           moldagem_elemental?: number
           ninjutsu_medico?: number
           nome: string
@@ -109,6 +113,7 @@ export type Database = {
           resistencia_genjutsu?: number
           sabotagem?: number
           sanidade?: number
+          sanidade_max?: number
           sensorial?: number
           shurikenjutsu?: number
           sobrevivencia?: number
@@ -117,12 +122,14 @@ export type Database = {
           tolerancia_dor?: number
           updated_at?: string
           vida?: number
+          vida_max?: number
           vontade_ninja?: number
         }
         Update: {
           acrobacia?: number
           analise_combate?: number
           chakra?: number
+          chakra_max?: number
           classe?: string
           concentracao?: number
           conhecimento_clas?: number
@@ -147,11 +154,11 @@ export type Database = {
           inventario?: string
           ip_address?: string
           kenjutsu?: number
-          maestria_agua?: number
-          maestria_fogo?: number
-          maestria_raio?: number
-          maestria_terra?: number
-          maestria_vento?: number
+          maestria_agua?: string
+          maestria_fogo?: string
+          maestria_raio?: string
+          maestria_terra?: string
+          maestria_vento?: string
           moldagem_elemental?: number
           ninjutsu_medico?: number
           nome?: string
@@ -161,6 +168,7 @@ export type Database = {
           resistencia_genjutsu?: number
           sabotagem?: number
           sanidade?: number
+          sanidade_max?: number
           sensorial?: number
           shurikenjutsu?: number
           sobrevivencia?: number
@@ -169,6 +177,7 @@ export type Database = {
           tolerancia_dor?: number
           updated_at?: string
           vida?: number
+          vida_max?: number
           vontade_ninja?: number
         }
         Relationships: []

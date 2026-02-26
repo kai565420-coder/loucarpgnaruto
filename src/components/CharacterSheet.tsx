@@ -11,11 +11,14 @@ interface CharacterSheetProps {
 }
 
 const atributos = [
-  { key: "vida", label: "Vida" },
-  { key: "sanidade", label: "Sanidade" },
   { key: "forca_fisica", label: "Força Física" },
   { key: "destreza", label: "Destreza" },
-  { key: "chakra", label: "Chakra" },
+];
+
+const barAtributos = [
+  { key: "vida", maxKey: "vida_max", label: "Vida", color: "hsl(0 70% 45%)" },
+  { key: "sanidade", maxKey: "sanidade_max", label: "Sanidade", color: "hsl(210 70% 45%)" },
+  { key: "chakra", maxKey: "chakra_max", label: "Chakra", color: "hsl(200 80% 50%)" },
 ];
 
 const maestrias = [
@@ -113,10 +116,13 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
         classe: form.classe,
         talento: form.talento,
         vida: form.vida,
+        vida_max: form.vida_max,
         sanidade: form.sanidade,
+        sanidade_max: form.sanidade_max,
+        chakra: form.chakra,
+        chakra_max: form.chakra_max,
         forca_fisica: form.forca_fisica,
         destreza: form.destreza,
-        chakra: form.chakra,
         taijutsu: form.taijutsu,
         forca_bruta: form.forca_bruta,
         imobilizacao: form.imobilizacao,
@@ -210,6 +216,32 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
     return <span className="retro-value">{(sheet as any)[key] ?? (type === "number" ? 0 : "-")}</span>;
   };
 
+  const renderBar = (key: string, maxKey: string, label: string, color: string) => {
+    const current = editing ? (form[key] ?? 0) : ((sheet as any)[key] ?? 0);
+    const max = editing ? (form[maxKey] ?? 0) : ((sheet as any)[maxKey] ?? 0);
+    const pct = max > 0 ? Math.min((current / max) * 100, 100) : 0;
+
+    return (
+      <div className="mb-2">
+        <div className="flex justify-between text-[11px] mb-1">
+          <span className="retro-label font-bold">{label}</span>
+          {editing && isOwner ? (
+            <span className="flex items-center gap-1">
+              <input type="number" className="retro-input w-12 text-center text-[10px]" value={form[key] ?? 0} onChange={(e) => handleNumberChange(key, e.target.value)} />
+              <span className="text-muted-foreground">/</span>
+              <input type="number" className="retro-input w-12 text-center text-[10px]" value={form[maxKey] ?? 0} onChange={(e) => handleNumberChange(maxKey, e.target.value)} />
+            </span>
+          ) : (
+            <span className="retro-value font-bold">{current}/{max}</span>
+          )}
+        </div>
+        <div className="w-full h-3 border border-border" style={{ background: "hsl(0 0% 5%)" }}>
+          <div className="h-full transition-all" style={{ width: `${pct}%`, background: color }} />
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="retro-panel p-3 mb-4">
       {/* Header with collapse */}
@@ -221,7 +253,8 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
         <span className="retro-section-title text-base mb-0 border-0 pb-0 flex-1">{sheet.nome}</span>
       </div>
 
-      <div className="flex gap-4">
+      {/* Top: Image + Info + Bars */}
+      <div className="flex gap-4 flex-wrap">
         {/* Imagem */}
         <div className="shrink-0">
           {sheet.imagem_url ? (
@@ -237,9 +270,9 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
           )}
         </div>
 
-        {/* Info básica */}
-        <div className="flex-1">
-          <table className="retro-table text-xs">
+        {/* Info básica + Barras */}
+        <div className="flex-1 min-w-[200px]">
+          <table className="retro-table text-xs mb-2">
             <tbody>
               <tr><td className="retro-label w-24">Idade:</td><td>{renderValue("idade", "text")}</td></tr>
               <tr><td className="retro-label">Elementos:</td><td>{renderValue("elementos", "text")}</td></tr>
@@ -247,6 +280,11 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
               <tr><td className="retro-label">Talento:</td><td>{renderValue("talento", "text")}</td></tr>
             </tbody>
           </table>
+
+          {/* Barras de Vida/Sanidade/Chakra */}
+          {barAtributos.map(({ key, maxKey, label, color }) => (
+            <div key={key}>{renderBar(key, maxKey, label, color)}</div>
+          ))}
         </div>
       </div>
 
@@ -275,14 +313,14 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
       {/* Perícias */}
       <div className="mt-3">
         <div className="retro-section-title text-xs">Perícias</div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {pericias.map(({ grupo, items }) => (
-            <div key={grupo}>
+            <div key={grupo} className="retro-panel p-2">
               <div className="text-accent font-bold text-[11px] border-b border-border pb-1 mb-1">
                 {grupo}
               </div>
               {items.map(({ key, label }) => (
-                <div key={key} className="flex justify-between text-[11px] items-center">
+                <div key={key} className="flex justify-between text-[11px] items-center py-[1px]">
                   <span className="retro-label">{label}</span>
                   {renderValue(key)}
                 </div>
@@ -294,16 +332,16 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
 
       {/* Maestria + Inventário side by side */}
       <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div>
+        <div className="retro-panel p-2">
           <div className="retro-section-title text-xs">Maestria</div>
           {maestrias.map(({ key, label }) => (
             <div key={key} className="flex justify-between text-[11px] items-center mb-1">
               <span className="retro-label">{label}:</span>
-              {renderValue(key)}
+              {renderValue(key, "text")}
             </div>
           ))}
         </div>
-        <div>
+        <div className="retro-panel p-2">
           <div className="retro-section-title text-xs">Inventário</div>
           {editing && isOwner ? (
             <textarea

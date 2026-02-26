@@ -36,6 +36,7 @@ const Index = () => {
         <div className="flex-1 flex max-w-[1000px] mx-auto w-full py-3 px-2 gap-3">
           <RetroSidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
+
           <main className="flex-1 min-w-0">
             {loading ? (
               <div className="retro-panel p-4 text-center text-muted-foreground text-xs">

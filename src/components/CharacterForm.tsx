@@ -13,23 +13,26 @@ const defaultValues = {
   elementos: "",
   classe: "",
   talento: "",
-  vida: 0, sanidade: 0, forca_fisica: 0, destreza: 0, chakra: 0,
+  vida: 0, vida_max: 0, sanidade: 0, sanidade_max: 0, forca_fisica: 0, destreza: 0, chakra: 0, chakra_max: 0,
   taijutsu: 0, forca_bruta: 0, imobilizacao: 0,
   acrobacia: 0, furtividade: 0, shurikenjutsu: 0, kenjutsu: 0, reflexos_ninja: 0, iniciativa: 0,
   analise_combate: 0, estrategia_tatica: 0, conhecimento_shinobi: 0, conhecimento_clas: 0, fuinjutsu: 0, sabotagem: 0,
   genjutsu: 0, resistencia_genjutsu: 0, concentracao: 0, intimidacao: 0, vontade_ninja: 0,
   fortitude: 0, resistencia_fisica: 0, recuperacao: 0, tolerancia_dor: 0, sobrevivencia: 0,
   controle_chakra: 0, moldagem_elemental: 0, ninjutsu_medico: 0, sensorial: 0,
-  maestria_fogo: 0, maestria_vento: 0, maestria_terra: 0, maestria_agua: 0, maestria_raio: 0,
+  maestria_fogo: "", maestria_vento: "", maestria_terra: "", maestria_agua: "", maestria_raio: "",
   inventario: "",
 };
 
 const atributos = [
-  { key: "vida", label: "Vida" },
-  { key: "sanidade", label: "Sanidade" },
   { key: "forca_fisica", label: "Força Física" },
   { key: "destreza", label: "Destreza" },
-  { key: "chakra", label: "Chakra" },
+];
+
+const barAtributos = [
+  { key: "vida", maxKey: "vida_max", label: "Vida" },
+  { key: "sanidade", maxKey: "sanidade_max", label: "Sanidade" },
+  { key: "chakra", maxKey: "chakra_max", label: "Chakra" },
 ];
 
 const maestrias = [
@@ -198,6 +201,33 @@ const CharacterForm = ({ ip, onCreated }: CharacterFormProps) => {
         </div>
       </div>
 
+      {/* Barras Vida/Sanidade/Chakra */}
+      <div className="retro-panel p-3 mb-3">
+        <div className="retro-section-title text-sm">Vida / Sanidade / Chakra</div>
+        <div className="grid grid-cols-1 gap-2">
+          {barAtributos.map(({ key, maxKey, label }) => (
+            <div key={key} className="flex items-center gap-2">
+              <label className="retro-label text-xs w-[100px] shrink-0">{label}:</label>
+              <input
+                type="number"
+                className="retro-input w-16 text-center"
+                value={(form as any)[key]}
+                onChange={(e) => handleNumberChange(key, e.target.value)}
+                placeholder="Atual"
+              />
+              <span className="text-muted-foreground text-xs">/</span>
+              <input
+                type="number"
+                className="retro-input w-16 text-center"
+                value={(form as any)[maxKey]}
+                onChange={(e) => handleNumberChange(maxKey, e.target.value)}
+                placeholder="Máx"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Atributos */}
       <div className="retro-panel p-3 mb-3">
         <div className="retro-section-title text-sm">Atributos</div>
@@ -249,10 +279,10 @@ const CharacterForm = ({ ip, onCreated }: CharacterFormProps) => {
             <div key={key} className="flex items-center gap-2 mb-1">
               <label className="retro-label text-[11px] w-[80px] shrink-0">{label}:</label>
               <input
-                type="number"
-                className="retro-input w-16 text-center"
+                type="text"
+                className="retro-input w-full text-xs"
                 value={(form as any)[key]}
-                onChange={(e) => handleNumberChange(key, e.target.value)}
+                onChange={(e) => handleTextChange(key, e.target.value)}
               />
             </div>
           ))}
