@@ -20,14 +20,24 @@ const defaultValues = {
   genjutsu: 0, resistencia_genjutsu: 0, concentracao: 0, intimidacao: 0, vontade_ninja: 0,
   fortitude: 0, resistencia_fisica: 0, recuperacao: 0, tolerancia_dor: 0, sobrevivencia: 0,
   controle_chakra: 0, moldagem_elemental: 0, ninjutsu_medico: 0, sensorial: 0,
+  maestria_fogo: 0, maestria_vento: 0, maestria_terra: 0, maestria_agua: 0, maestria_raio: 0,
+  inventario: "",
 };
 
-const atributosDestaque = [
+const atributos = [
   { key: "vida", label: "Vida" },
   { key: "sanidade", label: "Sanidade" },
   { key: "forca_fisica", label: "Força Física" },
   { key: "destreza", label: "Destreza" },
   { key: "chakra", label: "Chakra" },
+];
+
+const maestrias = [
+  { key: "maestria_fogo", label: "Fogo" },
+  { key: "maestria_vento", label: "Vento" },
+  { key: "maestria_terra", label: "Terra" },
+  { key: "maestria_agua", label: "Água" },
+  { key: "maestria_raio", label: "Raio" },
 ];
 
 const pericias = [
@@ -188,11 +198,11 @@ const CharacterForm = ({ ip, onCreated }: CharacterFormProps) => {
         </div>
       </div>
 
-      {/* Atributos Destaque */}
+      {/* Atributos */}
       <div className="retro-panel p-3 mb-3">
-        <div className="retro-section-title text-sm">Atributos (Destaque)</div>
+        <div className="retro-section-title text-sm">Atributos</div>
         <div className="grid grid-cols-2 gap-2">
-          {atributosDestaque.map(({ key, label }) => (
+          {atributos.map(({ key, label }) => (
             <div key={key}>
               <label className="retro-label block mb-1">{label}:</label>
               <input
@@ -229,6 +239,33 @@ const CharacterForm = ({ ip, onCreated }: CharacterFormProps) => {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Maestria + Inventário */}
+      <div className="retro-panel p-3 mb-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <div className="retro-section-title text-sm">Maestria</div>
+          {maestrias.map(({ key, label }) => (
+            <div key={key} className="flex items-center gap-2 mb-1">
+              <label className="retro-label text-[11px] w-[80px] shrink-0">{label}:</label>
+              <input
+                type="number"
+                className="retro-input w-16 text-center"
+                value={(form as any)[key]}
+                onChange={(e) => handleNumberChange(key, e.target.value)}
+              />
+            </div>
+          ))}
+        </div>
+        <div>
+          <div className="retro-section-title text-sm">Inventário</div>
+          <textarea
+            className="retro-input w-full text-xs min-h-[100px]"
+            placeholder="Escreva os itens do inventário..."
+            value={form.inventario}
+            onChange={(e) => handleTextChange("inventario", e.target.value)}
+          />
+        </div>
       </div>
 
       <button type="submit" className="retro-button w-full py-2" disabled={saving}>

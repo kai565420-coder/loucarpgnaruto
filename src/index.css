@@ -157,6 +157,11 @@
     color: hsl(var(--retro-text-bright));
   }
 
+  .retro-atributo-highlight {
+    background: hsl(0 0% 6%);
+    text-align: center;
+  }
+
   .retro-link {
     color: hsl(var(--retro-orange));
     text-decoration: none;

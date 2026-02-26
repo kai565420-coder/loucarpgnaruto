@@ -1,17 +1,29 @@
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
 
 interface CharacterSheetProps {
   sheet: Tables<"character_sheets">;
   isOwner: boolean;
   onDelete?: () => void;
+  onUpdated?: () => void;
 }
 
-const atributosDestaque = [
+const atributos = [
   { key: "vida", label: "Vida" },
   { key: "sanidade", label: "Sanidade" },
   { key: "forca_fisica", label: "Força Física" },
   { key: "destreza", label: "Destreza" },
   { key: "chakra", label: "Chakra" },
+];
+
+const maestrias = [
+  { key: "maestria_fogo", label: "Fogo" },
+  { key: "maestria_vento", label: "Vento" },
+  { key: "maestria_terra", label: "Terra" },
+  { key: "maestria_agua", label: "Água" },
+  { key: "maestria_raio", label: "Raio" },
 ];
 
 const pericias = [
@@ -76,9 +88,139 @@ const pericias = [
   },
 ];
 
-const CharacterSheet = ({ sheet, isOwner, onDelete }: CharacterSheetProps) => {
+const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetProps) => {
+  const [expanded, setExpanded] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState<Record<string, any>>({ ...sheet });
+  const [saving, setSaving] = useState(false);
+
+  const handleNumberChange = (key: string, value: string) => {
+    setForm((prev) => ({ ...prev, [key]: parseInt(value) || 0 }));
+  };
+
+  const handleTextChange = (key: string, value: string) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    const { error } = await supabase
+      .from("character_sheets")
+      .update({
+        nome: form.nome,
+        idade: form.idade,
+        elementos: form.elementos,
+        classe: form.classe,
+        talento: form.talento,
+        vida: form.vida,
+        sanidade: form.sanidade,
+        forca_fisica: form.forca_fisica,
+        destreza: form.destreza,
+        chakra: form.chakra,
+        taijutsu: form.taijutsu,
+        forca_bruta: form.forca_bruta,
+        imobilizacao: form.imobilizacao,
+        acrobacia: form.acrobacia,
+        furtividade: form.furtividade,
+        shurikenjutsu: form.shurikenjutsu,
+        kenjutsu: form.kenjutsu,
+        reflexos_ninja: form.reflexos_ninja,
+        iniciativa: form.iniciativa,
+        analise_combate: form.analise_combate,
+        estrategia_tatica: form.estrategia_tatica,
+        conhecimento_shinobi: form.conhecimento_shinobi,
+        conhecimento_clas: form.conhecimento_clas,
+        fuinjutsu: form.fuinjutsu,
+        sabotagem: form.sabotagem,
+        genjutsu: form.genjutsu,
+        resistencia_genjutsu: form.resistencia_genjutsu,
+        concentracao: form.concentracao,
+        intimidacao: form.intimidacao,
+        vontade_ninja: form.vontade_ninja,
+        fortitude: form.fortitude,
+        resistencia_fisica: form.resistencia_fisica,
+        recuperacao: form.recuperacao,
+        tolerancia_dor: form.tolerancia_dor,
+        sobrevivencia: form.sobrevivencia,
+        controle_chakra: form.controle_chakra,
+        moldagem_elemental: form.moldagem_elemental,
+        ninjutsu_medico: form.ninjutsu_medico,
+        sensorial: form.sensorial,
+        maestria_fogo: form.maestria_fogo,
+        maestria_vento: form.maestria_vento,
+        maestria_terra: form.maestria_terra,
+        maestria_agua: form.maestria_agua,
+        maestria_raio: form.maestria_raio,
+        inventario: form.inventario,
+      })
+      .eq("id", sheet.id);
+
+    setSaving(false);
+    if (error) {
+      toast.error("Erro ao salvar");
+    } else {
+      toast.success("Ficha atualizada!");
+      setEditing(false);
+      onUpdated?.();
+    }
+  };
+
+  // Collapsed view
+  if (!expanded) {
+    return (
+      <div
+        className="retro-panel p-2 mb-2 flex items-center gap-3 cursor-pointer hover:border-accent transition-colors"
+        onClick={() => setExpanded(true)}
+      >
+        {sheet.imagem_url ? (
+          <img
+            src={sheet.imagem_url}
+            alt={sheet.nome}
+            className="w-[40px] h-[40px] object-cover border border-border"
+          />
+        ) : (
+          <div className="w-[40px] h-[40px] border border-border flex items-center justify-center text-muted-foreground text-[8px]">
+            ?
+          </div>
+        )}
+        <span className="text-accent font-bold text-xs">{sheet.nome}</span>
+        <span className="ml-auto text-muted-foreground text-[10px]">▼ expandir</span>
+      </div>
+    );
+  }
+
+  const renderValue = (key: string, type: "number" | "text" = "number") => {
+    if (editing && isOwner) {
+      return type === "number" ? (
+        <input
+          type="number"
+          className="retro-input w-16 text-center text-xs"
+          value={form[key] ?? 0}
+          onChange={(e) => handleNumberChange(key, e.target.value)}
+        />
+      ) : (
+        <input
+          type="text"
+          className="retro-input w-full text-xs"
+          value={form[key] ?? ""}
+          onChange={(e) => handleTextChange(key, e.target.value)}
+        />
+      );
+    }
+    return <span className="retro-value">{(sheet as any)[key] ?? (type === "number" ? 0 : "-")}</span>;
+  };
+
   return (
     <div className="retro-panel p-3 mb-4">
+      {/* Header with collapse */}
+      <div
+        className="flex items-center gap-2 cursor-pointer mb-2"
+        onClick={() => { if (!editing) setExpanded(false); }}
+      >
+        <span className="text-muted-foreground text-[10px]">▲ recolher</span>
+        <span className="retro-section-title text-base mb-0 border-0 pb-0 flex-1">{sheet.nome}</span>
+      </div>
+
       <div className="flex gap-4">
         {/* Imagem */}
         <div className="shrink-0">
@@ -97,26 +239,34 @@ const CharacterSheet = ({ sheet, isOwner, onDelete }: CharacterSheetProps) => {
 
         {/* Info básica */}
         <div className="flex-1">
-          <div className="retro-section-title text-base mb-2">{sheet.nome}</div>
           <table className="retro-table text-xs">
             <tbody>
-              <tr><td className="retro-label w-24">Idade:</td><td className="retro-value">{sheet.idade || "-"}</td></tr>
-              <tr><td className="retro-label">Elementos:</td><td className="retro-value">{sheet.elementos || "-"}</td></tr>
-              <tr><td className="retro-label">Classe:</td><td className="retro-value">{sheet.classe || "-"}</td></tr>
-              <tr><td className="retro-label">Talento:</td><td className="retro-value">{sheet.talento || "-"}</td></tr>
+              <tr><td className="retro-label w-24">Idade:</td><td>{renderValue("idade", "text")}</td></tr>
+              <tr><td className="retro-label">Elementos:</td><td>{renderValue("elementos", "text")}</td></tr>
+              <tr><td className="retro-label">Classe:</td><td>{renderValue("classe", "text")}</td></tr>
+              <tr><td className="retro-label">Talento:</td><td>{renderValue("talento", "text")}</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Atributos Destaque */}
+      {/* Atributos */}
       <div className="mt-3">
-        <div className="retro-section-title text-xs">Atributos (Destaque)</div>
+        <div className="retro-section-title text-xs">Atributos</div>
         <div className="flex gap-4 flex-wrap">
-          {atributosDestaque.map(({ key, label }) => (
-            <div key={key} className="text-xs">
+          {atributos.map(({ key, label }) => (
+            <div key={key} className="text-xs retro-atributo-highlight p-2 border border-accent">
               <span className="retro-label">{label}: </span>
-              <span className="text-accent font-bold">{(sheet as any)[key]}</span>
+              {editing && isOwner ? (
+                <input
+                  type="number"
+                  className="retro-input w-14 text-center text-xs"
+                  value={form[key] ?? 0}
+                  onChange={(e) => handleNumberChange(key, e.target.value)}
+                />
+              ) : (
+                <span className="text-accent font-bold text-sm">{(sheet as any)[key]}</span>
+              )}
             </div>
           ))}
         </div>
@@ -132,9 +282,9 @@ const CharacterSheet = ({ sheet, isOwner, onDelete }: CharacterSheetProps) => {
                 {grupo}
               </div>
               {items.map(({ key, label }) => (
-                <div key={key} className="flex justify-between text-[11px]">
+                <div key={key} className="flex justify-between text-[11px] items-center">
                   <span className="retro-label">{label}</span>
-                  <span className="retro-value">{(sheet as any)[key]}</span>
+                  {renderValue(key)}
                 </div>
               ))}
             </div>
@@ -142,15 +292,71 @@ const CharacterSheet = ({ sheet, isOwner, onDelete }: CharacterSheetProps) => {
         </div>
       </div>
 
-      {isOwner && onDelete && (
-        <div className="mt-3 text-right">
-          <button
-            onClick={onDelete}
-            className="retro-button text-xs"
-            style={{ background: "linear-gradient(180deg, hsl(0 70% 45%) 0%, hsl(0 70% 30%) 100%)" }}
-          >
-            🗑️ Deletar Ficha
-          </button>
+      {/* Maestria + Inventário side by side */}
+      <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <div className="retro-section-title text-xs">Maestria</div>
+          {maestrias.map(({ key, label }) => (
+            <div key={key} className="flex justify-between text-[11px] items-center mb-1">
+              <span className="retro-label">{label}:</span>
+              {renderValue(key)}
+            </div>
+          ))}
+        </div>
+        <div>
+          <div className="retro-section-title text-xs">Inventário</div>
+          {editing && isOwner ? (
+            <textarea
+              className="retro-input w-full text-xs min-h-[100px]"
+              value={form.inventario ?? ""}
+              onChange={(e) => handleTextChange("inventario", e.target.value)}
+            />
+          ) : (
+            <div className="text-xs retro-value whitespace-pre-wrap min-h-[40px]">
+              {(sheet as any).inventario || "Vazio"}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Actions */}
+      {isOwner && (
+        <div className="mt-3 flex gap-2 justify-end">
+          {editing ? (
+            <>
+              <button
+                onClick={() => { setEditing(false); setForm({ ...sheet }); }}
+                className="retro-button text-xs"
+              >
+                ❌ Cancelar
+              </button>
+              <button
+                onClick={handleSave}
+                className="retro-button text-xs"
+                disabled={saving}
+              >
+                {saving ? "Salvando..." : "💾 Salvar"}
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => setEditing(true)}
+                className="retro-button text-xs"
+              >
+                ✏️ Editar
+              </button>
+              {onDelete && (
+                <button
+                  onClick={onDelete}
+                  className="retro-button text-xs"
+                  style={{ background: "linear-gradient(180deg, hsl(0 70% 45%) 0%, hsl(0 70% 30%) 100%)" }}
+                >
+                  🗑️ Deletar
+                </button>
+              )}
+            </>
+          )}
         </div>
       )}
     </div>

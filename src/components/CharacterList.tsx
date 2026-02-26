@@ -65,6 +65,7 @@ const CharacterList = ({ ip, refreshKey }: CharacterListProps) => {
           sheet={sheet}
           isOwner={sheet.ip_address === ip}
           onDelete={() => handleDelete(sheet.id)}
+          onUpdated={fetchSheets}
         />
       ))}
     </div>

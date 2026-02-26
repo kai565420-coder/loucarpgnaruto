@@ -40,8 +40,14 @@ export type Database = {
           imobilizacao: number
           iniciativa: number
           intimidacao: number
+          inventario: string
           ip_address: string
           kenjutsu: number
+          maestria_agua: number
+          maestria_fogo: number
+          maestria_raio: number
+          maestria_terra: number
+          maestria_vento: number
           moldagem_elemental: number
           ninjutsu_medico: number
           nome: string
@@ -86,8 +92,14 @@ export type Database = {
           imobilizacao?: number
           iniciativa?: number
           intimidacao?: number
+          inventario?: string
           ip_address: string
           kenjutsu?: number
+          maestria_agua?: number
+          maestria_fogo?: number
+          maestria_raio?: number
+          maestria_terra?: number
+          maestria_vento?: number
           moldagem_elemental?: number
           ninjutsu_medico?: number
           nome: string
@@ -132,8 +144,14 @@ export type Database = {
           imobilizacao?: number
           iniciativa?: number
           intimidacao?: number
+          inventario?: string
           ip_address?: string
           kenjutsu?: number
+          maestria_agua?: number
+          maestria_fogo?: number
+          maestria_raio?: number
+          maestria_terra?: number
+          maestria_vento?: number
           moldagem_elemental?: number
           ninjutsu_medico?: number
           nome?: string
