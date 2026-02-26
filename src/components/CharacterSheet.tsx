@@ -319,10 +319,10 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
               <div className="text-accent font-bold text-[11px] border-b border-border pb-1 mb-1">
                 {grupo}
               </div>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
                 {items.map(({ key, label }) => (
-                  <div key={key} className="flex items-center text-[11px] py-[2px]">
-                    <span className="retro-label shrink-0 w-[140px]">{label}:</span>
+                  <div key={key} className="grid grid-cols-[minmax(0,1fr)_60px] items-center gap-2 text-[11px] py-[2px]">
+                    <span className="retro-label leading-tight">{label}:</span>
                     {renderValue(key)}
                   </div>
                 ))}
