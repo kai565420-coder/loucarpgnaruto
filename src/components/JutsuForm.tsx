@@ -142,7 +142,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
     const parts = text.split(/(\*\*[^*]+\*\*)/g);
     return parts.map((part, i) => {
       if (part.startsWith("**") && part.endsWith("**")) {
-        return <strong key={i} className="font-bold">{part.slice(2, -2)}</strong>;
+        return <strong key={i} className="font-bold text-accent text-sm">{part.slice(2, -2)}</strong>;
       }
       return <span key={i}>{part}</span>;
     });
