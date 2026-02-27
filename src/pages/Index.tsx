@@ -6,6 +6,7 @@ import CharacterList from "@/components/CharacterList";
 import CharacterForm from "@/components/CharacterForm";
 import JutsuForm from "@/components/JutsuForm";
 import { useUserIp } from "@/hooks/useUserIp";
+import { isAdmin } from "@/lib/admin";
 
 const Index = () => {
   const { ip, loading } = useUserIp();
@@ -32,7 +33,7 @@ const Index = () => {
         </div>
 
         <div className="flex-1 flex max-w-[1000px] mx-auto w-full py-3 px-2 gap-3">
-          <RetroSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+          <RetroSidebar activeTab={activeTab} onTabChange={setActiveTab} ip={ip || "unknown"} />
 
           <main className="flex-1 min-w-0">
             {loading ? (
@@ -43,7 +44,7 @@ const Index = () => {
               <CharacterList ip={ip || "unknown"} refreshKey={refreshKey} />
             ) : activeTab === "criar" ? (
               <CharacterForm ip={ip || "unknown"} onCreated={handleCreated} />
-            ) : activeTab === "criar-jutsu" ? (
+            ) : activeTab === "criar-jutsu" && isAdmin(ip || "unknown") ? (
               <JutsuForm ip={ip || "unknown"} onCreated={() => setActiveTab("fichas")} />
             ) : activeTab === "sobre" ? (
               <div className="retro-panel p-4">
