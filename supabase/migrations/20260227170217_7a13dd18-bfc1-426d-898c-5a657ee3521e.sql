@@ -1,0 +1,1 @@
+ALTER TABLE public.character_sheets ADD COLUMN rank_ninja TEXT NOT NULL DEFAULT '';

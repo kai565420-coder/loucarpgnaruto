@@ -10,6 +10,7 @@ interface CharacterFormProps {
 const defaultValues = {
   nome: "",
   idade: "",
+  rank_ninja: "",
   elementos: "",
   classe: "",
   talento: "",
@@ -174,6 +175,7 @@ const CharacterForm = ({ ip, onCreated }: CharacterFormProps) => {
           {[
             { key: "nome", label: "Nome" },
             { key: "idade", label: "Idade" },
+            { key: "rank_ninja", label: "Rank Ninja" },
             { key: "elementos", label: "Elementos" },
             { key: "classe", label: "Classe" },
             { key: "talento", label: "Talento" },

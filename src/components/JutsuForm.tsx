@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { getJutsuEmoji } from "@/lib/jutsuEmoji";
+import JutsuWindow from "./JutsuWindow";
 
 interface JutsuFormProps {
   ip: string;
@@ -25,6 +26,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [previewJutsu, setPreviewJutsu] = useState<Jutsu | null>(null);
 
   const fetchJutsus = useCallback(async () => {
     setLoading(true);
@@ -249,7 +251,12 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
               .map((jutsu) => (
               <div key={jutsu.id} className="border-b border-border last:border-0 py-2 px-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-accent font-bold">{getJutsuEmoji(jutsu.nome)} {jutsu.nome}</span>
+                  <button
+                    onClick={() => setPreviewJutsu(jutsu)}
+                    className="text-xs text-accent font-bold hover:underline text-left"
+                  >
+                    {getJutsuEmoji(jutsu.nome)} {jutsu.nome}
+                  </button>
                   <div className="flex gap-2">
                     <button
                       onClick={() => startEdit(jutsu)}
@@ -267,16 +274,20 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
                     </button>
                   </div>
                 </div>
-                {jutsu.informacoes && (
-                  <div className="text-[11px] text-foreground mt-1 whitespace-pre-wrap leading-relaxed line-clamp-3">
-                    {renderBoldText(jutsu.informacoes)}
-                  </div>
-                )}
               </div>
             ))
           )}
         </div>
       </div>
+
+      {previewJutsu && (
+        <JutsuWindow
+          jutsu={previewJutsu}
+          onClose={() => setPreviewJutsu(null)}
+          onMinimize={() => setPreviewJutsu(null)}
+          initialPosition={{ x: 100, y: 100 }}
+        />
+      )}
     </div>
   );
 };
