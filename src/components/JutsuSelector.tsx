@@ -52,7 +52,7 @@ const JutsuSelector = ({ characterId, assignedJutsuIds, onChanged, onClose }: Ju
         if (error) throw error;
       }
 
-      toast.success("Jutsus atualizados!");
+      toast.success("Habilidades atualizadas!");
       onChanged();
       onClose();
     } catch (err: any) {
@@ -64,9 +64,9 @@ const JutsuSelector = ({ characterId, assignedJutsuIds, onChanged, onClose }: Ju
 
   return (
     <div className="retro-panel p-3">
-      <div className="retro-section-title text-xs">Adicionar Jutsus</div>
+      <div className="retro-section-title text-xs">Adicionar Habilidades</div>
       {allJutsus.length === 0 ? (
-        <p className="text-muted-foreground text-[11px]">Nenhum jutsu cadastrado. Crie um primeiro!</p>
+        <p className="text-muted-foreground text-[11px]">Nenhuma habilidade cadastrada. Crie uma primeiro!</p>
       ) : (
         <div className="max-h-[200px] overflow-y-auto mb-2">
           {allJutsus.map((j) => (

@@ -356,14 +356,14 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
             onClick={() => setShowJutsus(!showJutsus)}
             className="retro-button text-xs"
           >
-            🌀 Jutsus ({jutsus.length})
+            🌀 Habilidades ({jutsus.length})
           </button>
           {editing && isOwner && (
             <button
               onClick={() => setShowJutsuSelector(!showJutsuSelector)}
               className="retro-button text-xs"
             >
-              ➕ Adicionar Jutsu
+              ➕ Adicionar Habilidade
             </button>
           )}
         </div>
@@ -377,20 +377,28 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
           />
         )}
 
-        {showJutsus && (
+      {showJutsus && (
           <div className="retro-panel p-2">
             {jutsus.length === 0 ? (
-              <p className="text-muted-foreground text-[11px]">Nenhum jutsu atribuído.</p>
+              <p className="text-muted-foreground text-[11px]">Nenhuma habilidade atribuída.</p>
             ) : (
-              jutsus.map((jutsu) => (
-                <button
-                  key={jutsu.id}
-                  onClick={() => handleOpenJutsu(jutsu)}
-                  className="block w-full text-left px-2 py-1 text-xs text-foreground hover:bg-muted hover:text-accent transition-colors border-b border-border last:border-0"
-                >
-                  🌀 {jutsu.nome}
-                </button>
-              ))
+              [...jutsus].sort((a, b) => a.nome.localeCompare(b.nome)).map((jutsu) => {
+                const getEmoji = (nome: string) => {
+                  if (nome.startsWith("Ninjutsu")) return "🌀";
+                  if (nome.startsWith("Genjutsu")) return "👁️";
+                  if (nome.startsWith("Taijutsu")) return "💪";
+                  return "🥷";
+                };
+                return (
+                  <button
+                    key={jutsu.id}
+                    onClick={() => handleOpenJutsu(jutsu)}
+                    className="block w-full text-left px-2 py-1 text-xs text-foreground hover:bg-muted hover:text-accent transition-colors border-b border-border last:border-0"
+                  >
+                    {getEmoji(jutsu.nome)} {jutsu.nome}
+                  </button>
+                );
+              })
             )}
           </div>
         )}
