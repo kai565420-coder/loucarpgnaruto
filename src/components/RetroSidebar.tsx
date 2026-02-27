@@ -12,7 +12,7 @@ const menuItems = [
     items: [
       { id: "fichas", label: "📜 Ver Fichas" },
       { id: "criar", label: "✏️ Criar Ficha" },
-      { id: "criar-jutsu", label: "🌀 Criar Jutsu" },
+      { id: "criar-jutsu", label: "🌀 Criar Habilidade" },
     ],
   },
   {
