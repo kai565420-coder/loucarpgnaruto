@@ -15,6 +15,16 @@ interface JutsuWindowProps {
   initialPosition?: { x: number; y: number };
 }
 
+const renderBoldText = (text: string) => {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={i} className="font-bold">{part.slice(2, -2)}</strong>;
+    }
+    return <span key={i}>{part}</span>;
+  });
+};
+
 const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition }: JutsuWindowProps) => {
   const isMobile = useIsMobile();
   const [position, setPosition] = useState(initialPosition || { x: 50, y: 50 });
@@ -84,8 +94,8 @@ const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition }: JutsuWindo
                 className="w-full max-h-[200px] object-contain border border-border mb-3"
               />
             )}
-            <div className="text-xs text-foreground whitespace-pre-wrap leading-relaxed">
-              {jutsu.informacoes || "Sem informações."}
+          <div className="text-xs text-foreground whitespace-pre-wrap leading-relaxed">
+              {renderBoldText(jutsu.informacoes || "Sem informações.")}
             </div>
           </div>
         </div>
@@ -144,7 +154,7 @@ const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition }: JutsuWindo
             />
           )}
           <div className="text-xs text-foreground whitespace-pre-wrap leading-relaxed">
-            {jutsu.informacoes || "Sem informações."}
+            {renderBoldText(jutsu.informacoes || "Sem informações.")}
           </div>
         </div>
       </div>
