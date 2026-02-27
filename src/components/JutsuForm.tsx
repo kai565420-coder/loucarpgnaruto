@@ -24,6 +24,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
   const [jutsus, setJutsus] = useState<Jutsu[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchJutsus = useCallback(async () => {
     setLoading(true);
@@ -227,13 +228,25 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
       {/* Lista de jutsus existentes */}
       <div className="mt-6">
         <div className="retro-section-title">📋 Habilidades Cadastradas</div>
+        <div className="mb-2">
+          <input
+            type="text"
+            className="retro-input w-full text-xs"
+            placeholder="🔍 Buscar habilidade..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
         <div className="retro-panel p-2 max-h-[400px] overflow-y-auto">
           {loading ? (
             <p className="text-muted-foreground text-[11px] text-center py-2">Carregando...</p>
           ) : jutsus.length === 0 ? (
             <p className="text-muted-foreground text-[11px] text-center py-2">Nenhuma habilidade cadastrada ainda.</p>
           ) : (
-            [...jutsus].sort((a, b) => a.nome.localeCompare(b.nome)).map((jutsu) => (
+            [...jutsus]
+              .sort((a, b) => a.nome.localeCompare(b.nome))
+              .filter((j) => j.nome.toLowerCase().includes(searchQuery.toLowerCase()))
+              .map((jutsu) => (
               <div key={jutsu.id} className="border-b border-border last:border-0 py-2 px-1">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-accent font-bold">{getJutsuEmoji(jutsu.nome)} {jutsu.nome}</span>

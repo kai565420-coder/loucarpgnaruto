@@ -17,15 +17,15 @@ const RetroSidebar = ({ activeTab, onTabChange, ip }: RetroSidebarProps) => {
     {
       title: "Fichas",
       items: [
-        { id: "fichas", label: "📜 Ver Fichas" },
-        { id: "criar", label: "✏️ Criar Ficha" },
-        ...(admin ? [{ id: "criar-jutsu", label: "🌀 Criar Habilidade" }] : []),
+        { id: "fichas", label: "Ver Fichas", icon: "/images/icon-ver-fichas.png" },
+        { id: "criar", label: "Criar Ficha", icon: "/images/icon-criar-ficha.png" },
+        ...(admin ? [{ id: "criar-jutsu", label: "Criar Habilidade", icon: null as string | null }] : []),
       ],
     },
     {
       title: "Info",
       items: [
-        { id: "sobre", label: "📖 Sobre" },
+        { id: "sobre", label: "Sobre", icon: "/images/icon-sobre.png" },
       ],
     },
   ];
@@ -69,12 +69,17 @@ const RetroSidebar = ({ activeTab, onTabChange, ip }: RetroSidebarProps) => {
                   <button
                     key={item.id}
                     onClick={() => handleTabChange(item.id)}
-                    className={`block w-full text-left px-3 py-2 text-xs transition-colors ${
+                    className={`flex items-center gap-2 w-full text-left px-3 py-2 text-xs transition-colors ${
                       activeTab === item.id
                         ? "bg-muted text-accent"
                         : "text-foreground hover:bg-muted hover:text-accent"
                     }`}
                   >
+                    {item.icon ? (
+                      <img src={item.icon} alt="" className="w-4 h-4 object-contain" />
+                    ) : (
+                      <span>🌀</span>
+                    )}
                     {item.label}
                   </button>
                 ))}
@@ -98,12 +103,17 @@ const RetroSidebar = ({ activeTab, onTabChange, ip }: RetroSidebarProps) => {
               <button
                 key={item.id}
                 onClick={() => onTabChange(item.id)}
-                className={`block w-full text-left px-3 py-2 text-xs transition-colors ${
+                className={`flex items-center gap-2 w-full text-left px-3 py-2 text-xs transition-colors ${
                   activeTab === item.id
                     ? "bg-muted text-accent"
                     : "text-foreground hover:bg-muted hover:text-accent"
                 }`}
               >
+                {item.icon ? (
+                  <img src={item.icon} alt="" className="w-4 h-4 object-contain" />
+                ) : (
+                  <span>🌀</span>
+                )}
                 {item.label}
               </button>
             ))}
