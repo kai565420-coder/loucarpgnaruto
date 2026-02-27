@@ -284,6 +284,11 @@ const CharacterSheet = ({ sheet, isOwner, ip, onDelete, onUpdated }: CharacterSh
           ) : (
             <div className="w-[120px] h-[120px] border-2 border-border flex items-center justify-center text-muted-foreground text-xs">Sem Imagem</div>
           )}
+          {(sheet as any).rank_ninja && (
+            <div className="text-[10px] text-center text-accent font-bold mt-1 border border-border bg-card px-1 py-0.5">
+              {(sheet as any).rank_ninja}
+            </div>
+          )}
         </div>
         <div className="flex-1 min-w-[200px]">
           <table className="retro-table text-xs mb-2">
