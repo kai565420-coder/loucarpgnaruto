@@ -22,6 +22,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
   const [saving, setSaving] = useState(false);
   const [jutsus, setJutsus] = useState<Jutsu[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const fetchJutsus = useCallback(async () => {
     setLoading(true);
@@ -67,6 +68,21 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
     }
   };
 
+  const startEdit = (jutsu: Jutsu) => {
+    setEditingId(jutsu.id);
+    setNome(jutsu.nome);
+    setInformacoes(jutsu.informacoes);
+    setImageFile(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setNome("");
+    setInformacoes("");
+    setImageFile(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nome.trim()) {
@@ -92,23 +108,31 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
         imagem_url = urlData.publicUrl;
       }
 
-      const { error } = await supabase.from("jutsus").insert({
-        nome,
-        informacoes,
-        imagem_url,
-        ip_address: ip,
-      });
+      if (editingId) {
+        const updateData: Record<string, any> = { nome, informacoes };
+        if (imagem_url) updateData.imagem_url = imagem_url;
+        const { error } = await supabase.from("jutsus").update(updateData).eq("id", editingId);
+        if (error) throw error;
+        toast.success("Habilidade atualizada!");
+        setEditingId(null);
+      } else {
+        const { error } = await supabase.from("jutsus").insert({
+          nome,
+          informacoes,
+          imagem_url,
+          ip_address: ip,
+        });
+        if (error) throw error;
+        toast.success("Habilidade criada com sucesso!");
+      }
 
-      if (error) throw error;
-
-      toast.success("Habilidade criada com sucesso!");
       setNome("");
       setInformacoes("");
       setImageFile(null);
       fetchJutsus();
       onCreated();
     } catch (err: any) {
-      toast.error("Erro ao criar habilidade: " + err.message);
+      toast.error("Erro: " + err.message);
     } finally {
       setSaving(false);
     }
@@ -127,7 +151,9 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        <div className="retro-section-title">🌀 Criar Nova Habilidade</div>
+        <div className="retro-section-title">
+          {editingId ? "✏️ Editar Habilidade" : "🌀 Criar Nova Habilidade"}
+        </div>
 
         <div className="retro-panel p-3 mb-3">
           <div className="mb-3">
@@ -176,9 +202,16 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
           </div>
         </div>
 
-        <button type="submit" className="retro-button w-full py-2" disabled={saving}>
-          {saving ? "Salvando..." : "💾 Salvar Habilidade"}
-        </button>
+        <div className="flex gap-2">
+          {editingId && (
+            <button type="button" onClick={cancelEdit} className="retro-button flex-1 py-2">
+              ❌ Cancelar Edição
+            </button>
+          )}
+          <button type="submit" className="retro-button flex-1 py-2" disabled={saving}>
+            {saving ? "Salvando..." : editingId ? "💾 Atualizar Habilidade" : "💾 Salvar Habilidade"}
+          </button>
+        </div>
       </form>
 
       {/* Lista de jutsus existentes */}
@@ -194,13 +227,22 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
               <div key={jutsu.id} className="border-b border-border last:border-0 py-2 px-1">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-accent font-bold">🌀 {jutsu.nome}</span>
-                  <button
-                    onClick={() => handleDelete(jutsu.id)}
-                    className="text-[10px] text-muted-foreground hover:text-destructive"
-                    title="Deletar"
-                  >
-                    🗑️
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => startEdit(jutsu)}
+                      className="text-[10px] text-muted-foreground hover:text-accent"
+                      title="Editar"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      onClick={() => handleDelete(jutsu.id)}
+                      className="text-[10px] text-muted-foreground hover:text-destructive"
+                      title="Deletar"
+                    >
+                      🗑️
+                    </button>
+                  </div>
                 </div>
                 {jutsu.informacoes && (
                   <div className="text-[11px] text-foreground mt-1 whitespace-pre-wrap leading-relaxed line-clamp-3">
