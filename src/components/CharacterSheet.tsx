@@ -109,7 +109,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
   // Jutsu state
   const [jutsus, setJutsus] = useState<Jutsu[]>([]);
   const [showJutsus, setShowJutsus] = useState(false);
-  const [openJutsu, setOpenJutsu] = useState<Jutsu | null>(null);
+  const [openJutsus, setOpenJutsus] = useState<Jutsu[]>([]);
   const [minimizedJutsus, setMinimizedJutsus] = useState<Jutsu[]>([]);
   const [showJutsuSelector, setShowJutsuSelector] = useState(false);
   const [assignedJutsuIds, setAssignedJutsuIds] = useState<string[]>([]);
@@ -184,21 +184,20 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
 
   const handleOpenJutsu = (jutsu: Jutsu) => {
     setMinimizedJutsus((prev) => prev.filter((j) => j.id !== jutsu.id));
-    setOpenJutsu(jutsu);
+    setOpenJutsus((prev) => {
+      if (prev.some((j) => j.id === jutsu.id)) return prev;
+      return [...prev, jutsu];
+    });
   };
 
-  const handleMinimizeJutsu = () => {
-    if (openJutsu) {
-      setMinimizedJutsus((prev) => [...prev.filter((j) => j.id !== openJutsu.id), openJutsu]);
-      setOpenJutsu(null);
-    }
+  const handleMinimizeJutsu = (jutsu: Jutsu) => {
+    setMinimizedJutsus((prev) => [...prev.filter((j) => j.id !== jutsu.id), jutsu]);
+    setOpenJutsus((prev) => prev.filter((j) => j.id !== jutsu.id));
   };
 
-  const handleCloseJutsu = () => {
-    if (openJutsu) {
-      setMinimizedJutsus((prev) => prev.filter((j) => j.id !== openJutsu.id));
-      setOpenJutsu(null);
-    }
+  const handleCloseJutsu = (jutsu: Jutsu) => {
+    setMinimizedJutsus((prev) => prev.filter((j) => j.id !== jutsu.id));
+    setOpenJutsus((prev) => prev.filter((j) => j.id !== jutsu.id));
   };
 
   const handleCloseMinimized = (id: string) => {
@@ -432,14 +431,16 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
         </div>
       )}
 
-      {/* Open Jutsu Window */}
-      {openJutsu && (
+      {/* Open Jutsu Windows */}
+      {openJutsus.map((jutsu, idx) => (
         <JutsuWindow
-          jutsu={openJutsu}
-          onClose={handleCloseJutsu}
-          onMinimize={handleMinimizeJutsu}
+          key={jutsu.id}
+          jutsu={jutsu}
+          onClose={() => handleCloseJutsu(jutsu)}
+          onMinimize={() => handleMinimizeJutsu(jutsu)}
+          initialPosition={{ x: 50 + idx * 30, y: 50 + idx * 30 }}
         />
-      )}
+      ))}
     </div>
   );
 };
