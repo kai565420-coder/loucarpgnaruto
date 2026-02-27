@@ -59,7 +59,7 @@ const CharacterList = ({ ip, refreshKey }: CharacterListProps) => {
   return (
     <div>
       <div className="retro-section-title">📜 Fichas de Personagens ({sheets.length})</div>
-      {sheets.map((sheet) => (
+      {[...sheets].sort((a, b) => a.nome.localeCompare(b.nome)).map((sheet) => (
         <CharacterSheet
           key={sheet.id}
           sheet={sheet}

@@ -217,13 +217,13 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
       {/* Lista de jutsus existentes */}
       <div className="mt-6">
         <div className="retro-section-title">📋 Habilidades Cadastradas</div>
-        <div className="retro-panel p-2">
+        <div className="retro-panel p-2 max-h-[400px] overflow-y-auto">
           {loading ? (
             <p className="text-muted-foreground text-[11px] text-center py-2">Carregando...</p>
           ) : jutsus.length === 0 ? (
             <p className="text-muted-foreground text-[11px] text-center py-2">Nenhuma habilidade cadastrada ainda.</p>
           ) : (
-            jutsus.map((jutsu) => (
+            [...jutsus].sort((a, b) => a.nome.localeCompare(b.nome)).map((jutsu) => (
               <div key={jutsu.id} className="border-b border-border last:border-0 py-2 px-1">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-accent font-bold">🌀 {jutsu.nome}</span>
