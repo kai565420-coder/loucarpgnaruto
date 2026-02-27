@@ -4,10 +4,13 @@ import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
 import JutsuWindow from "./JutsuWindow";
 import JutsuSelector from "./JutsuSelector";
+import { isAdmin } from "@/lib/admin";
+import { getJutsuEmoji } from "@/lib/jutsuEmoji";
 
 interface CharacterSheetProps {
   sheet: Tables<"character_sheets">;
   isOwner: boolean;
+  ip: string;
   onDelete?: () => void;
   onUpdated?: () => void;
 }
@@ -100,7 +103,8 @@ const pericias = [
   },
 ];
 
-const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetProps) => {
+const CharacterSheet = ({ sheet, isOwner, ip, onDelete, onUpdated }: CharacterSheetProps) => {
+  const canEdit = isOwner || isAdmin(ip);
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<Record<string, any>>({ ...sheet });
@@ -223,7 +227,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
   }
 
   const renderValue = (key: string, type: "number" | "text" = "number") => {
-    if (editing && isOwner) {
+    if (editing && canEdit) {
       return type === "number" ? (
         <input type="number" className="retro-input w-16 text-center text-xs" value={form[key] ?? 0} onChange={(e) => handleNumberChange(key, e.target.value)} />
       ) : (
@@ -242,7 +246,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
       <div className="mb-2">
         <div className="flex justify-between text-[11px] mb-1">
           <span className="retro-label font-bold">{label}</span>
-          {editing && isOwner ? (
+          {editing && canEdit ? (
             <span className="flex items-center gap-1">
               <input type="number" className="retro-input w-12 text-center text-[10px]" value={form[key] ?? 0} onChange={(e) => handleNumberChange(key, e.target.value)} />
               <span className="text-muted-foreground">/</span>
@@ -298,7 +302,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
           {atributos.map(({ key, label }) => (
             <div key={key} className="text-xs retro-atributo-highlight p-2 border border-accent">
               <span className="retro-label">{label}: </span>
-              {editing && isOwner ? (
+              {editing && canEdit ? (
                 <input type="number" className="retro-input w-14 text-center text-xs" value={form[key] ?? 0} onChange={(e) => handleNumberChange(key, e.target.value)} />
               ) : (
                 <span className="text-accent font-bold text-sm">{(sheet as any)[key]}</span>
@@ -341,7 +345,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
         </div>
         <div className="retro-panel p-2">
           <div className="retro-section-title text-xs">Inventário</div>
-          {editing && isOwner ? (
+          {editing && canEdit ? (
             <textarea className="retro-input w-full text-xs min-h-[100px]" value={form.inventario ?? ""} onChange={(e) => handleTextChange("inventario", e.target.value)} />
           ) : (
             <div className="text-xs retro-value whitespace-pre-wrap min-h-[40px]">{(sheet as any).inventario || "Vazio"}</div>
@@ -358,7 +362,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
           >
             🌀 Habilidades ({jutsus.length})
           </button>
-          {editing && isOwner && (
+          {editing && canEdit && (
             <button
               onClick={() => setShowJutsuSelector(!showJutsuSelector)}
               className="retro-button text-xs"
@@ -368,7 +372,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
           )}
         </div>
 
-        {showJutsuSelector && editing && isOwner && (
+        {showJutsuSelector && editing && canEdit && (
           <JutsuSelector
             characterId={sheet.id}
             assignedJutsuIds={assignedJutsuIds}
@@ -383,19 +387,13 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
               <p className="text-muted-foreground text-[11px]">Nenhuma habilidade atribuída.</p>
             ) : (
               [...jutsus].sort((a, b) => a.nome.localeCompare(b.nome)).map((jutsu) => {
-                const getEmoji = (nome: string) => {
-                  if (nome.startsWith("Ninjutsu")) return "🌀";
-                  if (nome.startsWith("Genjutsu")) return "👁️";
-                  if (nome.startsWith("Taijutsu")) return "💪";
-                  return "🥷";
-                };
                 return (
                   <button
                     key={jutsu.id}
                     onClick={() => handleOpenJutsu(jutsu)}
                     className="block w-full text-left px-2 py-1 text-xs text-foreground hover:bg-muted hover:text-accent transition-colors border-b border-border last:border-0"
                   >
-                    {getEmoji(jutsu.nome)} {jutsu.nome}
+                    {getJutsuEmoji(jutsu.nome)} {jutsu.nome}
                   </button>
                 );
               })
@@ -419,7 +417,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated }: CharacterSheetP
       )}
 
       {/* Actions */}
-      {isOwner && (
+      {canEdit && (
         <div className="mt-3 flex gap-2 justify-end">
           {editing ? (
             <>

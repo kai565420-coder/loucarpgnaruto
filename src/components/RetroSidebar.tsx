@@ -1,31 +1,34 @@
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { isAdmin } from "@/lib/admin";
 
 interface RetroSidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  ip: string;
 }
 
-const menuItems = [
-  {
-    title: "Fichas",
-    items: [
-      { id: "fichas", label: "📜 Ver Fichas" },
-      { id: "criar", label: "✏️ Criar Ficha" },
-      { id: "criar-jutsu", label: "🌀 Criar Habilidade" },
-    ],
-  },
-  {
-    title: "Info",
-    items: [
-      { id: "sobre", label: "📖 Sobre" },
-    ],
-  },
-];
-
-const RetroSidebar = ({ activeTab, onTabChange }: RetroSidebarProps) => {
+const RetroSidebar = ({ activeTab, onTabChange, ip }: RetroSidebarProps) => {
   const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
+  const admin = isAdmin(ip);
+
+  const menuItems = [
+    {
+      title: "Fichas",
+      items: [
+        { id: "fichas", label: "📜 Ver Fichas" },
+        { id: "criar", label: "✏️ Criar Ficha" },
+        ...(admin ? [{ id: "criar-jutsu", label: "🌀 Criar Habilidade" }] : []),
+      ],
+    },
+    {
+      title: "Info",
+      items: [
+        { id: "sobre", label: "📖 Sobre" },
+      ],
+    },
+  ];
 
   const handleTabChange = (tab: string) => {
     onTabChange(tab);

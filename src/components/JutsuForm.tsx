@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { getJutsuEmoji } from "@/lib/jutsuEmoji";
 
 interface JutsuFormProps {
   ip: string;
@@ -38,8 +39,10 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
     fetchJutsus();
   }, [fetchJutsus]);
 
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   const handleBold = () => {
-    const textarea = document.getElementById("jutsu-info-textarea") as HTMLTextAreaElement;
+    const textarea = textareaRef.current;
     if (!textarea) return;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
@@ -183,8 +186,15 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
               </span>
             </div>
             <textarea
+              ref={textareaRef}
               id="jutsu-info-textarea"
               className="retro-input w-full text-xs min-h-[200px]"
+              onKeyDown={(e) => {
+                if (e.ctrlKey && e.key === "b") {
+                  e.preventDefault();
+                  handleBold();
+                }
+              }}
               value={informacoes}
               onChange={(e) => setInformacoes(e.target.value)}
               placeholder="Descreva o jutsu ou habilidade em detalhes... Use **texto** para negrito."
@@ -226,7 +236,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
             [...jutsus].sort((a, b) => a.nome.localeCompare(b.nome)).map((jutsu) => (
               <div key={jutsu.id} className="border-b border-border last:border-0 py-2 px-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-accent font-bold">🌀 {jutsu.nome}</span>
+                  <span className="text-xs text-accent font-bold">{getJutsuEmoji(jutsu.nome)} {jutsu.nome}</span>
                   <div className="flex gap-2">
                     <button
                       onClick={() => startEdit(jutsu)}
