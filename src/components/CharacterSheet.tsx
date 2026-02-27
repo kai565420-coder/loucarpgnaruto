@@ -155,7 +155,7 @@ const CharacterSheet = ({ sheet, isOwner, ip, onDelete, onUpdated }: CharacterSh
     const { error } = await supabase
       .from("character_sheets")
       .update({
-        nome: form.nome, idade: form.idade, elementos: form.elementos, classe: form.classe, talento: form.talento,
+        nome: form.nome, idade: form.idade, rank_ninja: form.rank_ninja, elementos: form.elementos, classe: form.classe, talento: form.talento,
         vida: form.vida, vida_max: form.vida_max, sanidade: form.sanidade, sanidade_max: form.sanidade_max,
         chakra: form.chakra, chakra_max: form.chakra_max, forca_fisica: form.forca_fisica, destreza: form.destreza,
         taijutsu: form.taijutsu, forca_bruta: form.forca_bruta, imobilizacao: form.imobilizacao,
@@ -221,7 +221,12 @@ const CharacterSheet = ({ sheet, isOwner, ip, onDelete, onUpdated }: CharacterSh
           <div className="w-[40px] h-[40px] border border-border flex items-center justify-center text-muted-foreground text-[8px]">?</div>
         )}
         <span className="text-accent font-bold text-xs">{sheet.nome}</span>
-        <span className="ml-auto text-muted-foreground text-[10px]">▼ expandir</span>
+        <div className="flex gap-3 ml-auto items-center">
+          <span className="text-[10px] text-foreground">💖 {(sheet as any).vida ?? 0}/{(sheet as any).vida_max ?? 0}</span>
+          <span className="text-[10px] text-foreground">🌀 {(sheet as any).chakra ?? 0}/{(sheet as any).chakra_max ?? 0}</span>
+          <span className="text-[10px] text-foreground">🧠 {(sheet as any).sanidade ?? 0}/{(sheet as any).sanidade_max ?? 0}</span>
+          <span className="text-muted-foreground text-[10px]">▼</span>
+        </div>
       </div>
     );
   }
@@ -284,6 +289,7 @@ const CharacterSheet = ({ sheet, isOwner, ip, onDelete, onUpdated }: CharacterSh
           <table className="retro-table text-xs mb-2">
             <tbody>
               <tr><td className="retro-label w-24">Idade:</td><td>{renderValue("idade", "text")}</td></tr>
+              <tr><td className="retro-label">Rank Ninja:</td><td>{renderValue("rank_ninja", "text")}</td></tr>
               <tr><td className="retro-label">Elementos:</td><td>{renderValue("elementos", "text")}</td></tr>
               <tr><td className="retro-label">Classe:</td><td>{renderValue("classe", "text")}</td></tr>
               <tr><td className="retro-label">Talento:</td><td>{renderValue("talento", "text")}</td></tr>

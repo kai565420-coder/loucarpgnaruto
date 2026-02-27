@@ -88,6 +88,7 @@ export type Database = {
           moldagem_elemental: number
           ninjutsu_medico: number
           nome: string
+          rank_ninja: string
           recuperacao: number
           reflexos_ninja: number
           resistencia_fisica: number
@@ -143,6 +144,7 @@ export type Database = {
           moldagem_elemental?: number
           ninjutsu_medico?: number
           nome: string
+          rank_ninja?: string
           recuperacao?: number
           reflexos_ninja?: number
           resistencia_fisica?: number
@@ -198,6 +200,7 @@ export type Database = {
           moldagem_elemental?: number
           ninjutsu_medico?: number
           nome?: string
+          rank_ninja?: string
           recuperacao?: number
           reflexos_ninja?: number
           resistencia_fisica?: number
