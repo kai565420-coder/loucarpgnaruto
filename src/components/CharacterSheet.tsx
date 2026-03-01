@@ -294,7 +294,6 @@ const CharacterSheet = ({ sheet, isOwner, ip, onDelete, onUpdated }: CharacterSh
           <table className="retro-table text-xs mb-2">
             <tbody>
               <tr><td className="retro-label w-24">Idade:</td><td>{renderValue("idade", "text")}</td></tr>
-              <tr><td className="retro-label">Rank Ninja:</td><td>{renderValue("rank_ninja", "text")}</td></tr>
               <tr><td className="retro-label">Elementos:</td><td>{renderValue("elementos", "text")}</td></tr>
               <tr><td className="retro-label">Classe:</td><td>{renderValue("classe", "text")}</td></tr>
               <tr><td className="retro-label">Talento:</td><td>{renderValue("talento", "text")}</td></tr>
