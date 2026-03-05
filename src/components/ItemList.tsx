@@ -298,16 +298,14 @@ const ItemList = ({ ip }: ItemListProps) => {
                 <div className="mt-2 border-t border-border pt-2" onClick={(e) => e.stopPropagation()}>
                   {item.descricao && (
                     <div className="mb-1">
-                      <span className="retro-label text-[10px]">Descrição:</span>
                       <p className="text-[11px] text-foreground whitespace-pre-wrap leading-relaxed">
                         {renderBoldText(item.descricao)}
                       </p>
                     </div>
                   )}
                   {item.valor && (
-                    <div className="mb-1">
-                      <span className="retro-label text-[10px]">Valor:</span>
-                      <span className="text-[11px] text-foreground ml-1">{item.valor}</span>
+                    <div className="mb-1 mt-1">
+                      <span className="text-xs font-bold text-accent">Valor: {item.valor}</span>
                     </div>
                   )}
                   {admin && (
