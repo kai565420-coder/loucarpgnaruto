@@ -26,6 +26,7 @@ const RetroSidebar = ({ activeTab, onTabChange, ip }: RetroSidebarProps) => {
       title: "Info",
       items: [
         { id: "sobre", label: "Sobre", icon: "/images/icon-sobre.png" },
+        { id: "itens", label: "Itens", icon: "/images/icon-itens.png" },
       ],
     },
   ];
