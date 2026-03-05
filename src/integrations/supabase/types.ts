@@ -221,6 +221,36 @@ export type Database = {
         }
         Relationships: []
       }
+      items: {
+        Row: {
+          created_at: string
+          descricao: string
+          id: string
+          imagem_url: string | null
+          ip_address: string
+          nome: string
+          valor: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string
+          id?: string
+          imagem_url?: string | null
+          ip_address: string
+          nome: string
+          valor?: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string
+          id?: string
+          imagem_url?: string | null
+          ip_address?: string
+          nome?: string
+          valor?: string
+        }
+        Relationships: []
+      }
       jutsus: {
         Row: {
           created_at: string

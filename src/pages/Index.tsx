@@ -5,6 +5,7 @@ import RetroFooter from "@/components/RetroFooter";
 import CharacterList from "@/components/CharacterList";
 import CharacterForm from "@/components/CharacterForm";
 import JutsuForm from "@/components/JutsuForm";
+import ItemList from "@/components/ItemList";
 import { useUserIp } from "@/hooks/useUserIp";
 import { isAdmin } from "@/lib/admin";
 
@@ -46,6 +47,8 @@ const Index = () => {
               <CharacterForm ip={ip || "unknown"} onCreated={handleCreated} />
             ) : activeTab === "criar-jutsu" && isAdmin(ip || "unknown") ? (
               <JutsuForm ip={ip || "unknown"} onCreated={() => setActiveTab("fichas")} />
+            ) : activeTab === "itens" ? (
+              <ItemList ip={ip || "unknown"} />
             ) : activeTab === "sobre" ? (
               <div className="retro-panel p-4">
                 <div className="retro-section-title">📖 Sobre o Sistema</div>
