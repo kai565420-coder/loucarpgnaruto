@@ -38,7 +38,7 @@ const ItemList = ({ ip }: ItemListProps) => {
     const { data } = await supabase
       .from("items")
       .select("*")
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: true });
     setItems(data || []);
     setLoading(false);
   }, []);
@@ -160,8 +160,7 @@ const ItemList = ({ ip }: ItemListProps) => {
     });
   };
 
-  const filtered = [...items]
-    .sort((a, b) => a.nome.localeCompare(b.nome))
+  const filtered = items
     .filter((i) => i.nome.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
@@ -276,7 +275,7 @@ const ItemList = ({ ip }: ItemListProps) => {
           {filtered.map((item) => (
             <div
               key={item.id}
-              className="retro-panel p-2 cursor-pointer hover:border-accent transition-colors"
+              className={`retro-panel p-2 cursor-pointer hover:border-accent transition-colors ${expandedId === item.id ? "col-span-2" : ""}`}
               onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
             >
               {/* Collapsed: image + name */}
