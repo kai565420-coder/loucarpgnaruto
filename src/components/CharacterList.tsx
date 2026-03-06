@@ -75,6 +75,7 @@ const CharacterList = ({ ip, refreshKey, onOpenJutsu }: CharacterListProps) => {
           ip={ip}
           onDelete={() => handleDelete(sheet.id)}
           onUpdated={fetchSheets}
+          onOpenJutsu={onOpenJutsu}
         />
       ))}
     </div>
