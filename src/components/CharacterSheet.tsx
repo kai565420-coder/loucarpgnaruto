@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
-import JutsuWindow from "./JutsuWindow";
 import JutsuSelector from "./JutsuSelector";
 import { isAdmin } from "@/lib/admin";
 import { getJutsuEmoji } from "@/lib/jutsuEmoji";
