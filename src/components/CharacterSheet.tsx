@@ -186,25 +186,7 @@ const CharacterSheet = ({ sheet, isOwner, ip, onDelete, onUpdated, onOpenJutsu }
   };
 
   const handleOpenJutsu = (jutsu: Jutsu) => {
-    setMinimizedJutsus((prev) => prev.filter((j) => j.id !== jutsu.id));
-    setOpenJutsus((prev) => {
-      if (prev.some((j) => j.id === jutsu.id)) return prev;
-      return [...prev, jutsu];
-    });
-  };
-
-  const handleMinimizeJutsu = (jutsu: Jutsu) => {
-    setMinimizedJutsus((prev) => [...prev.filter((j) => j.id !== jutsu.id), jutsu]);
-    setOpenJutsus((prev) => prev.filter((j) => j.id !== jutsu.id));
-  };
-
-  const handleCloseJutsu = (jutsu: Jutsu) => {
-    setMinimizedJutsus((prev) => prev.filter((j) => j.id !== jutsu.id));
-    setOpenJutsus((prev) => prev.filter((j) => j.id !== jutsu.id));
-  };
-
-  const handleCloseMinimized = (id: string) => {
-    setMinimizedJutsus((prev) => prev.filter((j) => j.id !== id));
+    onOpenJutsu?.(jutsu);
   };
 
   // Collapsed view
