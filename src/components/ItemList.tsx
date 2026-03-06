@@ -14,28 +14,18 @@ interface Item {
   created_at: string;
 }
 
-interface OpenWindow {
-  item: Item;
-  position: { x: number; y: number };
-}
-
-interface MinimizedWindow {
-  item: Item;
-}
-
 interface ItemListProps {
   ip: string;
+  onOpenItem?: (item: Item) => void;
 }
 
-const ItemList = ({ ip }: ItemListProps) => {
+const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
   const admin = isAdmin(ip);
   const isMobile = useIsMobile();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [openWindows, setOpenWindows] = useState<OpenWindow[]>([]);
-  const [minimizedWindows, setMinimizedWindows] = useState<MinimizedWindow[]>([]);
 
   // Form state
   const [showForm, setShowForm] = useState(false);
