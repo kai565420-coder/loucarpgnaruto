@@ -4,12 +4,20 @@ import type { Tables } from "@/integrations/supabase/types";
 import CharacterSheet from "./CharacterSheet";
 import { toast } from "sonner";
 
+interface Jutsu {
+  id: string;
+  nome: string;
+  informacoes: string;
+  imagem_url: string | null;
+}
+
 interface CharacterListProps {
   ip: string;
   refreshKey: number;
+  onOpenJutsu?: (jutsu: Jutsu) => void;
 }
 
-const CharacterList = ({ ip, refreshKey }: CharacterListProps) => {
+const CharacterList = ({ ip, refreshKey, onOpenJutsu }: CharacterListProps) => {
   const [sheets, setSheets] = useState<Tables<"character_sheets">[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -67,6 +75,7 @@ const CharacterList = ({ ip, refreshKey }: CharacterListProps) => {
           ip={ip}
           onDelete={() => handleDelete(sheet.id)}
           onUpdated={fetchSheets}
+          onOpenJutsu={onOpenJutsu}
         />
       ))}
     </div>

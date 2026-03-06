@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { isAdmin } from "@/lib/admin";
 import { useIsMobile } from "@/hooks/use-mobile";
-import ItemWindow from "@/components/ItemWindow";
+
 
 interface Item {
   id: string;
@@ -14,28 +14,18 @@ interface Item {
   created_at: string;
 }
 
-interface OpenWindow {
-  item: Item;
-  position: { x: number; y: number };
-}
-
-interface MinimizedWindow {
-  item: Item;
-}
-
 interface ItemListProps {
   ip: string;
+  onOpenItem?: (item: Item) => void;
 }
 
-const ItemList = ({ ip }: ItemListProps) => {
+const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
   const admin = isAdmin(ip);
   const isMobile = useIsMobile();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [openWindows, setOpenWindows] = useState<OpenWindow[]>([]);
-  const [minimizedWindows, setMinimizedWindows] = useState<MinimizedWindow[]>([]);
 
   // Form state
   const [showForm, setShowForm] = useState(false);
@@ -178,12 +168,7 @@ const ItemList = ({ ip }: ItemListProps) => {
     if (isMobile) {
       setExpandedId(expandedId === item.id ? null : item.id);
     } else {
-      // Desktop: open window if not already open
-      if (openWindows.some((w) => w.item.id === item.id)) return;
-      const offset = openWindows.length * 30;
-      setOpenWindows((prev) => [...prev, { item, position: { x: 150 + offset, y: 100 + offset } }]);
-      // Remove from minimized if it was there
-      setMinimizedWindows((prev) => prev.filter((m) => m.item.id !== item.id));
+      onOpenItem?.(item);
     }
   };
 
@@ -336,47 +321,6 @@ const ItemList = ({ ip }: ItemListProps) => {
                 </div>
               )}
             </div>
-          ))}
-        </div>
-      )}
-
-      {/* Desktop: item windows */}
-      {!isMobile && openWindows.map((w) => (
-        <ItemWindow
-          key={w.item.id}
-          item={w.item}
-          initialPosition={w.position}
-          admin={admin}
-          onClose={() => setOpenWindows((prev) => prev.filter((o) => o.item.id !== w.item.id))}
-          onMinimize={() => {
-            setOpenWindows((prev) => prev.filter((o) => o.item.id !== w.item.id));
-            setMinimizedWindows((prev) => [...prev.filter((m) => m.item.id !== w.item.id), { item: w.item }]);
-          }}
-          onEdit={() => {
-            setOpenWindows((prev) => prev.filter((o) => o.item.id !== w.item.id));
-            startEdit(w.item);
-          }}
-          onDelete={() => {
-            setOpenWindows((prev) => prev.filter((o) => o.item.id !== w.item.id));
-            handleDelete(w.item.id);
-          }}
-        />
-      ))}
-
-      {/* Minimized taskbar */}
-      {!isMobile && minimizedWindows.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 flex gap-1 p-1 bg-card border-t border-border">
-          {minimizedWindows.map((m) => (
-            <button
-              key={m.item.id}
-              className="text-[10px] px-2 py-1 bg-muted border border-border hover:border-accent truncate max-w-[150px]"
-              onClick={() => {
-                setMinimizedWindows((prev) => prev.filter((x) => x.item.id !== m.item.id));
-                setOpenWindows((prev) => [...prev, { item: m.item, position: { x: 100, y: 100 } }]);
-              }}
-            >
-              🎒 {m.item.nome}
-            </button>
           ))}
         </div>
       )}

@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
-import JutsuWindow from "./JutsuWindow";
 import JutsuSelector from "./JutsuSelector";
 import { isAdmin } from "@/lib/admin";
 import { getJutsuEmoji } from "@/lib/jutsuEmoji";
@@ -13,6 +12,7 @@ interface CharacterSheetProps {
   ip: string;
   onDelete?: () => void;
   onUpdated?: () => void;
+  onOpenJutsu?: (jutsu: Jutsu) => void;
 }
 
 interface Jutsu {
@@ -103,7 +103,7 @@ const pericias = [
   },
 ];
 
-const CharacterSheet = ({ sheet, isOwner, ip, onDelete, onUpdated }: CharacterSheetProps) => {
+const CharacterSheet = ({ sheet, isOwner, ip, onDelete, onUpdated, onOpenJutsu }: CharacterSheetProps) => {
   const canEdit = isOwner || isAdmin(ip);
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -113,8 +113,6 @@ const CharacterSheet = ({ sheet, isOwner, ip, onDelete, onUpdated }: CharacterSh
   // Jutsu state
   const [jutsus, setJutsus] = useState<Jutsu[]>([]);
   const [showJutsus, setShowJutsus] = useState(false);
-  const [openJutsus, setOpenJutsus] = useState<Jutsu[]>([]);
-  const [minimizedJutsus, setMinimizedJutsus] = useState<Jutsu[]>([]);
   const [showJutsuSelector, setShowJutsuSelector] = useState(false);
   const [assignedJutsuIds, setAssignedJutsuIds] = useState<string[]>([]);
 
@@ -187,25 +185,7 @@ const CharacterSheet = ({ sheet, isOwner, ip, onDelete, onUpdated }: CharacterSh
   };
 
   const handleOpenJutsu = (jutsu: Jutsu) => {
-    setMinimizedJutsus((prev) => prev.filter((j) => j.id !== jutsu.id));
-    setOpenJutsus((prev) => {
-      if (prev.some((j) => j.id === jutsu.id)) return prev;
-      return [...prev, jutsu];
-    });
-  };
-
-  const handleMinimizeJutsu = (jutsu: Jutsu) => {
-    setMinimizedJutsus((prev) => [...prev.filter((j) => j.id !== jutsu.id), jutsu]);
-    setOpenJutsus((prev) => prev.filter((j) => j.id !== jutsu.id));
-  };
-
-  const handleCloseJutsu = (jutsu: Jutsu) => {
-    setMinimizedJutsus((prev) => prev.filter((j) => j.id !== jutsu.id));
-    setOpenJutsus((prev) => prev.filter((j) => j.id !== jutsu.id));
-  };
-
-  const handleCloseMinimized = (id: string) => {
-    setMinimizedJutsus((prev) => prev.filter((j) => j.id !== id));
+    onOpenJutsu?.(jutsu);
   };
 
   // Collapsed view
@@ -412,20 +392,6 @@ const CharacterSheet = ({ sheet, isOwner, ip, onDelete, onUpdated }: CharacterSh
         )}
       </div>
 
-      {/* Minimized jutsu taskbar */}
-      {minimizedJutsus.length > 0 && (
-        <div className="mt-2 flex gap-1 flex-wrap">
-          {minimizedJutsus.map((j) => (
-            <div key={j.id} className="flex items-center gap-1 text-[10px] border border-border bg-card px-2 py-0.5">
-              <button onClick={() => handleOpenJutsu(j)} className="text-accent hover:underline truncate max-w-[100px]">
-                {j.nome}
-              </button>
-              <button onClick={() => handleCloseMinimized(j.id)} className="text-muted-foreground hover:text-destructive">✕</button>
-            </div>
-          ))}
-        </div>
-      )}
-
       {/* Actions */}
       {canEdit && (
         <div className="mt-3 flex gap-2 justify-end">
@@ -446,17 +412,6 @@ const CharacterSheet = ({ sheet, isOwner, ip, onDelete, onUpdated }: CharacterSh
           )}
         </div>
       )}
-
-      {/* Open Jutsu Windows */}
-      {openJutsus.map((jutsu, idx) => (
-        <JutsuWindow
-          key={jutsu.id}
-          jutsu={jutsu}
-          onClose={() => handleCloseJutsu(jutsu)}
-          onMinimize={() => handleMinimizeJutsu(jutsu)}
-          initialPosition={{ x: 50 + idx * 30, y: 50 + idx * 30 }}
-        />
-      ))}
     </div>
   );
 };
