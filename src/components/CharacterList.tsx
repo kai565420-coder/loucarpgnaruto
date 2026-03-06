@@ -17,7 +17,7 @@ interface CharacterListProps {
   onOpenJutsu?: (jutsu: Jutsu) => void;
 }
 
-const CharacterList = ({ ip, refreshKey }: CharacterListProps) => {
+const CharacterList = ({ ip, refreshKey, onOpenJutsu }: CharacterListProps) => {
   const [sheets, setSheets] = useState<Tables<"character_sheets">[]>([]);
   const [loading, setLoading] = useState(true);
 
