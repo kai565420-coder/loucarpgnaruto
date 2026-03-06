@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { isAdmin } from "@/lib/admin";
 import { useIsMobile } from "@/hooks/use-mobile";
-import ItemWindow from "@/components/ItemWindow";
+
 
 interface Item {
   id: string;
