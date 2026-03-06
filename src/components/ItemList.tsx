@@ -174,6 +174,19 @@ const ItemList = ({ ip }: ItemListProps) => {
     });
   };
 
+  const handleItemClick = (item: Item) => {
+    if (isMobile) {
+      setExpandedId(expandedId === item.id ? null : item.id);
+    } else {
+      // Desktop: open window if not already open
+      if (openWindows.some((w) => w.item.id === item.id)) return;
+      const offset = openWindows.length * 30;
+      setOpenWindows((prev) => [...prev, { item, position: { x: 150 + offset, y: 100 + offset } }]);
+      // Remove from minimized if it was there
+      setMinimizedWindows((prev) => prev.filter((m) => m.item.id !== item.id));
+    }
+  };
+
   const filtered = items
     .filter((i) => i.nome.toLowerCase().includes(searchQuery.toLowerCase()));
 
