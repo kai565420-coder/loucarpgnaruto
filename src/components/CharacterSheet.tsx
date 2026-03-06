@@ -13,6 +13,7 @@ interface CharacterSheetProps {
   ip: string;
   onDelete?: () => void;
   onUpdated?: () => void;
+  onOpenJutsu?: (jutsu: Jutsu) => void;
 }
 
 interface Jutsu {
