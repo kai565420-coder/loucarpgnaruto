@@ -324,47 +324,6 @@ const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
           ))}
         </div>
       )}
-
-      {/* Desktop: item windows */}
-      {!isMobile && openWindows.map((w) => (
-        <ItemWindow
-          key={w.item.id}
-          item={w.item}
-          initialPosition={w.position}
-          admin={admin}
-          onClose={() => setOpenWindows((prev) => prev.filter((o) => o.item.id !== w.item.id))}
-          onMinimize={() => {
-            setOpenWindows((prev) => prev.filter((o) => o.item.id !== w.item.id));
-            setMinimizedWindows((prev) => [...prev.filter((m) => m.item.id !== w.item.id), { item: w.item }]);
-          }}
-          onEdit={() => {
-            setOpenWindows((prev) => prev.filter((o) => o.item.id !== w.item.id));
-            startEdit(w.item);
-          }}
-          onDelete={() => {
-            setOpenWindows((prev) => prev.filter((o) => o.item.id !== w.item.id));
-            handleDelete(w.item.id);
-          }}
-        />
-      ))}
-
-      {/* Minimized taskbar */}
-      {!isMobile && minimizedWindows.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 flex gap-1 p-1 bg-card border-t border-border">
-          {minimizedWindows.map((m) => (
-            <button
-              key={m.item.id}
-              className="text-[10px] px-2 py-1 bg-muted border border-border hover:border-accent truncate max-w-[150px]"
-              onClick={() => {
-                setMinimizedWindows((prev) => prev.filter((x) => x.item.id !== m.item.id));
-                setOpenWindows((prev) => [...prev, { item: m.item, position: { x: 100, y: 100 } }]);
-              }}
-            >
-              🎒 {m.item.nome}
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   );
 };
