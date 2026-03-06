@@ -6,18 +6,90 @@ import CharacterList from "@/components/CharacterList";
 import CharacterForm from "@/components/CharacterForm";
 import JutsuForm from "@/components/JutsuForm";
 import ItemList from "@/components/ItemList";
+import JutsuWindow from "@/components/JutsuWindow";
+import ItemWindow from "@/components/ItemWindow";
 import { useUserIp } from "@/hooks/useUserIp";
 import { isAdmin } from "@/lib/admin";
+import { useIsMobile } from "@/hooks/use-mobile";
+
+interface Jutsu {
+  id: string;
+  nome: string;
+  informacoes: string;
+  imagem_url: string | null;
+}
+
+interface Item {
+  id: string;
+  nome: string;
+  descricao: string;
+  valor: string;
+  imagem_url: string | null;
+}
+
+type WindowEntry =
+  | { type: "jutsu"; id: string; data: Jutsu; position: { x: number; y: number } }
+  | { type: "item"; id: string; data: Item; position: { x: number; y: number } };
+
+type MinimizedEntry =
+  | { type: "jutsu"; id: string; data: Jutsu }
+  | { type: "item"; id: string; data: Item };
 
 const Index = () => {
   const { ip, loading } = useUserIp();
+  const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState("fichas");
   const [refreshKey, setRefreshKey] = useState(0);
+  const [openWindows, setOpenWindows] = useState<WindowEntry[]>([]);
+  const [minimizedWindows, setMinimizedWindows] = useState<MinimizedEntry[]>([]);
 
   const handleCreated = () => {
     setRefreshKey((k) => k + 1);
     setActiveTab("fichas");
   };
+
+  const openWindow = (type: "jutsu" | "item", id: string, data: any) => {
+    setMinimizedWindows((prev) => prev.filter((m) => m.id !== id));
+    setOpenWindows((prev) => {
+      if (prev.some((w) => w.id === id)) return prev;
+      const offset = prev.length * 30;
+      return [...prev, { type, id, data, position: { x: 150 + offset, y: 100 + offset } }];
+    });
+  };
+
+  const closeWindow = (id: string) => {
+    setOpenWindows((prev) => prev.filter((w) => w.id !== id));
+    setMinimizedWindows((prev) => prev.filter((m) => m.id !== id));
+  };
+
+  const minimizeWindow = (id: string) => {
+    setOpenWindows((prev) => {
+      const found = prev.find((w) => w.id === id);
+      if (found) {
+        setMinimizedWindows((mp) => [
+          ...mp.filter((m) => m.id !== id),
+          { type: found.type, id: found.id, data: found.data } as MinimizedEntry,
+        ]);
+      }
+      return prev.filter((w) => w.id !== id);
+    });
+  };
+
+  const restoreWindow = (id: string) => {
+    setMinimizedWindows((prev) => {
+      const found = prev.find((m) => m.id === id);
+      if (found) {
+        setOpenWindows((op) => {
+          if (op.some((w) => w.id === id)) return op;
+          const offset = op.length * 30;
+          return [...op, { ...found, position: { x: 150 + offset, y: 100 + offset } } as WindowEntry];
+        });
+      }
+      return prev.filter((m) => m.id !== id);
+    });
+  };
+
+  const admin = isAdmin(ip || "unknown");
 
   return (
     <div className="min-h-screen flex flex-col relative">
@@ -42,13 +114,20 @@ const Index = () => {
                 Conectando ao servidor...
               </div>
             ) : activeTab === "fichas" ? (
-              <CharacterList ip={ip || "unknown"} refreshKey={refreshKey} />
+              <CharacterList
+                ip={ip || "unknown"}
+                refreshKey={refreshKey}
+                onOpenJutsu={(jutsu) => openWindow("jutsu", jutsu.id, jutsu)}
+              />
             ) : activeTab === "criar" ? (
               <CharacterForm ip={ip || "unknown"} onCreated={handleCreated} />
-            ) : activeTab === "criar-jutsu" && isAdmin(ip || "unknown") ? (
+            ) : activeTab === "criar-jutsu" && admin ? (
               <JutsuForm ip={ip || "unknown"} onCreated={() => setActiveTab("fichas")} />
             ) : activeTab === "itens" ? (
-              <ItemList ip={ip || "unknown"} />
+              <ItemList
+                ip={ip || "unknown"}
+                onOpenItem={(item) => openWindow("item", item.id, item)}
+              />
             ) : activeTab === "sobre" ? (
               <div className="retro-panel p-4">
                 <div className="retro-section-title">📖 Sobre o Sistema</div>
@@ -67,6 +146,50 @@ const Index = () => {
 
         <RetroFooter />
       </div>
+
+      {/* Global floating windows */}
+      {!isMobile && openWindows.map((w) =>
+        w.type === "jutsu" ? (
+          <JutsuWindow
+            key={w.id}
+            jutsu={w.data as Jutsu}
+            initialPosition={w.position}
+            onClose={() => closeWindow(w.id)}
+            onMinimize={() => minimizeWindow(w.id)}
+          />
+        ) : (
+          <ItemWindow
+            key={w.id}
+            item={w.data as Item}
+            initialPosition={w.position}
+            admin={admin}
+            onClose={() => closeWindow(w.id)}
+            onMinimize={() => minimizeWindow(w.id)}
+          />
+        )
+      )}
+
+      {/* Global minimized taskbar */}
+      {!isMobile && minimizedWindows.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 flex gap-1 p-1 bg-card border-t border-border">
+          {minimizedWindows.map((m) => (
+            <div key={m.id} className="flex items-center gap-0.5">
+              <button
+                className="text-[10px] px-2 py-1 bg-muted border border-border hover:border-accent truncate max-w-[150px]"
+                onClick={() => restoreWindow(m.id)}
+              >
+                {m.type === "jutsu" ? "🌀" : "🎒"} {m.data.nome}
+              </button>
+              <button
+                className="text-[10px] px-1 py-1 bg-muted border border-border hover:border-destructive text-muted-foreground hover:text-destructive"
+                onClick={() => closeWindow(m.id)}
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
