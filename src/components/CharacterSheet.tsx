@@ -116,8 +116,6 @@ const CharacterSheet = ({ sheet, isOwner, ip, onDelete, onUpdated, onOpenJutsu }
   const [showJutsus, setShowJutsus] = useState(false);
   const [showJutsuSelector, setShowJutsuSelector] = useState(false);
   const [assignedJutsuIds, setAssignedJutsuIds] = useState<string[]>([]);
-  const [showJutsuSelector, setShowJutsuSelector] = useState(false);
-  const [assignedJutsuIds, setAssignedJutsuIds] = useState<string[]>([]);
 
   const fetchJutsus = useCallback(async () => {
     const { data: links } = await supabase
