@@ -289,57 +289,81 @@ const ItemList = ({ ip }: ItemListProps) => {
           {filtered.map((item) => (
             <div
               key={item.id}
-              className={`retro-panel p-2 cursor-pointer hover:border-accent transition-colors ${expandedId === item.id ? "col-span-2" : ""}`}
-              onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
+              className={`retro-panel p-2 cursor-pointer hover:border-accent transition-colors ${isMobile && expandedId === item.id ? "col-span-2" : ""}`}
+              onClick={() => handleItemClick(item)}
             >
-              {/* Collapsed: image + name */}
               {item.imagem_url && (
                 <div className="w-full aspect-square mb-2 overflow-hidden rounded border border-border">
-                  <img
-                    src={item.imagem_url}
-                    alt={item.nome}
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={item.imagem_url} alt={item.nome} className="w-full h-full object-cover" />
                 </div>
               )}
               <div className="text-xs font-bold text-accent text-center truncate">
                 {item.nome}
               </div>
 
-              {/* Expanded */}
-              {expandedId === item.id && (
+              {/* Mobile expanded */}
+              {isMobile && expandedId === item.id && (
                 <div className="mt-2 border-t border-border pt-2" onClick={(e) => e.stopPropagation()}>
                   {item.descricao && (
-                    <div className="mb-1">
-                      <p className="text-[11px] text-foreground whitespace-pre-wrap leading-relaxed">
-                        {renderBoldText(item.descricao)}
-                      </p>
-                    </div>
+                    <p className="text-[11px] text-foreground whitespace-pre-wrap leading-relaxed mb-1">
+                      {renderBoldText(item.descricao)}
+                    </p>
                   )}
                   {item.valor && (
                     <div className="mb-1 mt-1">
-                      <span className="text-xs font-bold text-accent">Valor: {item.valor}</span>
+                      <span className="text-sm font-bold text-accent">💰 {item.valor}</span>
                     </div>
                   )}
                   {admin && (
                     <div className="flex gap-2 mt-2 justify-end">
-                      <button
-                        onClick={() => startEdit(item)}
-                        className="text-[10px] text-muted-foreground hover:text-accent"
-                      >
-                        ✏️ Editar
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        className="text-[10px] text-muted-foreground hover:text-destructive"
-                      >
-                        🗑️ Deletar
-                      </button>
+                      <button onClick={() => startEdit(item)} className="text-[10px] text-muted-foreground hover:text-accent">✏️ Editar</button>
+                      <button onClick={() => handleDelete(item.id)} className="text-[10px] text-muted-foreground hover:text-destructive">🗑️ Deletar</button>
                     </div>
                   )}
                 </div>
               )}
             </div>
+          ))}
+        </div>
+      )}
+
+      {/* Desktop: item windows */}
+      {!isMobile && openWindows.map((w) => (
+        <ItemWindow
+          key={w.item.id}
+          item={w.item}
+          initialPosition={w.position}
+          admin={admin}
+          onClose={() => setOpenWindows((prev) => prev.filter((o) => o.item.id !== w.item.id))}
+          onMinimize={() => {
+            setOpenWindows((prev) => prev.filter((o) => o.item.id !== w.item.id));
+            setMinimizedWindows((prev) => [...prev.filter((m) => m.item.id !== w.item.id), { item: w.item }]);
+          }}
+          onEdit={() => {
+            setOpenWindows((prev) => prev.filter((o) => o.item.id !== w.item.id));
+            startEdit(w.item);
+          }}
+          onDelete={() => {
+            setOpenWindows((prev) => prev.filter((o) => o.item.id !== w.item.id));
+            handleDelete(w.item.id);
+          }}
+        />
+      ))}
+
+      {/* Minimized taskbar */}
+      {!isMobile && minimizedWindows.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 flex gap-1 p-1 bg-card border-t border-border">
+          {minimizedWindows.map((m) => (
+            <button
+              key={m.item.id}
+              className="text-[10px] px-2 py-1 bg-muted border border-border hover:border-accent truncate max-w-[150px]"
+              onClick={() => {
+                setMinimizedWindows((prev) => prev.filter((x) => x.item.id !== m.item.id));
+                setOpenWindows((prev) => [...prev, { item: m.item, position: { x: 100, y: 100 } }]);
+              }}
+            >
+              🎒 {m.item.nome}
+            </button>
           ))}
         </div>
       )}
