@@ -104,7 +104,7 @@ const pericias = [
   },
 ];
 
-const CharacterSheet = ({ sheet, isOwner, ip, onDelete, onUpdated }: CharacterSheetProps) => {
+const CharacterSheet = ({ sheet, isOwner, ip, onDelete, onUpdated, onOpenJutsu }: CharacterSheetProps) => {
   const canEdit = isOwner || isAdmin(ip);
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -114,8 +114,8 @@ const CharacterSheet = ({ sheet, isOwner, ip, onDelete, onUpdated }: CharacterSh
   // Jutsu state
   const [jutsus, setJutsus] = useState<Jutsu[]>([]);
   const [showJutsus, setShowJutsus] = useState(false);
-  const [openJutsus, setOpenJutsus] = useState<Jutsu[]>([]);
-  const [minimizedJutsus, setMinimizedJutsus] = useState<Jutsu[]>([]);
+  const [showJutsuSelector, setShowJutsuSelector] = useState(false);
+  const [assignedJutsuIds, setAssignedJutsuIds] = useState<string[]>([]);
   const [showJutsuSelector, setShowJutsuSelector] = useState(false);
   const [assignedJutsuIds, setAssignedJutsuIds] = useState<string[]>([]);
 
