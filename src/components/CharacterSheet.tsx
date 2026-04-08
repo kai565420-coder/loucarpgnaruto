@@ -259,15 +259,52 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
       {/* Top: Image + Info + Bars */}
       <div className="flex gap-4 flex-wrap">
         <div className="shrink-0">
-          {sheet.imagem_url ? (
-            <img src={sheet.imagem_url} alt={sheet.nome} className="w-[120px] h-[120px] object-cover border-2 border-accent" />
+          {editing && canEdit ? (
+            <>
+              {form.imagem_url ? (
+                <img src={form.imagem_url} alt={form.nome} className="w-[120px] h-[120px] object-cover border-2 border-accent" />
+              ) : (
+                <div className="w-[120px] h-[120px] border-2 border-border flex items-center justify-center text-muted-foreground text-xs">Sem Imagem</div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                className="retro-input w-[120px] text-[9px] mt-1"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const ext = file.name.split(".").pop();
+                  const path = `edit_${sheet.id}_${Date.now()}.${ext}`;
+                  const { error: uploadError } = await supabase.storage.from("character-images").upload(path, file);
+                  if (uploadError) { toast.error("Erro ao enviar imagem"); return; }
+                  const { data: urlData } = supabase.storage.from("character-images").getPublicUrl(path);
+                  setForm((prev) => ({ ...prev, imagem_url: urlData.publicUrl }));
+                  toast.success("Imagem carregada!");
+                }}
+              />
+              <div className="mt-1">
+                <label className="retro-label text-[9px]">Rank Ninja:</label>
+                <input
+                  type="text"
+                  className="retro-input w-[120px] text-[10px]"
+                  value={form.rank_ninja ?? ""}
+                  onChange={(e) => handleTextChange("rank_ninja", e.target.value)}
+                />
+              </div>
+            </>
           ) : (
-            <div className="w-[120px] h-[120px] border-2 border-border flex items-center justify-center text-muted-foreground text-xs">Sem Imagem</div>
-          )}
-          {(sheet as any).rank_ninja && (
-            <div className="text-[10px] text-center text-accent font-bold mt-1 border border-border bg-card px-1 py-0.5">
-              {(sheet as any).rank_ninja}
-            </div>
+            <>
+              {sheet.imagem_url ? (
+                <img src={sheet.imagem_url} alt={sheet.nome} className="w-[120px] h-[120px] object-cover border-2 border-accent" />
+              ) : (
+                <div className="w-[120px] h-[120px] border-2 border-border flex items-center justify-center text-muted-foreground text-xs">Sem Imagem</div>
+              )}
+              {(sheet as any).rank_ninja && (
+                <div className="text-[10px] text-center text-accent font-bold mt-1 border border-border bg-card px-1 py-0.5">
+                  {(sheet as any).rank_ninja}
+                </div>
+              )}
+            </>
           )}
         </div>
         <div className="flex-1 min-w-[200px]">
