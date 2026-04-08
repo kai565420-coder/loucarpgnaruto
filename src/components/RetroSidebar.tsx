@@ -1,17 +1,16 @@
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { isAdmin } from "@/lib/admin";
+import { useAdmin } from "@/contexts/AdminContext";
 
 interface RetroSidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
-  ip: string;
 }
 
-const RetroSidebar = ({ activeTab, onTabChange, ip }: RetroSidebarProps) => {
+const RetroSidebar = ({ activeTab, onTabChange }: RetroSidebarProps) => {
   const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
-  const admin = isAdmin(ip);
+  const { isAdminMode } = useAdmin();
 
   const menuItems = [
     {
@@ -19,7 +18,7 @@ const RetroSidebar = ({ activeTab, onTabChange, ip }: RetroSidebarProps) => {
       items: [
         { id: "fichas", label: "Ver Fichas", icon: "/images/icon-ver-fichas.png" },
         { id: "criar", label: "Criar Ficha", icon: "/images/icon-criar-ficha.png" },
-        ...(admin ? [{ id: "criar-jutsu", label: "Criar Habilidade", icon: null as string | null }] : []),
+        ...(isAdminMode ? [{ id: "criar-jutsu", label: "Criar Habilidade", icon: null as string | null }] : []),
       ],
     },
     {

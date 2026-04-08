@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { isAdmin } from "@/lib/admin";
+import { useAdmin } from "@/contexts/AdminContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 
@@ -20,7 +20,7 @@ interface ItemListProps {
 }
 
 const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
-  const admin = isAdmin(ip);
+  const { isAdminMode: admin } = useAdmin();
   const isMobile = useIsMobile();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);

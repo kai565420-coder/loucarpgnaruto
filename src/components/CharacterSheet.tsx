@@ -3,13 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
 import JutsuSelector from "./JutsuSelector";
-import { isAdmin } from "@/lib/admin";
+import { useAdmin } from "@/contexts/AdminContext";
 import { getJutsuEmoji } from "@/lib/jutsuEmoji";
 
 interface CharacterSheetProps {
   sheet: Tables<"character_sheets">;
   isOwner: boolean;
-  ip: string;
   onDelete?: () => void;
   onUpdated?: () => void;
   onOpenJutsu?: (jutsu: Jutsu) => void;
@@ -103,8 +102,9 @@ const pericias = [
   },
 ];
 
-const CharacterSheet = ({ sheet, isOwner, ip, onDelete, onUpdated, onOpenJutsu }: CharacterSheetProps) => {
-  const canEdit = isOwner || isAdmin(ip);
+const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: CharacterSheetProps) => {
+  const { isAdminMode } = useAdmin();
+  const canEdit = isOwner || isAdminMode;
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<Record<string, any>>({ ...sheet });

@@ -9,7 +9,7 @@ import ItemList from "@/components/ItemList";
 import JutsuWindow from "@/components/JutsuWindow";
 import ItemWindow from "@/components/ItemWindow";
 import { useUserIp } from "@/hooks/useUserIp";
-import { isAdmin } from "@/lib/admin";
+import { useAdmin } from "@/contexts/AdminContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Jutsu {
@@ -38,6 +38,7 @@ type MinimizedEntry =
 const Index = () => {
   const { ip, loading } = useUserIp();
   const isMobile = useIsMobile();
+  const { isAdminMode } = useAdmin();
   const [activeTab, setActiveTab] = useState("fichas");
   const [refreshKey, setRefreshKey] = useState(0);
   const [openWindows, setOpenWindows] = useState<WindowEntry[]>([]);
@@ -89,8 +90,6 @@ const Index = () => {
     });
   };
 
-  const admin = isAdmin(ip || "unknown");
-
   return (
     <div className="min-h-screen flex flex-col relative">
       <div
@@ -106,7 +105,7 @@ const Index = () => {
         </div>
 
         <div className="flex-1 flex max-w-[1000px] mx-auto w-full py-3 px-2 gap-3">
-          <RetroSidebar activeTab={activeTab} onTabChange={setActiveTab} ip={ip || "unknown"} />
+          <RetroSidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
           <main className="flex-1 min-w-0">
             {loading ? (
@@ -121,7 +120,7 @@ const Index = () => {
               />
             ) : activeTab === "criar" ? (
               <CharacterForm ip={ip || "unknown"} onCreated={handleCreated} />
-            ) : activeTab === "criar-jutsu" && admin ? (
+            ) : activeTab === "criar-jutsu" && isAdminMode ? (
               <JutsuForm ip={ip || "unknown"} onCreated={() => setActiveTab("fichas")} />
             ) : activeTab === "itens" ? (
               <ItemList
@@ -148,7 +147,7 @@ const Index = () => {
       </div>
 
       {/* Global floating windows */}
-      {!isMobile && openWindows.map((w) =>
+      {openWindows.map((w) =>
         w.type === "jutsu" ? (
           <JutsuWindow
             key={w.id}
@@ -162,7 +161,7 @@ const Index = () => {
             key={w.id}
             item={w.data as Item}
             initialPosition={w.position}
-            admin={admin}
+            admin={isAdminMode}
             onClose={() => closeWindow(w.id)}
             onMinimize={() => minimizeWindow(w.id)}
           />
@@ -170,7 +169,7 @@ const Index = () => {
       )}
 
       {/* Global minimized taskbar */}
-      {!isMobile && minimizedWindows.length > 0 && (
+      {minimizedWindows.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 z-40 flex gap-1 p-1 bg-card border-t border-border">
           {minimizedWindows.map((m) => (
             <div key={m.id} className="flex items-center gap-0.5">
