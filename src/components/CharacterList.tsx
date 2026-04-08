@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import CharacterSheet from "./CharacterSheet";
 import { toast } from "sonner";
+import { useAdmin } from "@/contexts/AdminContext";
 
 interface Jutsu {
   id: string;
@@ -18,6 +19,7 @@ interface CharacterListProps {
 }
 
 const CharacterList = ({ ip, refreshKey, onOpenJutsu }: CharacterListProps) => {
+  const { isAdminMode } = useAdmin();
   const [sheets, setSheets] = useState<Tables<"character_sheets">[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -71,8 +73,7 @@ const CharacterList = ({ ip, refreshKey, onOpenJutsu }: CharacterListProps) => {
         <CharacterSheet
           key={sheet.id}
           sheet={sheet}
-          isOwner={sheet.ip_address === ip}
-          ip={ip}
+          isOwner={sheet.ip_address === ip || isAdminMode}
           onDelete={() => handleDelete(sheet.id)}
           onUpdated={fetchSheets}
           onOpenJutsu={onOpenJutsu}
