@@ -154,6 +154,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
       .from("character_sheets")
       .update({
         nome: form.nome, idade: form.idade, rank_ninja: form.rank_ninja, elementos: form.elementos, classe: form.classe, talento: form.talento,
+        imagem_url: form.imagem_url,
         vida: form.vida, vida_max: form.vida_max, sanidade: form.sanidade, sanidade_max: form.sanidade_max,
         chakra: form.chakra, chakra_max: form.chakra_max, forca_fisica: form.forca_fisica, destreza: form.destreza,
         taijutsu: form.taijutsu, forca_bruta: form.forca_bruta, imobilizacao: form.imobilizacao,
