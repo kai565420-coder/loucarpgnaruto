@@ -161,7 +161,6 @@ const Index = () => {
             key={w.id}
             item={w.data as Item}
             initialPosition={w.position}
-            admin={admin}
             admin={isAdminMode}
             onClose={() => closeWindow(w.id)}
             onMinimize={() => minimizeWindow(w.id)}
