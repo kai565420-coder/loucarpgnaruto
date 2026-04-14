@@ -321,6 +321,14 @@ const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
                 <div className="text-[9px] text-muted-foreground text-center">⚖️ {item.peso}</div>
               )}
 
+              {/* Admin buttons on grid */}
+              {admin && !isMobile && (
+                <div className="flex gap-1 mt-1 justify-center" onClick={(e) => e.stopPropagation()}>
+                  <button onClick={() => startEdit(item)} className="text-[9px] text-muted-foreground hover:text-accent">✏️</button>
+                  <button onClick={() => handleDelete(item.id)} className="text-[9px] text-muted-foreground hover:text-destructive">🗑️</button>
+                </div>
+              )}
+
               {/* Mobile expanded */}
               {isMobile && expandedId === item.id && (
                 <div className="mt-2 border-t border-border pt-2" onClick={(e) => e.stopPropagation()}>
