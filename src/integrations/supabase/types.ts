@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      character_bag_items: {
+        Row: {
+          bag_type: string
+          character_id: string
+          created_at: string
+          id: string
+          item_id: string
+          quantidade: number
+        }
+        Insert: {
+          bag_type?: string
+          character_id: string
+          created_at?: string
+          id?: string
+          item_id: string
+          quantidade?: number
+        }
+        Update: {
+          bag_type?: string
+          character_id?: string
+          created_at?: string
+          id?: string
+          item_id?: string
+          quantidade?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "character_bag_items_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "character_sheets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "character_bag_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       character_jutsus: {
         Row: {
           character_id: string
@@ -54,6 +96,7 @@ export type Database = {
         Row: {
           acrobacia: number
           analise_combate: number
+          bolsa_traseira_tamanho: string
           chakra: number
           chakra_max: number
           classe: string
@@ -62,6 +105,7 @@ export type Database = {
           conhecimento_shinobi: number
           controle_chakra: number
           created_at: string
+          deslocamento: number
           destreza: number
           elementos: string
           estrategia_tatica: number
@@ -110,6 +154,7 @@ export type Database = {
         Insert: {
           acrobacia?: number
           analise_combate?: number
+          bolsa_traseira_tamanho?: string
           chakra?: number
           chakra_max?: number
           classe?: string
@@ -118,6 +163,7 @@ export type Database = {
           conhecimento_shinobi?: number
           controle_chakra?: number
           created_at?: string
+          deslocamento?: number
           destreza?: number
           elementos?: string
           estrategia_tatica?: number
@@ -166,6 +212,7 @@ export type Database = {
         Update: {
           acrobacia?: number
           analise_combate?: number
+          bolsa_traseira_tamanho?: string
           chakra?: number
           chakra_max?: number
           classe?: string
@@ -174,6 +221,7 @@ export type Database = {
           conhecimento_shinobi?: number
           controle_chakra?: number
           created_at?: string
+          deslocamento?: number
           destreza?: number
           elementos?: string
           estrategia_tatica?: number
@@ -229,6 +277,7 @@ export type Database = {
           imagem_url: string | null
           ip_address: string
           nome: string
+          peso: number
           valor: string
         }
         Insert: {
@@ -238,6 +287,7 @@ export type Database = {
           imagem_url?: string | null
           ip_address: string
           nome: string
+          peso?: number
           valor?: string
         }
         Update: {
@@ -247,6 +297,7 @@ export type Database = {
           imagem_url?: string | null
           ip_address?: string
           nome?: string
+          peso?: number
           valor?: string
         }
         Relationships: []
