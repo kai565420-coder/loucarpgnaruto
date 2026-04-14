@@ -10,6 +10,7 @@ interface Item {
   nome: string;
   descricao: string;
   valor: string;
+  peso: number;
   imagem_url: string | null;
   created_at: string;
 }
@@ -33,6 +34,7 @@ const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
   const [valor, setValor] = useState("");
+  const [peso, setPeso] = useState(0);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -93,7 +95,7 @@ const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
       }
 
       if (editingId) {
-        const updateData: Record<string, any> = { nome, descricao, valor };
+        const updateData: Record<string, any> = { nome, descricao, valor, peso };
         if (imagem_url) updateData.imagem_url = imagem_url;
         const { error } = await supabase.from("items").update(updateData).eq("id", editingId);
         if (error) throw error;
@@ -104,6 +106,7 @@ const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
           nome,
           descricao,
           valor,
+          peso,
           imagem_url,
           ip_address: ip,
         });
@@ -114,6 +117,7 @@ const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
       setNome("");
       setDescricao("");
       setValor("");
+      setPeso(0);
       setImageFile(null);
       setShowForm(false);
       fetchItems();
@@ -140,6 +144,7 @@ const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
     setNome(item.nome);
     setDescricao(item.descricao);
     setValor(item.valor);
+    setPeso(item.peso || 0);
     setImageFile(null);
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -150,6 +155,7 @@ const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
     setNome("");
     setDescricao("");
     setValor("");
+    setPeso(0);
     setImageFile(null);
     setShowForm(false);
   };
@@ -233,15 +239,28 @@ const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
                 placeholder="Descreva o item... Use **texto** para negrito."
               />
             </div>
-            <div className="mb-3">
-              <label className="retro-label block mb-1">Valor:</label>
-              <input
-                type="text"
-                className="retro-input w-full"
-                value={valor}
-                onChange={(e) => setValor(e.target.value)}
-                placeholder="Ex: 500 ryō"
-              />
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              <div>
+                <label className="retro-label block mb-1">Valor:</label>
+                <input
+                  type="text"
+                  className="retro-input w-full"
+                  value={valor}
+                  onChange={(e) => setValor(e.target.value)}
+                  placeholder="Ex: 500 ryō"
+                />
+              </div>
+              <div>
+                <label className="retro-label block mb-1">Peso:</label>
+                <input
+                  type="number"
+                  className="retro-input w-full"
+                  value={peso}
+                  onChange={(e) => setPeso(parseInt(e.target.value) || 0)}
+                  placeholder="Ex: 2"
+                  min={0}
+                />
+              </div>
             </div>
             <div>
               <label className="retro-label block mb-1">Imagem:</label>
@@ -298,6 +317,9 @@ const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
               <div className="text-xs font-bold text-accent text-center truncate">
                 {item.nome}
               </div>
+              {item.peso > 0 && (
+                <div className="text-[9px] text-muted-foreground text-center">⚖️ {item.peso}</div>
+              )}
 
               {/* Mobile expanded */}
               {isMobile && expandedId === item.id && (

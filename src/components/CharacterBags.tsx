@@ -1,0 +1,282 @@
+import { useState, useEffect, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+interface BagItem {
+  id: string;
+  item_id: string;
+  bag_type: string;
+  quantidade: number;
+  item: {
+    nome: string;
+    peso: number;
+    imagem_url: string | null;
+  };
+}
+
+interface Item {
+  id: string;
+  nome: string;
+  peso: number;
+  imagem_url: string | null;
+}
+
+interface CharacterBagsProps {
+  characterId: string;
+  bolsaTraseiraTamanho: string;
+  editing: boolean;
+  canEdit: boolean;
+  onTamanhoChange?: (tamanho: string) => void;
+}
+
+const TRASEIRA_SIZES: Record<string, number> = {
+  pequena: 10,
+  media: 20,
+  grande: 30,
+};
+
+const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, onTamanhoChange }: CharacterBagsProps) => {
+  const [bagItems, setBagItems] = useState<BagItem[]>([]);
+  const [allItems, setAllItems] = useState<Item[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [addingTo, setAddingTo] = useState<string | null>(null);
+  const [selectedItemId, setSelectedItemId] = useState("");
+  const [addQtd, setAddQtd] = useState(1);
+
+  const fetchBagItems = useCallback(async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("character_bag_items")
+      .select("id, item_id, bag_type, quantidade")
+      .eq("character_id", characterId);
+
+    if (data && data.length > 0) {
+      const itemIds = data.map((d) => d.item_id);
+      const { data: itemsData } = await supabase
+        .from("items")
+        .select("id, nome, peso, imagem_url")
+        .in("id", itemIds);
+
+      const itemsMap = new Map((itemsData || []).map((i) => [i.id, i]));
+      const enriched = data.map((d) => ({
+        ...d,
+        item: itemsMap.get(d.item_id) || { nome: "?", peso: 0, imagem_url: null },
+      }));
+      setBagItems(enriched);
+    } else {
+      setBagItems([]);
+    }
+    setLoading(false);
+  }, [characterId]);
+
+  const fetchAllItems = useCallback(async () => {
+    const { data } = await supabase.from("items").select("id, nome, peso, imagem_url").order("nome");
+    setAllItems(data || []);
+  }, []);
+
+  useEffect(() => {
+    fetchBagItems();
+    fetchAllItems();
+  }, [fetchBagItems, fetchAllItems]);
+
+  const lateralItems = bagItems.filter((b) => b.bag_type === "lateral");
+  const traseiraItems = bagItems.filter((b) => b.bag_type === "traseira");
+
+  const lateralUsed = lateralItems.reduce((s, b) => s + b.quantidade, 0);
+  const lateralMax = 4;
+
+  const traseiraMax = TRASEIRA_SIZES[bolsaTraseiraTamanho] || 10;
+  const traseiraUsed = traseiraItems.reduce((s, b) => s + b.item.peso * b.quantidade, 0);
+
+  const handleAdd = async (bagType: string) => {
+    if (!selectedItemId) return;
+    if (addQtd < 1) return;
+
+    const item = allItems.find((i) => i.id === selectedItemId);
+    if (!item) return;
+
+    if (bagType === "lateral") {
+      const isKunaiShuriken = item.nome.toLowerCase().includes("kunai") || item.nome.toLowerCase().includes("shuriken");
+      if (!isKunaiShuriken) {
+        toast.error("A bolsa lateral aceita apenas Kunais e Shurikens!");
+        return;
+      }
+      if (lateralUsed + addQtd > lateralMax) {
+        toast.error(`Espaço insuficiente na bolsa lateral! (${lateralMax - lateralUsed} restantes)`);
+        return;
+      }
+    }
+
+    if (bagType === "traseira") {
+      const spaceNeeded = item.peso * addQtd;
+      if (traseiraUsed + spaceNeeded > traseiraMax) {
+        toast.error(`Espaço insuficiente na bolsa traseira! (${traseiraMax - traseiraUsed} restantes)`);
+        return;
+      }
+    }
+
+    // Check if item already exists in this bag
+    const existing = bagItems.find((b) => b.item_id === selectedItemId && b.bag_type === bagType);
+    if (existing) {
+      const { error } = await supabase
+        .from("character_bag_items")
+        .update({ quantidade: existing.quantidade + addQtd })
+        .eq("id", existing.id);
+      if (error) { toast.error("Erro ao atualizar"); return; }
+    } else {
+      const { error } = await supabase.from("character_bag_items").insert({
+        character_id: characterId,
+        item_id: selectedItemId,
+        bag_type: bagType,
+        quantidade: addQtd,
+      });
+      if (error) { toast.error("Erro ao adicionar"); return; }
+    }
+
+    toast.success("Item adicionado!");
+    setSelectedItemId("");
+    setAddQtd(1);
+    setAddingTo(null);
+    fetchBagItems();
+  };
+
+  const handleRemove = async (bagItemId: string) => {
+    const { error } = await supabase.from("character_bag_items").delete().eq("id", bagItemId);
+    if (error) { toast.error("Erro ao remover"); return; }
+    toast.success("Item removido!");
+    fetchBagItems();
+  };
+
+  const handleChangeQtd = async (bagItemId: string, newQtd: number) => {
+    if (newQtd < 1) return;
+    const { error } = await supabase.from("character_bag_items").update({ quantidade: newQtd }).eq("id", bagItemId);
+    if (error) { toast.error("Erro ao atualizar"); return; }
+    fetchBagItems();
+  };
+
+  const renderBagTable = (items: BagItem[], bagType: string, used: number, max: number, label: string) => (
+    <div className="mb-3">
+      <div className="flex justify-between items-center mb-1">
+        <span className="text-accent font-bold text-[11px]">{label}</span>
+        <span className={`text-[10px] font-bold ${used > max ? "text-destructive" : "text-muted-foreground"}`}>
+          {used}/{max} {bagType === "lateral" ? "slots" : "peso"}
+        </span>
+      </div>
+      <div className="w-full h-2 border border-border mb-2" style={{ background: "hsl(0 0% 5%)" }}>
+        <div
+          className="h-full transition-all"
+          style={{
+            width: `${Math.min((used / max) * 100, 100)}%`,
+            background: used > max ? "hsl(0 70% 45%)" : "hsl(140 60% 40%)",
+          }}
+        />
+      </div>
+
+      {items.length === 0 ? (
+        <div className="text-[10px] text-muted-foreground text-center py-2">Vazia</div>
+      ) : (
+        <table className="w-full text-[11px]">
+          <thead>
+            <tr className="border-b border-border">
+              <th className="text-left retro-label py-1">Nome</th>
+              <th className="text-center retro-label py-1 w-12">Peso</th>
+              <th className="text-center retro-label py-1 w-12">Qtd.</th>
+              {editing && canEdit && <th className="w-8"></th>}
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((bi) => (
+              <tr key={bi.id} className="border-b border-border last:border-0">
+                <td className="py-1 text-foreground">{bi.item.nome}</td>
+                <td className="py-1 text-center text-muted-foreground">{bi.item.peso}</td>
+                <td className="py-1 text-center">
+                  {editing && canEdit ? (
+                    <input
+                      type="number"
+                      className="retro-input w-10 text-center text-[10px]"
+                      value={bi.quantidade}
+                      min={1}
+                      onChange={(e) => handleChangeQtd(bi.id, parseInt(e.target.value) || 1)}
+                    />
+                  ) : (
+                    <span className="text-foreground">{bi.quantidade}</span>
+                  )}
+                </td>
+                {editing && canEdit && (
+                  <td className="py-1 text-center">
+                    <button onClick={() => handleRemove(bi.id)} className="text-destructive hover:text-destructive/80 text-[10px]">✕</button>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {editing && canEdit && (
+        <div className="mt-1">
+          {addingTo === bagType ? (
+            <div className="flex flex-col gap-1 mt-1">
+              <select
+                className="retro-input text-[10px] w-full"
+                value={selectedItemId}
+                onChange={(e) => setSelectedItemId(e.target.value)}
+              >
+                <option value="">Selecione um item...</option>
+                {allItems
+                  .filter((i) => bagType !== "lateral" || i.nome.toLowerCase().includes("kunai") || i.nome.toLowerCase().includes("shuriken"))
+                  .map((i) => (
+                    <option key={i.id} value={i.id}>{i.nome} (peso: {i.peso})</option>
+                  ))}
+              </select>
+              <div className="flex gap-1">
+                <input
+                  type="number"
+                  className="retro-input w-14 text-center text-[10px]"
+                  value={addQtd}
+                  min={1}
+                  onChange={(e) => setAddQtd(parseInt(e.target.value) || 1)}
+                  placeholder="Qtd"
+                />
+                <button onClick={() => handleAdd(bagType)} className="retro-button text-[10px] flex-1">✅ Add</button>
+                <button onClick={() => setAddingTo(null)} className="retro-button text-[10px]">✕</button>
+              </div>
+            </div>
+          ) : (
+            <button onClick={() => { setAddingTo(bagType); setSelectedItemId(""); setAddQtd(1); }} className="text-[10px] text-accent hover:underline mt-1">
+              ➕ Adicionar item
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+
+  if (loading) return <div className="text-[10px] text-muted-foreground">Carregando bolsas...</div>;
+
+  return (
+    <div>
+      <div className="retro-section-title text-xs">🎒 Bolsa</div>
+
+      {editing && canEdit && (
+        <div className="mb-2 flex items-center gap-2">
+          <span className="retro-label text-[10px]">Tamanho Traseira:</span>
+          <select
+            className="retro-input text-[10px]"
+            value={bolsaTraseiraTamanho}
+            onChange={(e) => onTamanhoChange?.(e.target.value)}
+          >
+            <option value="pequena">Pequena (10)</option>
+            <option value="media">Média (20)</option>
+            <option value="grande">Grande (30)</option>
+          </select>
+        </div>
+      )}
+
+      {renderBagTable(lateralItems, "lateral", lateralUsed, lateralMax, "📌 Bolsa Lateral (Kunais/Shurikens)")}
+      {renderBagTable(traseiraItems, "traseira", traseiraUsed, traseiraMax, `🎒 Bolsa Traseira (${bolsaTraseiraTamanho.charAt(0).toUpperCase() + bolsaTraseiraTamanho.slice(1)})`)}
+    </div>
+  );
+};
+
+export default CharacterBags;
