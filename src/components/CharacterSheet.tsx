@@ -5,6 +5,7 @@ import type { Tables } from "@/integrations/supabase/types";
 import JutsuSelector from "./JutsuSelector";
 import { useAdmin } from "@/contexts/AdminContext";
 import { getJutsuEmoji } from "@/lib/jutsuEmoji";
+import CharacterBags from "./CharacterBags";
 
 interface CharacterSheetProps {
   sheet: Tables<"character_sheets">;
@@ -24,6 +25,7 @@ interface Jutsu {
 const atributos = [
   { key: "forca_fisica", label: "Força Física" },
   { key: "destreza", label: "Destreza" },
+  { key: "deslocamento", label: "Deslocamento" },
 ];
 
 const barAtributos = [
@@ -156,7 +158,8 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
         nome: form.nome, idade: form.idade, rank_ninja: form.rank_ninja, elementos: form.elementos, classe: form.classe, talento: form.talento,
         imagem_url: form.imagem_url,
         vida: form.vida, vida_max: form.vida_max, sanidade: form.sanidade, sanidade_max: form.sanidade_max,
-        chakra: form.chakra, chakra_max: form.chakra_max, forca_fisica: form.forca_fisica, destreza: form.destreza,
+        chakra: form.chakra, chakra_max: form.chakra_max, forca_fisica: form.forca_fisica, destreza: form.destreza, deslocamento: form.deslocamento,
+        bolsa_traseira_tamanho: form.bolsa_traseira_tamanho,
         taijutsu: form.taijutsu, forca_bruta: form.forca_bruta, imobilizacao: form.imobilizacao,
         acrobacia: form.acrobacia, furtividade: form.furtividade, shurikenjutsu: form.shurikenjutsu,
         kenjutsu: form.kenjutsu, reflexos_ninja: form.reflexos_ninja, iniciativa: form.iniciativa,
@@ -360,7 +363,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
         </div>
       </div>
 
-      {/* Maestria + Inventário */}
+      {/* Maestria + Bolsa */}
       <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
         <div className="retro-panel p-2">
           <div className="retro-section-title text-xs">Maestria</div>
@@ -372,12 +375,13 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
           ))}
         </div>
         <div className="retro-panel p-2">
-          <div className="retro-section-title text-xs">Inventário</div>
-          {editing && canEdit ? (
-            <textarea className="retro-input w-full text-xs min-h-[100px]" value={form.inventario ?? ""} onChange={(e) => handleTextChange("inventario", e.target.value)} />
-          ) : (
-            <div className="text-xs retro-value whitespace-pre-wrap min-h-[40px]">{(sheet as any).inventario || "Vazio"}</div>
-          )}
+          <CharacterBags
+            characterId={sheet.id}
+            bolsaTraseiraTamanho={editing ? (form.bolsa_traseira_tamanho ?? "pequena") : ((sheet as any).bolsa_traseira_tamanho ?? "pequena")}
+            editing={editing}
+            canEdit={canEdit}
+            onTamanhoChange={(t) => handleTextChange("bolsa_traseira_tamanho", t)}
+          />
         </div>
       </div>
 

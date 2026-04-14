@@ -5,6 +5,7 @@ interface Item {
   nome: string;
   descricao: string;
   valor: string;
+  peso?: number;
   imagem_url: string | null;
 }
 
@@ -45,11 +46,14 @@ const ItemWindow = ({ item, onClose, onMinimize, initialPosition, admin, onEdit,
           {renderBoldText(item.descricao)}
         </div>
       )}
-      {item.valor && (
-        <div className="mb-2">
+      <div className="flex gap-3 mb-2 items-center">
+        {item.valor && (
           <span className="text-sm font-bold text-accent">💰 {item.valor}</span>
-        </div>
-      )}
+        )}
+        {(item.peso ?? 0) > 0 && (
+          <span className="text-xs text-muted-foreground">⚖️ Peso: {item.peso}</span>
+        )}
+      </div>
       {admin && (
         <div className="flex gap-2 mt-2 justify-end border-t border-border pt-2">
           {onEdit && <button onClick={onEdit} className="text-[10px] text-muted-foreground hover:text-accent">✏️ Editar</button>}

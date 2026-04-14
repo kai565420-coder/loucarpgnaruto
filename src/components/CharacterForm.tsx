@@ -14,7 +14,8 @@ const defaultValues = {
   elementos: "",
   classe: "",
   talento: "",
-  vida: 0, vida_max: 0, sanidade: 0, sanidade_max: 0, forca_fisica: 0, destreza: 0, chakra: 0, chakra_max: 0,
+  vida: 0, vida_max: 0, sanidade: 0, sanidade_max: 0, forca_fisica: 0, destreza: 0, deslocamento: 0, chakra: 0, chakra_max: 0,
+  bolsa_traseira_tamanho: "pequena",
   taijutsu: 0, forca_bruta: 0, imobilizacao: 0,
   acrobacia: 0, furtividade: 0, shurikenjutsu: 0, kenjutsu: 0, reflexos_ninja: 0, iniciativa: 0,
   analise_combate: 0, estrategia_tatica: 0, conhecimento_shinobi: 0, conhecimento_clas: 0, fuinjutsu: 0, sabotagem: 0,
@@ -22,12 +23,12 @@ const defaultValues = {
   fortitude: 0, resistencia_fisica: 0, recuperacao: 0, tolerancia_dor: 0, sobrevivencia: 0,
   controle_chakra: 0, moldagem_elemental: 0, ninjutsu_medico: 0, sensorial: 0,
   maestria_fogo: "", maestria_vento: "", maestria_terra: "", maestria_agua: "", maestria_raio: "",
-  inventario: "",
 };
 
 const atributos = [
   { key: "forca_fisica", label: "Força Física" },
   { key: "destreza", label: "Destreza" },
+  { key: "deslocamento", label: "Deslocamento" },
 ];
 
 const barAtributos = [
@@ -273,7 +274,7 @@ const CharacterForm = ({ ip, onCreated }: CharacterFormProps) => {
         ))}
       </div>
 
-      {/* Maestria + Inventário */}
+      {/* Maestria + Bolsa */}
       <div className="retro-panel p-3 mb-3 grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
           <div className="retro-section-title text-sm">Maestria</div>
@@ -290,13 +291,20 @@ const CharacterForm = ({ ip, onCreated }: CharacterFormProps) => {
           ))}
         </div>
         <div>
-          <div className="retro-section-title text-sm">Inventário</div>
-          <textarea
-            className="retro-input w-full text-xs min-h-[100px]"
-            placeholder="Escreva os itens do inventário..."
-            value={form.inventario}
-            onChange={(e) => handleTextChange("inventario", e.target.value)}
-          />
+          <div className="retro-section-title text-sm">Bolsa Traseira</div>
+          <div className="flex items-center gap-2 mb-2">
+            <label className="retro-label text-[11px]">Tamanho:</label>
+            <select
+              className="retro-input text-xs"
+              value={form.bolsa_traseira_tamanho}
+              onChange={(e) => handleTextChange("bolsa_traseira_tamanho", e.target.value)}
+            >
+              <option value="pequena">Pequena (10 Espaço)</option>
+              <option value="media">Média (20 Espaço)</option>
+              <option value="grande">Grande (30 Espaço)</option>
+            </select>
+          </div>
+          <p className="text-[10px] text-muted-foreground">Os itens serão adicionados à bolsa após a criação da ficha.</p>
         </div>
       </div>
 
