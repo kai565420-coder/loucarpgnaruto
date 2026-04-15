@@ -14,12 +14,14 @@ interface Jutsu {
   nome: string;
   informacoes: string;
   imagem_url: string | null;
+  categoria: string;
   created_at: string;
 }
 
 const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
   const [nome, setNome] = useState("");
   const [informacoes, setInformacoes] = useState("");
+  const [categoria, setCategoria] = useState("jutsu");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [jutsus, setJutsus] = useState<Jutsu[]>([]);
@@ -78,6 +80,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
     setEditingId(jutsu.id);
     setNome(jutsu.nome);
     setInformacoes(jutsu.informacoes);
+    setCategoria(jutsu.categoria || "jutsu");
     setImageFile(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -86,6 +89,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
     setEditingId(null);
     setNome("");
     setInformacoes("");
+    setCategoria("jutsu");
     setImageFile(null);
   };
 
@@ -115,7 +119,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
       }
 
       if (editingId) {
-        const updateData: Record<string, any> = { nome, informacoes };
+        const updateData: Record<string, any> = { nome, informacoes, categoria };
         if (imagem_url) updateData.imagem_url = imagem_url;
         const { error } = await supabase.from("jutsus").update(updateData).eq("id", editingId);
         if (error) throw error;
@@ -125,6 +129,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
         const { error } = await supabase.from("jutsus").insert({
           nome,
           informacoes,
+          categoria,
           imagem_url,
           ip_address: ip,
         });
@@ -134,6 +139,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
 
       setNome("");
       setInformacoes("");
+      setCategoria("jutsu");
       setImageFile(null);
       fetchJutsus();
       onCreated();
@@ -171,6 +177,18 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
               onChange={(e) => setNome(e.target.value)}
               placeholder="Nome do Jutsu ou Habilidade"
             />
+          </div>
+
+          <div className="mb-3">
+            <label className="retro-label block mb-1">Categoria:</label>
+            <select
+              className="retro-input w-full text-xs"
+              value={categoria}
+              onChange={(e) => setCategoria(e.target.value)}
+            >
+              <option value="jutsu">Jutsu</option>
+              <option value="habilidade">Habilidade</option>
+            </select>
           </div>
 
           <div className="mb-3">

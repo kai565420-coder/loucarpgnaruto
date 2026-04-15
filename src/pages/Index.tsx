@@ -6,6 +6,7 @@ import CharacterList from "@/components/CharacterList";
 import CharacterForm from "@/components/CharacterForm";
 import JutsuForm from "@/components/JutsuForm";
 import ItemList from "@/components/ItemList";
+import PersonalizadoList from "@/components/PersonalizadoList";
 import JutsuWindow from "@/components/JutsuWindow";
 import ItemWindow from "@/components/ItemWindow";
 import { useUserIp } from "@/hooks/useUserIp";
@@ -124,6 +125,11 @@ const Index = () => {
               <JutsuForm ip={ip || "unknown"} onCreated={() => setActiveTab("fichas")} />
             ) : activeTab === "itens" ? (
               <ItemList
+                ip={ip || "unknown"}
+                onOpenItem={(item) => openWindow("item", item.id, item)}
+              />
+            ) : activeTab === "personalizados" && isAdminMode ? (
+              <PersonalizadoList
                 ip={ip || "unknown"}
                 onOpenItem={(item) => openWindow("item", item.id, item)}
               />

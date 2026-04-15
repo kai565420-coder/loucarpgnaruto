@@ -34,7 +34,7 @@ const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
   const [valor, setValor] = useState("");
-  const [peso, setPeso] = useState(0);
+  const [peso, setPeso] = useState<number>(0);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -256,9 +256,10 @@ const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
                   type="number"
                   className="retro-input w-full"
                   value={peso}
-                  onChange={(e) => setPeso(parseInt(e.target.value) || 0)}
-                  placeholder="Ex: 2"
+                  onChange={(e) => setPeso(parseFloat(e.target.value) || 0)}
+                  placeholder="Ex: 2.5"
                   min={0}
+                  step="0.1"
                 />
               </div>
             </div>

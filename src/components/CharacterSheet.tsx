@@ -6,6 +6,7 @@ import JutsuSelector from "./JutsuSelector";
 import { useAdmin } from "@/contexts/AdminContext";
 import { getJutsuEmoji } from "@/lib/jutsuEmoji";
 import CharacterBags from "./CharacterBags";
+import SelosManuaisSelector from "./SelosManuaisSelector";
 
 interface CharacterSheetProps {
   sheet: Tables<"character_sheets">;
@@ -20,12 +21,12 @@ interface Jutsu {
   nome: string;
   informacoes: string;
   imagem_url: string | null;
+  categoria: string;
 }
 
 const atributos = [
   { key: "forca_fisica", label: "Força Física" },
   { key: "destreza", label: "Destreza" },
-  { key: "deslocamento", label: "Deslocamento" },
 ];
 
 const barAtributos = [
@@ -112,7 +113,6 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
   const [form, setForm] = useState<Record<string, any>>({ ...sheet });
   const [saving, setSaving] = useState(false);
 
-  // Jutsu state
   const [jutsus, setJutsus] = useState<Jutsu[]>([]);
   const [showJutsus, setShowJutsus] = useState(false);
   const [showJutsuSelector, setShowJutsuSelector] = useState(false);
@@ -160,6 +160,8 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
         vida: form.vida, vida_max: form.vida_max, sanidade: form.sanidade, sanidade_max: form.sanidade_max,
         chakra: form.chakra, chakra_max: form.chakra_max, forca_fisica: form.forca_fisica, destreza: form.destreza, deslocamento: form.deslocamento,
         bolsa_traseira_tamanho: form.bolsa_traseira_tamanho,
+        dinheiro: form.dinheiro,
+        selos_manuais: form.selos_manuais,
         taijutsu: form.taijutsu, forca_bruta: form.forca_bruta, imobilizacao: form.imobilizacao,
         acrobacia: form.acrobacia, furtividade: form.furtividade, shurikenjutsu: form.shurikenjutsu,
         kenjutsu: form.kenjutsu, reflexos_ninja: form.reflexos_ninja, iniciativa: form.iniciativa,
@@ -192,7 +194,6 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
     onOpenJutsu?.(jutsu);
   };
 
-  // Collapsed view
   if (!expanded) {
     return (
       <div
@@ -252,9 +253,13 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
     );
   };
 
+  // Separate jutsus by categoria
+  const jutsusList = [...jutsus].filter(j => (j.categoria || "jutsu") === "jutsu").sort((a, b) => a.nome.localeCompare(b.nome));
+  const habilidadesList = [...jutsus].filter(j => (j.categoria || "jutsu") === "habilidade").sort((a, b) => a.nome.localeCompare(b.nome));
+
   return (
     <div className="retro-panel p-3 mb-4">
-      {/* Header with collapse */}
+      {/* Header */}
       <div className="flex items-center gap-2 cursor-pointer mb-2" onClick={() => { if (!editing) setExpanded(false); }}>
         <span className="text-muted-foreground text-[10px]">▲ recolher</span>
         <span className="retro-section-title text-base mb-0 border-0 pb-0 flex-1">{sheet.nome}</span>
@@ -271,9 +276,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
                 <div className="w-[120px] h-[120px] border-2 border-border flex items-center justify-center text-muted-foreground text-xs">Sem Imagem</div>
               )}
               <input
-                type="file"
-                accept="image/*"
-                className="retro-input w-[120px] text-[9px] mt-1"
+                type="file" accept="image/*" className="retro-input w-[120px] text-[9px] mt-1"
                 onChange={async (e) => {
                   const file = e.target.files?.[0];
                   if (!file) return;
@@ -288,12 +291,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
               />
               <div className="mt-1">
                 <label className="retro-label text-[9px]">Rank Ninja:</label>
-                <input
-                  type="text"
-                  className="retro-input w-[120px] text-[10px]"
-                  value={form.rank_ninja ?? ""}
-                  onChange={(e) => handleTextChange("rank_ninja", e.target.value)}
-                />
+                <input type="text" className="retro-input w-[120px] text-[10px]" value={form.rank_ninja ?? ""} onChange={(e) => handleTextChange("rank_ninja", e.target.value)} />
               </div>
             </>
           ) : (
@@ -340,6 +338,28 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
               )}
             </div>
           ))}
+          {/* Deslocamento with "m" */}
+          <div className="text-xs retro-atributo-highlight p-2 border border-accent">
+            <span className="retro-label">Deslocamento: </span>
+            {editing && canEdit ? (
+              <span className="inline-flex items-center gap-0.5">
+                <input type="number" className="retro-input w-14 text-center text-xs" value={form.deslocamento ?? 0} onChange={(e) => handleNumberChange("deslocamento", e.target.value)} />
+                <span className="text-muted-foreground text-[10px]">m</span>
+              </span>
+            ) : (
+              <span className="text-accent font-bold text-sm">{(sheet as any).deslocamento}m</span>
+            )}
+          </div>
+          {/* Selos Manuais */}
+          <div className="text-xs retro-atributo-highlight p-2 border border-accent min-w-[180px]">
+            <span className="retro-label block mb-1">Selos Manuais: </span>
+            <SelosManuaisSelector
+              value={editing ? (form.selos_manuais ?? "") : ((sheet as any).selos_manuais ?? "")}
+              onChange={(v) => handleTextChange("selos_manuais", v)}
+              editing={editing}
+              canEdit={canEdit}
+            />
+          </div>
         </div>
       </div>
 
@@ -380,26 +400,22 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
             bolsaTraseiraTamanho={editing ? (form.bolsa_traseira_tamanho ?? "pequena") : ((sheet as any).bolsa_traseira_tamanho ?? "pequena")}
             editing={editing}
             canEdit={canEdit}
+            dinheiro={editing ? (form.dinheiro ?? 0) : ((sheet as any).dinheiro ?? 0)}
             onTamanhoChange={(t) => handleTextChange("bolsa_traseira_tamanho", t)}
+            onDinheiroChange={(v) => setForm((prev) => ({ ...prev, dinheiro: v }))}
           />
         </div>
       </div>
 
-      {/* Jutsus Section */}
+      {/* Jutsus / Habilidades Section */}
       <div className="mt-3">
         <div className="flex items-center gap-2 mb-2">
-          <button
-            onClick={() => setShowJutsus(!showJutsus)}
-            className="retro-button text-xs"
-          >
-            🌀 Habilidades ({jutsus.length})
+          <button onClick={() => setShowJutsus(!showJutsus)} className="retro-button text-xs">
+            🌀 Jutsus ({jutsusList.length}) / Habilidades ({habilidadesList.length})
           </button>
           {editing && canEdit && (
-            <button
-              onClick={() => setShowJutsuSelector(!showJutsuSelector)}
-              className="retro-button text-xs"
-            >
-              ➕ Adicionar Habilidade
+            <button onClick={() => setShowJutsuSelector(!showJutsuSelector)} className="retro-button text-xs">
+              ➕ Adicionar
             </button>
           )}
         </div>
@@ -413,13 +429,12 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
           />
         )}
 
-      {showJutsus && (
+        {showJutsus && (
           <div className="retro-panel p-2">
-            {jutsus.length === 0 ? (
-              <p className="text-muted-foreground text-[11px]">Nenhuma habilidade atribuída.</p>
-            ) : (
-              [...jutsus].sort((a, b) => a.nome.localeCompare(b.nome)).map((jutsu) => {
-                return (
+            {jutsusList.length > 0 && (
+              <>
+                <div className="text-accent font-bold text-[11px] border-b border-border pb-1 mb-1">🌀 Jutsus</div>
+                {jutsusList.map((jutsu) => (
                   <button
                     key={jutsu.id}
                     onClick={() => handleOpenJutsu(jutsu)}
@@ -427,8 +442,25 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
                   >
                     {getJutsuEmoji(jutsu.nome)} {jutsu.nome}
                   </button>
-                );
-              })
+                ))}
+              </>
+            )}
+            {habilidadesList.length > 0 && (
+              <>
+                <div className="text-accent font-bold text-[11px] border-b border-border pb-1 mb-1 mt-2">💪 Habilidades</div>
+                {habilidadesList.map((jutsu) => (
+                  <button
+                    key={jutsu.id}
+                    onClick={() => handleOpenJutsu(jutsu)}
+                    className="block w-full text-left px-2 py-1 text-xs text-foreground hover:bg-muted hover:text-accent transition-colors border-b border-border last:border-0"
+                  >
+                    {getJutsuEmoji(jutsu.nome)} {jutsu.nome}
+                  </button>
+                ))}
+              </>
+            )}
+            {jutsusList.length === 0 && habilidadesList.length === 0 && (
+              <p className="text-muted-foreground text-[11px]">Nenhuma habilidade atribuída.</p>
             )}
           </div>
         )}

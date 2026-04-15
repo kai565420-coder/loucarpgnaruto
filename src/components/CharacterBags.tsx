@@ -7,6 +7,7 @@ interface BagItem {
   item_id: string;
   bag_type: string;
   quantidade: number;
+  is_papel_lacrado: boolean;
   item: {
     nome: string;
     peso: number;
@@ -26,7 +27,9 @@ interface CharacterBagsProps {
   bolsaTraseiraTamanho: string;
   editing: boolean;
   canEdit: boolean;
+  dinheiro: number;
   onTamanhoChange?: (tamanho: string) => void;
+  onDinheiroChange?: (value: number) => void;
 }
 
 const TRASEIRA_SIZES: Record<string, number> = {
@@ -35,19 +38,22 @@ const TRASEIRA_SIZES: Record<string, number> = {
   grande: 30,
 };
 
-const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, onTamanhoChange }: CharacterBagsProps) => {
+const PAPEL_LACRADO_PESO = 0.5;
+
+const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, dinheiro, onTamanhoChange, onDinheiroChange }: CharacterBagsProps) => {
   const [bagItems, setBagItems] = useState<BagItem[]>([]);
   const [allItems, setAllItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [addingTo, setAddingTo] = useState<string | null>(null);
   const [selectedItemId, setSelectedItemId] = useState("");
   const [addQtd, setAddQtd] = useState(1);
+  const [addAsPapelLacrado, setAddAsPapelLacrado] = useState(false);
 
   const fetchBagItems = useCallback(async () => {
     setLoading(true);
     const { data } = await supabase
       .from("character_bag_items")
-      .select("id, item_id, bag_type, quantidade")
+      .select("id, item_id, bag_type, quantidade, is_papel_lacrado")
       .eq("character_id", characterId);
 
     if (data && data.length > 0) {
@@ -86,7 +92,14 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, on
   const lateralMax = 4;
 
   const traseiraMax = TRASEIRA_SIZES[bolsaTraseiraTamanho] || 10;
-  const traseiraUsed = traseiraItems.reduce((s, b) => s + b.item.peso * b.quantidade, 0);
+  const traseiraUsed = traseiraItems.reduce((s, b) => {
+    const itemPeso = b.is_papel_lacrado ? PAPEL_LACRADO_PESO : b.item.peso;
+    return s + itemPeso * b.quantidade;
+  }, 0);
+
+  const getItemWeight = (bi: BagItem) => {
+    return bi.is_papel_lacrado ? PAPEL_LACRADO_PESO : bi.item.peso;
+  };
 
   const handleAdd = async (bagType: string) => {
     if (!selectedItemId) return;
@@ -108,15 +121,15 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, on
     }
 
     if (bagType === "traseira") {
-      const spaceNeeded = item.peso * addQtd;
+      const itemPeso = addAsPapelLacrado ? PAPEL_LACRADO_PESO : item.peso;
+      const spaceNeeded = itemPeso * addQtd;
       if (traseiraUsed + spaceNeeded > traseiraMax) {
-        toast.error(`Espaço insuficiente na bolsa traseira! (${traseiraMax - traseiraUsed} restantes)`);
+        toast.error(`Espaço insuficiente na bolsa traseira! (${(traseiraMax - traseiraUsed).toFixed(1)} restantes)`);
         return;
       }
     }
 
-    // Check if item already exists in this bag
-    const existing = bagItems.find((b) => b.item_id === selectedItemId && b.bag_type === bagType);
+    const existing = bagItems.find((b) => b.item_id === selectedItemId && b.bag_type === bagType && b.is_papel_lacrado === addAsPapelLacrado);
     if (existing) {
       const { error } = await supabase
         .from("character_bag_items")
@@ -129,6 +142,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, on
         item_id: selectedItemId,
         bag_type: bagType,
         quantidade: addQtd,
+        is_papel_lacrado: addAsPapelLacrado,
       });
       if (error) { toast.error("Erro ao adicionar"); return; }
     }
@@ -136,6 +150,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, on
     toast.success("Item adicionado!");
     setSelectedItemId("");
     setAddQtd(1);
+    setAddAsPapelLacrado(false);
     setAddingTo(null);
     fetchBagItems();
   };
@@ -159,7 +174,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, on
       <div className="flex justify-between items-center mb-1">
         <span className="text-accent font-bold text-[11px]">{label}</span>
         <span className={`text-[10px] font-bold ${used > max ? "text-destructive" : "text-muted-foreground"}`}>
-          {used}/{max} {bagType === "lateral" ? "slots" : "peso"}
+          {Number(used.toFixed(1))}/{max} {bagType === "lateral" ? "slots" : "peso"}
         </span>
       </div>
       <div className="w-full h-2 border border-border mb-2" style={{ background: "hsl(0 0% 5%)" }}>
@@ -187,8 +202,11 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, on
           <tbody>
             {items.map((bi) => (
               <tr key={bi.id} className="border-b border-border last:border-0">
-                <td className="py-1 text-foreground">{bi.item.nome}</td>
-                <td className="py-1 text-center text-muted-foreground">{bi.item.peso}</td>
+                <td className="py-1 text-foreground">
+                  {bi.is_papel_lacrado && <span title="Papel Lacrado">📜 </span>}
+                  {bi.item.nome}
+                </td>
+                <td className="py-1 text-center text-muted-foreground">{getItemWeight(bi)}</td>
                 <td className="py-1 text-center">
                   {editing && canEdit ? (
                     <input
@@ -229,6 +247,17 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, on
                     <option key={i.id} value={i.id}>{i.nome} (peso: {i.peso})</option>
                   ))}
               </select>
+              {bagType === "traseira" && (
+                <label className="flex items-center gap-1 text-[10px] text-foreground">
+                  <input
+                    type="checkbox"
+                    checked={addAsPapelLacrado}
+                    onChange={(e) => setAddAsPapelLacrado(e.target.checked)}
+                    className="accent-[hsl(25,100%,50%)]"
+                  />
+                  📜 Papel Lacrado (peso: {PAPEL_LACRADO_PESO})
+                </label>
+              )}
               <div className="flex gap-1">
                 <input
                   type="number"
@@ -239,11 +268,11 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, on
                   placeholder="Qtd"
                 />
                 <button onClick={() => handleAdd(bagType)} className="retro-button text-[10px] flex-1">✅ Add</button>
-                <button onClick={() => setAddingTo(null)} className="retro-button text-[10px]">✕</button>
+                <button onClick={() => { setAddingTo(null); setAddAsPapelLacrado(false); }} className="retro-button text-[10px]">✕</button>
               </div>
             </div>
           ) : (
-            <button onClick={() => { setAddingTo(bagType); setSelectedItemId(""); setAddQtd(1); }} className="text-[10px] text-accent hover:underline mt-1">
+            <button onClick={() => { setAddingTo(bagType); setSelectedItemId(""); setAddQtd(1); setAddAsPapelLacrado(false); }} className="text-[10px] text-accent hover:underline mt-1">
               ➕ Adicionar item
             </button>
           )}
@@ -275,6 +304,26 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, on
 
       {renderBagTable(lateralItems, "lateral", lateralUsed, lateralMax, "📌 Bolsa Lateral (Kunais/Shurikens)")}
       {renderBagTable(traseiraItems, "traseira", traseiraUsed, traseiraMax, `🎒 Bolsa Traseira (${bolsaTraseiraTamanho.charAt(0).toUpperCase() + bolsaTraseiraTamanho.slice(1)})`)}
+
+      {/* Dinheiro */}
+      <div className="mt-2 border-t border-border pt-2">
+        <div className="flex items-center gap-2">
+          <span className="text-accent font-bold text-[11px]">💰 Ryos: 両</span>
+          {editing && canEdit ? (
+            <input
+              type="text"
+              className="retro-input w-24 text-center text-[11px]"
+              value={dinheiro}
+              onChange={(e) => {
+                const val = parseFloat(e.target.value.replace(/[^\d.]/g, "")) || 0;
+                onDinheiroChange?.(val);
+              }}
+            />
+          ) : (
+            <span className="text-foreground font-bold text-sm">{dinheiro.toLocaleString("pt-BR")}</span>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
