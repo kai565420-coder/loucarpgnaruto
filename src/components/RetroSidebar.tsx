@@ -26,6 +26,7 @@ const RetroSidebar = ({ activeTab, onTabChange }: RetroSidebarProps) => {
       items: [
         { id: "sobre", label: "Sobre", icon: "/images/icon-sobre.png" },
         { id: "itens", label: "Itens", icon: "/images/icon-itens.png" },
+        ...(isAdminMode ? [{ id: "personalizados", label: "Personalizados", icon: null as string | null }] : []),
       ],
     },
   ];
@@ -47,10 +48,7 @@ const RetroSidebar = ({ activeTab, onTabChange }: RetroSidebarProps) => {
         </button>
 
         {open && (
-          <div
-            className="fixed inset-0 z-40 bg-black/70"
-            onClick={() => setOpen(false)}
-          />
+          <div className="fixed inset-0 z-40 bg-black/70" onClick={() => setOpen(false)} />
         )}
 
         <aside
@@ -70,16 +68,10 @@ const RetroSidebar = ({ activeTab, onTabChange }: RetroSidebarProps) => {
                     key={item.id}
                     onClick={() => handleTabChange(item.id)}
                     className={`flex items-center gap-2 w-full text-left px-3 py-2 text-xs transition-colors ${
-                      activeTab === item.id
-                        ? "bg-muted text-accent"
-                        : "text-foreground hover:bg-muted hover:text-accent"
+                      activeTab === item.id ? "bg-muted text-accent" : "text-foreground hover:bg-muted hover:text-accent"
                     }`}
                   >
-                    {item.icon ? (
-                      <img src={item.icon} alt="" className="w-4 h-4 object-contain" />
-                    ) : (
-                      <span>🌀</span>
-                    )}
+                    {item.icon ? <img src={item.icon} alt="" className="w-4 h-4 object-contain" /> : <span>⭐</span>}
                     {item.label}
                   </button>
                 ))}
@@ -104,16 +96,10 @@ const RetroSidebar = ({ activeTab, onTabChange }: RetroSidebarProps) => {
                 key={item.id}
                 onClick={() => onTabChange(item.id)}
                 className={`flex items-center gap-2 w-full text-left px-3 py-2 text-xs transition-colors ${
-                  activeTab === item.id
-                    ? "bg-muted text-accent"
-                    : "text-foreground hover:bg-muted hover:text-accent"
+                  activeTab === item.id ? "bg-muted text-accent" : "text-foreground hover:bg-muted hover:text-accent"
                 }`}
               >
-                {item.icon ? (
-                  <img src={item.icon} alt="" className="w-4 h-4 object-contain" />
-                ) : (
-                  <span>🌀</span>
-                )}
+                {item.icon ? <img src={item.icon} alt="" className="w-4 h-4 object-contain" /> : <span>⭐</span>}
                 {item.label}
               </button>
             ))}
