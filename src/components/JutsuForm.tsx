@@ -190,7 +190,6 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
               <option value="habilidade">Habilidade</option>
             </select>
           </div>
-          </div>
 
           <div className="mb-3">
             <label className="retro-label block mb-1">Informações:</label>
