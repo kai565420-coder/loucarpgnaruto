@@ -15,7 +15,7 @@ const defaultValues = {
   classe: "",
   talento: "",
   vida: 0, vida_max: 0, sanidade: 0, sanidade_max: 0, forca_fisica: 0, destreza: 0, deslocamento: 0, chakra: 0, chakra_max: 0,
-  bolsa_traseira_tamanho: "pequena",
+  bolsa_traseira_tamanho: "pequena", dinheiro: 0, selos_manuais: "",
   taijutsu: 0, forca_bruta: 0, imobilizacao: 0,
   acrobacia: 0, furtividade: 0, shurikenjutsu: 0, kenjutsu: 0, reflexos_ninja: 0, iniciativa: 0,
   analise_combate: 0, estrategia_tatica: 0, conhecimento_shinobi: 0, conhecimento_clas: 0, fuinjutsu: 0, sabotagem: 0,
