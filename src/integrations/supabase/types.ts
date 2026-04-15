@@ -20,6 +20,7 @@ export type Database = {
           character_id: string
           created_at: string
           id: string
+          is_papel_lacrado: boolean
           item_id: string
           quantidade: number
         }
@@ -28,6 +29,7 @@ export type Database = {
           character_id: string
           created_at?: string
           id?: string
+          is_papel_lacrado?: boolean
           item_id: string
           quantidade?: number
         }
@@ -36,6 +38,7 @@ export type Database = {
           character_id?: string
           created_at?: string
           id?: string
+          is_papel_lacrado?: boolean
           item_id?: string
           quantidade?: number
         }
@@ -107,6 +110,7 @@ export type Database = {
           created_at: string
           deslocamento: number
           destreza: number
+          dinheiro: number
           elementos: string
           estrategia_tatica: number
           forca_bruta: number
@@ -140,6 +144,7 @@ export type Database = {
           sabotagem: number
           sanidade: number
           sanidade_max: number
+          selos_manuais: string
           sensorial: number
           shurikenjutsu: number
           sobrevivencia: number
@@ -165,6 +170,7 @@ export type Database = {
           created_at?: string
           deslocamento?: number
           destreza?: number
+          dinheiro?: number
           elementos?: string
           estrategia_tatica?: number
           forca_bruta?: number
@@ -198,6 +204,7 @@ export type Database = {
           sabotagem?: number
           sanidade?: number
           sanidade_max?: number
+          selos_manuais?: string
           sensorial?: number
           shurikenjutsu?: number
           sobrevivencia?: number
@@ -223,6 +230,7 @@ export type Database = {
           created_at?: string
           deslocamento?: number
           destreza?: number
+          dinheiro?: number
           elementos?: string
           estrategia_tatica?: number
           forca_bruta?: number
@@ -256,6 +264,7 @@ export type Database = {
           sabotagem?: number
           sanidade?: number
           sanidade_max?: number
+          selos_manuais?: string
           sensorial?: number
           shurikenjutsu?: number
           sobrevivencia?: number
@@ -304,6 +313,7 @@ export type Database = {
       }
       jutsus: {
         Row: {
+          categoria: string
           created_at: string
           id: string
           imagem_url: string | null
@@ -312,6 +322,7 @@ export type Database = {
           nome: string
         }
         Insert: {
+          categoria?: string
           created_at?: string
           id?: string
           imagem_url?: string | null
@@ -320,12 +331,46 @@ export type Database = {
           nome: string
         }
         Update: {
+          categoria?: string
           created_at?: string
           id?: string
           imagem_url?: string | null
           informacoes?: string
           ip_address?: string
           nome?: string
+        }
+        Relationships: []
+      }
+      personalizados: {
+        Row: {
+          created_at: string
+          descricao: string
+          id: string
+          imagem_url: string | null
+          ip_address: string
+          nome: string
+          peso: number
+          valor: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string
+          id?: string
+          imagem_url?: string | null
+          ip_address: string
+          nome: string
+          peso?: number
+          valor?: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string
+          id?: string
+          imagem_url?: string | null
+          ip_address?: string
+          nome?: string
+          peso?: number
+          valor?: string
         }
         Relationships: []
       }
