@@ -1,0 +1,1 @@
+ALTER TABLE public.character_jutsus ADD COLUMN maestria_nivel text NOT NULL DEFAULT 'I';

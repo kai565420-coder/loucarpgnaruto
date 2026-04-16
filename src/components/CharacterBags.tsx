@@ -22,6 +22,13 @@ interface Item {
   imagem_url: string | null;
 }
 
+interface PersonalizadoItem {
+  id: string;
+  nome: string;
+  peso: number;
+  imagem_url: string | null;
+}
+
 interface CharacterBagsProps {
   characterId: string;
   bolsaTraseiraTamanho: string;
@@ -43,11 +50,13 @@ const PAPEL_LACRADO_PESO = 0.5;
 const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, dinheiro, onTamanhoChange, onDinheiroChange }: CharacterBagsProps) => {
   const [bagItems, setBagItems] = useState<BagItem[]>([]);
   const [allItems, setAllItems] = useState<Item[]>([]);
+  const [personalizados, setPersonalizados] = useState<PersonalizadoItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [addingTo, setAddingTo] = useState<string | null>(null);
   const [selectedItemId, setSelectedItemId] = useState("");
   const [addQtd, setAddQtd] = useState(1);
   const [addAsPapelLacrado, setAddAsPapelLacrado] = useState(false);
+  const [itemSource, setItemSource] = useState<"items" | "personalizados">("items");
 
   const fetchBagItems = useCallback(async () => {
     setLoading(true);
@@ -58,12 +67,18 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
 
     if (data && data.length > 0) {
       const itemIds = data.map((d) => d.item_id);
-      const { data: itemsData } = await supabase
-        .from("items")
-        .select("id, nome, peso, imagem_url")
-        .in("id", itemIds);
+      
+      // Fetch from both items and personalizados
+      const [{ data: itemsData }, { data: persData }] = await Promise.all([
+        supabase.from("items").select("id, nome, peso, imagem_url").in("id", itemIds),
+        supabase.from("personalizados").select("id, nome, peso, imagem_url").in("id", itemIds),
+      ]);
 
-      const itemsMap = new Map((itemsData || []).map((i) => [i.id, i]));
+      const itemsMap = new Map([
+        ...((itemsData || []).map((i) => [i.id, i] as [string, any])),
+        ...((persData || []).map((i) => [i.id, i] as [string, any])),
+      ]);
+      
       const enriched = data.map((d) => ({
         ...d,
         item: itemsMap.get(d.item_id) || { nome: "?", peso: 0, imagem_url: null },
@@ -76,8 +91,12 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
   }, [characterId]);
 
   const fetchAllItems = useCallback(async () => {
-    const { data } = await supabase.from("items").select("id, nome, peso, imagem_url").order("nome");
-    setAllItems(data || []);
+    const [{ data: items }, { data: pers }] = await Promise.all([
+      supabase.from("items").select("id, nome, peso, imagem_url").order("nome"),
+      supabase.from("personalizados").select("id, nome, peso, imagem_url").order("nome"),
+    ]);
+    setAllItems(items || []);
+    setPersonalizados(pers || []);
   }, []);
 
   useEffect(() => {
@@ -87,6 +106,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
 
   const lateralItems = bagItems.filter((b) => b.bag_type === "lateral");
   const traseiraItems = bagItems.filter((b) => b.bag_type === "traseira");
+  const equipadoItems = bagItems.filter((b) => b.bag_type === "equipado");
 
   const lateralUsed = lateralItems.reduce((s, b) => s + b.quantidade, 0);
   const lateralMax = 4;
@@ -101,11 +121,22 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
     return bi.is_papel_lacrado ? PAPEL_LACRADO_PESO : bi.item.peso;
   };
 
+  const getAvailableItems = (bagType: string) => {
+    if (bagType === "equipado") return personalizados;
+    if (bagType === "lateral") {
+      return allItems.filter((i) => i.nome.toLowerCase().includes("kunai") || i.nome.toLowerCase().includes("shuriken"));
+    }
+    // traseira - show both based on itemSource
+    if (itemSource === "personalizados") return personalizados;
+    return allItems;
+  };
+
   const handleAdd = async (bagType: string) => {
     if (!selectedItemId) return;
     if (addQtd < 1) return;
 
-    const item = allItems.find((i) => i.id === selectedItemId);
+    const allAvailable = [...allItems, ...personalizados];
+    const item = allAvailable.find((i) => i.id === selectedItemId);
     if (!item) return;
 
     if (bagType === "lateral") {
@@ -129,6 +160,8 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
       }
     }
 
+    // equipado items have weight 0, no space check needed
+
     const existing = bagItems.find((b) => b.item_id === selectedItemId && b.bag_type === bagType && b.is_papel_lacrado === addAsPapelLacrado);
     if (existing) {
       const { error } = await supabase
@@ -142,7 +175,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
         item_id: selectedItemId,
         bag_type: bagType,
         quantidade: addQtd,
-        is_papel_lacrado: addAsPapelLacrado,
+        is_papel_lacrado: bagType === "equipado" ? false : addAsPapelLacrado,
       });
       if (error) { toast.error("Erro ao adicionar"); return; }
     }
@@ -152,6 +185,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
     setAddQtd(1);
     setAddAsPapelLacrado(false);
     setAddingTo(null);
+    setItemSource("items");
     fetchBagItems();
   };
 
@@ -169,23 +203,34 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
     fetchBagItems();
   };
 
-  const renderBagTable = (items: BagItem[], bagType: string, used: number, max: number, label: string) => (
+  const handleMoveTo = async (bagItemId: string, newBagType: string) => {
+    const { error } = await supabase.from("character_bag_items").update({ bag_type: newBagType }).eq("id", bagItemId);
+    if (error) { toast.error("Erro ao mover"); return; }
+    toast.success("Item movido!");
+    fetchBagItems();
+  };
+
+  const renderBagTable = (items: BagItem[], bagType: string, used: number | null, max: number | null, label: string) => (
     <div className="mb-3">
       <div className="flex justify-between items-center mb-1">
         <span className="text-accent font-bold text-[11px]">{label}</span>
-        <span className={`text-[10px] font-bold ${used > max ? "text-destructive" : "text-muted-foreground"}`}>
-          {Number(used.toFixed(1))}/{max} {bagType === "lateral" ? "slots" : "peso"}
-        </span>
+        {used !== null && max !== null && (
+          <span className={`text-[10px] font-bold ${used > max ? "text-destructive" : "text-muted-foreground"}`}>
+            {Number(used.toFixed(1))}/{max} {bagType === "lateral" ? "slots" : "peso"}
+          </span>
+        )}
       </div>
-      <div className="w-full h-2 border border-border mb-2" style={{ background: "hsl(0 0% 5%)" }}>
-        <div
-          className="h-full transition-all"
-          style={{
-            width: `${Math.min((used / max) * 100, 100)}%`,
-            background: used > max ? "hsl(0 70% 45%)" : "hsl(140 60% 40%)",
-          }}
-        />
-      </div>
+      {used !== null && max !== null && (
+        <div className="w-full h-2 border border-border mb-2" style={{ background: "hsl(0 0% 5%)" }}>
+          <div
+            className="h-full transition-all"
+            style={{
+              width: `${Math.min((used / max) * 100, 100)}%`,
+              background: used > max ? "hsl(0 70% 45%)" : "hsl(140 60% 40%)",
+            }}
+          />
+        </div>
+      )}
 
       {items.length === 0 ? (
         <div className="text-[10px] text-muted-foreground text-center py-2">Vazia</div>
@@ -194,19 +239,24 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
           <thead>
             <tr className="border-b border-border">
               <th className="text-left retro-label py-1">Nome</th>
-              <th className="text-center retro-label py-1 w-12">Peso</th>
+              {bagType !== "equipado" && <th className="text-center retro-label py-1 w-12">Peso</th>}
               <th className="text-center retro-label py-1 w-12">Qtd.</th>
-              {editing && canEdit && <th className="w-8"></th>}
+              {editing && canEdit && <th className="w-16"></th>}
             </tr>
           </thead>
           <tbody>
             {items.map((bi) => (
               <tr key={bi.id} className="border-b border-border last:border-0">
                 <td className="py-1 text-foreground">
-                  {bi.is_papel_lacrado && <span title="Papel Lacrado">📜 </span>}
-                  {bi.item.nome}
+                  {bi.is_papel_lacrado ? (
+                    <span title="Papel Lacrado">📜 {bi.item.nome}: Papel Selado</span>
+                  ) : (
+                    bi.item.nome
+                  )}
                 </td>
-                <td className="py-1 text-center text-muted-foreground">{getItemWeight(bi)}</td>
+                {bagType !== "equipado" && (
+                  <td className="py-1 text-center text-muted-foreground">{getItemWeight(bi)}</td>
+                )}
                 <td className="py-1 text-center">
                   {editing && canEdit ? (
                     <input
@@ -221,7 +271,14 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
                   )}
                 </td>
                 {editing && canEdit && (
-                  <td className="py-1 text-center">
+                  <td className="py-1 text-center flex gap-1 items-center justify-center">
+                    {/* Move buttons for equipado <-> traseira */}
+                    {bagType === "equipado" && (
+                      <button onClick={() => handleMoveTo(bi.id, "traseira")} className="text-[9px] text-accent hover:underline" title="Mover para bolsa">🎒</button>
+                    )}
+                    {bagType === "traseira" && personalizados.some(p => p.id === bi.item_id) && (
+                      <button onClick={() => handleMoveTo(bi.id, "equipado")} className="text-[9px] text-accent hover:underline" title="Equipar">⚔️</button>
+                    )}
                     <button onClick={() => handleRemove(bi.id)} className="text-destructive hover:text-destructive/80 text-[10px]">✕</button>
                   </td>
                 )}
@@ -235,17 +292,27 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
         <div className="mt-1">
           {addingTo === bagType ? (
             <div className="flex flex-col gap-1 mt-1">
+              {bagType === "traseira" && (
+                <div className="flex gap-1 mb-1">
+                  <button
+                    onClick={() => { setItemSource("items"); setSelectedItemId(""); }}
+                    className={`text-[9px] px-2 py-0.5 border ${itemSource === "items" ? "border-accent text-accent" : "border-border text-muted-foreground"}`}
+                  >Itens</button>
+                  <button
+                    onClick={() => { setItemSource("personalizados"); setSelectedItemId(""); }}
+                    className={`text-[9px] px-2 py-0.5 border ${itemSource === "personalizados" ? "border-accent text-accent" : "border-border text-muted-foreground"}`}
+                  >Personalizados</button>
+                </div>
+              )}
               <select
                 className="retro-input text-[10px] w-full"
                 value={selectedItemId}
                 onChange={(e) => setSelectedItemId(e.target.value)}
               >
                 <option value="">Selecione um item...</option>
-                {allItems
-                  .filter((i) => bagType !== "lateral" || i.nome.toLowerCase().includes("kunai") || i.nome.toLowerCase().includes("shuriken"))
-                  .map((i) => (
-                    <option key={i.id} value={i.id}>{i.nome} (peso: {i.peso})</option>
-                  ))}
+                {getAvailableItems(bagType).map((i) => (
+                  <option key={i.id} value={i.id}>{i.nome} (peso: {i.peso})</option>
+                ))}
               </select>
               {bagType === "traseira" && (
                 <label className="flex items-center gap-1 text-[10px] text-foreground">
@@ -268,11 +335,11 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
                   placeholder="Qtd"
                 />
                 <button onClick={() => handleAdd(bagType)} className="retro-button text-[10px] flex-1">✅ Add</button>
-                <button onClick={() => { setAddingTo(null); setAddAsPapelLacrado(false); }} className="retro-button text-[10px]">✕</button>
+                <button onClick={() => { setAddingTo(null); setAddAsPapelLacrado(false); setItemSource("items"); }} className="retro-button text-[10px]">✕</button>
               </div>
             </div>
           ) : (
-            <button onClick={() => { setAddingTo(bagType); setSelectedItemId(""); setAddQtd(1); setAddAsPapelLacrado(false); }} className="text-[10px] text-accent hover:underline mt-1">
+            <button onClick={() => { setAddingTo(bagType); setSelectedItemId(""); setAddQtd(1); setAddAsPapelLacrado(false); setItemSource("items"); }} className="text-[10px] text-accent hover:underline mt-1">
               ➕ Adicionar item
             </button>
           )}
@@ -304,6 +371,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
 
       {renderBagTable(lateralItems, "lateral", lateralUsed, lateralMax, "📌 Bolsa Lateral (Kunais/Shurikens)")}
       {renderBagTable(traseiraItems, "traseira", traseiraUsed, traseiraMax, `🎒 Bolsa Traseira (${bolsaTraseiraTamanho.charAt(0).toUpperCase() + bolsaTraseiraTamanho.slice(1)})`)}
+      {renderBagTable(equipadoItems, "equipado", null, null, "⚔️ Itens Equipados")}
 
       {/* Dinheiro */}
       <div className="mt-2 border-t border-border pt-2">

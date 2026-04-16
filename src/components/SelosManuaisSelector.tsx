@@ -24,67 +24,53 @@ const SELOS_MANUAIS = [
 ];
 
 interface SelosManuaisSelectorProps {
-  value: string; // comma-separated IDs
+  value: string;
   onChange: (value: string) => void;
   editing: boolean;
   canEdit: boolean;
 }
 
 const SelosManuaisSelector = ({ value, onChange, editing, canEdit }: SelosManuaisSelectorProps) => {
-  const [expandedSelo, setExpandedSelo] = useState<string | null>(null);
+  const [showDesc, setShowDesc] = useState(false);
 
-  const selectedIds = value ? value.split(",").filter(Boolean) : [];
+  const currentSelo = SELOS_MANUAIS.find((s) => s.id === value) || null;
 
-  const toggleSelo = (id: string) => {
-    if (!editing || !canEdit) return;
-    let newIds: string[];
-    if (selectedIds.includes(id)) {
-      newIds = selectedIds.filter((s) => s !== id);
-    } else {
-      if (selectedIds.length >= 4) return;
-      newIds = [...selectedIds, id];
-    }
-    onChange(newIds.join(","));
-  };
+  if (editing && canEdit) {
+    return (
+      <div>
+        <select
+          className="retro-input text-[10px] w-full"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        >
+          <option value="">Nenhum</option>
+          {SELOS_MANUAIS.map((selo) => (
+            <option key={selo.id} value={selo.id}>{selo.label}</option>
+          ))}
+        </select>
+      </div>
+    );
+  }
+
+  if (!currentSelo) {
+    return <span className="text-muted-foreground text-[10px]">Nenhum</span>;
+  }
 
   return (
-    <div>
-      <div className="flex flex-wrap gap-1">
-        {SELOS_MANUAIS.map((selo) => {
-          const isSelected = selectedIds.includes(selo.id);
-          return (
-            <div key={selo.id} className="relative">
-              <button
-                type="button"
-                onClick={() => {
-                  if (editing && canEdit) {
-                    toggleSelo(selo.id);
-                  } else {
-                    setExpandedSelo(expandedSelo === selo.id ? null : selo.id);
-                  }
-                }}
-                className={`text-[9px] px-1.5 py-0.5 border transition-colors ${
-                  isSelected
-                    ? "border-accent bg-accent/20 text-accent font-bold"
-                    : "border-border text-muted-foreground hover:border-accent/50"
-                }`}
-                title={selo.descricao}
-              >
-                {selo.label}
-              </button>
-              {expandedSelo === selo.id && !editing && (
-                <div className="absolute z-20 top-full left-0 mt-1 w-[200px] bg-card border border-border p-2 text-[10px] text-foreground shadow-lg">
-                  <div className="font-bold text-accent mb-1">{selo.label}</div>
-                  <p>{selo.descricao}</p>
-                  <button onClick={() => setExpandedSelo(null)} className="text-[9px] text-muted-foreground hover:text-accent mt-1">Fechar</button>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-      {editing && canEdit && (
-        <div className="text-[9px] text-muted-foreground mt-1">Clique para selecionar (máx. 4)</div>
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setShowDesc(!showDesc)}
+        className="text-[10px] px-1.5 py-0.5 border border-accent bg-accent/20 text-accent font-bold cursor-pointer"
+      >
+        {currentSelo.label}
+      </button>
+      {showDesc && (
+        <div className="absolute z-20 top-full left-0 mt-1 w-[220px] bg-card border border-border p-2 text-[10px] text-foreground shadow-lg">
+          <div className="font-bold text-accent mb-1">{currentSelo.label}</div>
+          <p>{currentSelo.descricao}</p>
+          <button onClick={() => setShowDesc(false)} className="text-[9px] text-muted-foreground hover:text-accent mt-1">Fechar</button>
+        </div>
       )}
     </div>
   );

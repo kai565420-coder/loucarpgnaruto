@@ -65,18 +65,21 @@ export type Database = {
           created_at: string
           id: string
           jutsu_id: string
+          maestria_nivel: string
         }
         Insert: {
           character_id: string
           created_at?: string
           id?: string
           jutsu_id: string
+          maestria_nivel?: string
         }
         Update: {
           character_id?: string
           created_at?: string
           id?: string
           jutsu_id?: string
+          maestria_nivel?: string
         }
         Relationships: [
           {
