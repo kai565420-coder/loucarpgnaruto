@@ -161,7 +161,7 @@ const PersonalizadoList = ({ ip, onOpenItem }: PersonalizadoListProps) => {
               </div>
               <div>
                 <label className="retro-label block mb-1">Peso:</label>
-                <input type="number" className="retro-input w-full" value={peso} onChange={(e) => setPeso(parseFloat(e.target.value) || 0)} placeholder="Ex: 2.5" min={0} step="0.1" />
+                <input type="number" className="retro-input w-full" value={peso} onChange={(e) => setPeso(parseFloat(e.target.value) || 0)} placeholder="Ex: 0.16" min={0} step="0.001" />
               </div>
             </div>
             <div>
