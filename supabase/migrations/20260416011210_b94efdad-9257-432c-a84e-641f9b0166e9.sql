@@ -1,0 +1,1 @@
+ALTER TABLE public.character_bag_items DROP CONSTRAINT IF EXISTS character_bag_items_item_id_fkey;
