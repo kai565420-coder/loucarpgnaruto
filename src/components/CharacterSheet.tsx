@@ -24,6 +24,13 @@ interface Jutsu {
   categoria: string;
 }
 
+interface CharacterJutsuLink {
+  jutsu_id: string;
+  maestria_nivel: string;
+}
+
+const MAESTRIA_LEVELS = ["I", "II", "III", "IV", "V"];
+
 const atributos = [
   { key: "forca_fisica", label: "Força Física" },
   { key: "destreza", label: "Destreza" },
@@ -114,6 +121,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
   const [saving, setSaving] = useState(false);
 
   const [jutsus, setJutsus] = useState<Jutsu[]>([]);
+  const [jutsuLinks, setJutsuLinks] = useState<CharacterJutsuLink[]>([]);
   const [showJutsus, setShowJutsus] = useState(false);
   const [showJutsuSelector, setShowJutsuSelector] = useState(false);
   const [assignedJutsuIds, setAssignedJutsuIds] = useState<string[]>([]);
@@ -121,10 +129,16 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
   const fetchJutsus = useCallback(async () => {
     const { data: links } = await supabase
       .from("character_jutsus")
-      .select("jutsu_id")
+      .select("jutsu_id, maestria_nivel")
       .eq("character_id", sheet.id);
 
-    const ids = (links || []).map((l: any) => l.jutsu_id);
+    const typedLinks: CharacterJutsuLink[] = (links || []).map((l: any) => ({
+      jutsu_id: l.jutsu_id,
+      maestria_nivel: l.maestria_nivel || "I",
+    }));
+    setJutsuLinks(typedLinks);
+
+    const ids = typedLinks.map((l) => l.jutsu_id);
     setAssignedJutsuIds(ids);
 
     if (ids.length > 0) {
@@ -194,6 +208,23 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
     onOpenJutsu?.(jutsu);
   };
 
+  const handleMaestriaChange = async (jutsuId: string, newLevel: string) => {
+    const { error } = await supabase
+      .from("character_jutsus")
+      .update({ maestria_nivel: newLevel })
+      .eq("character_id", sheet.id)
+      .eq("jutsu_id", jutsuId);
+    if (error) {
+      toast.error("Erro ao atualizar maestria");
+      return;
+    }
+    setJutsuLinks((prev) => prev.map((l) => l.jutsu_id === jutsuId ? { ...l, maestria_nivel: newLevel } : l));
+  };
+
+  const getMaestriaForJutsu = (jutsuId: string) => {
+    return jutsuLinks.find((l) => l.jutsu_id === jutsuId)?.maestria_nivel || "I";
+  };
+
   if (!expanded) {
     return (
       <div
@@ -256,6 +287,38 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
   // Separate jutsus by categoria
   const jutsusList = [...jutsus].filter(j => (j.categoria || "jutsu") === "jutsu").sort((a, b) => a.nome.localeCompare(b.nome));
   const habilidadesList = [...jutsus].filter(j => (j.categoria || "jutsu") === "habilidade").sort((a, b) => a.nome.localeCompare(b.nome));
+
+  const renderJutsuItem = (jutsu: Jutsu) => {
+    const maestria = getMaestriaForJutsu(jutsu.id);
+    return (
+      <div key={jutsu.id} className="flex items-center justify-between border-b border-border last:border-0 px-2 py-1">
+        <button
+          onClick={() => handleOpenJutsu(jutsu)}
+          className="text-left text-xs text-foreground hover:text-accent transition-colors flex-1"
+        >
+          {getJutsuEmoji(jutsu.nome)} {jutsu.nome}
+        </button>
+        <div className="flex items-center gap-1 shrink-0">
+          {editing && canEdit ? (
+            <select
+              className="retro-input text-[9px] w-auto"
+              value={maestria}
+              onChange={(e) => handleMaestriaChange(jutsu.id, e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {MAESTRIA_LEVELS.map((lvl) => (
+                <option key={lvl} value={lvl}>Maestria {lvl}</option>
+              ))}
+            </select>
+          ) : (
+            <span className="text-[9px] text-muted-foreground border border-border px-1 py-0.5">
+              Maestria {maestria}
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="retro-panel p-3 mb-4">
@@ -434,29 +497,13 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
             {jutsusList.length > 0 && (
               <>
                 <div className="text-accent font-bold text-[11px] border-b border-border pb-1 mb-1">🌀 Jutsus</div>
-                {jutsusList.map((jutsu) => (
-                  <button
-                    key={jutsu.id}
-                    onClick={() => handleOpenJutsu(jutsu)}
-                    className="block w-full text-left px-2 py-1 text-xs text-foreground hover:bg-muted hover:text-accent transition-colors border-b border-border last:border-0"
-                  >
-                    {getJutsuEmoji(jutsu.nome)} {jutsu.nome}
-                  </button>
-                ))}
+                {jutsusList.map((jutsu) => renderJutsuItem(jutsu))}
               </>
             )}
             {habilidadesList.length > 0 && (
               <>
                 <div className="text-accent font-bold text-[11px] border-b border-border pb-1 mb-1 mt-2">💪 Habilidades</div>
-                {habilidadesList.map((jutsu) => (
-                  <button
-                    key={jutsu.id}
-                    onClick={() => handleOpenJutsu(jutsu)}
-                    className="block w-full text-left px-2 py-1 text-xs text-foreground hover:bg-muted hover:text-accent transition-colors border-b border-border last:border-0"
-                  >
-                    {getJutsuEmoji(jutsu.nome)} {jutsu.nome}
-                  </button>
-                ))}
+                {habilidadesList.map((jutsu) => renderJutsuItem(jutsu))}
               </>
             )}
             {jutsusList.length === 0 && habilidadesList.length === 0 && (
