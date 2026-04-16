@@ -50,13 +50,6 @@ export type Database = {
             referencedRelation: "character_sheets"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "character_bag_items_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "items"
-            referencedColumns: ["id"]
-          },
         ]
       }
       character_jutsus: {
