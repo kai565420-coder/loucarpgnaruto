@@ -259,7 +259,7 @@ const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
                   onChange={(e) => setPeso(parseFloat(e.target.value) || 0)}
                   placeholder="Ex: 2.5"
                   min={0}
-                  step="0.1"
+                  step="0.001"
                 />
               </div>
             </div>
