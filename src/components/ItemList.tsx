@@ -294,6 +294,28 @@ const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
         />
       </div>
 
+      {/* Preços de Bolsas Traseiras */}
+      <div className="retro-panel p-2 mb-3 border-2 border-accent/60">
+        <div className="text-accent font-bold text-[11px] mb-1.5 uppercase tracking-wider">🎒 Bolsas Traseiras — Preços</div>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="bg-card border border-border p-1.5 text-center">
+            <div className="text-[10px] text-accent font-bold">Pequena</div>
+            <div className="text-[9px] text-muted-foreground">10 de espaço</div>
+            <div className="text-[10px] text-foreground font-bold mt-0.5">Inicial</div>
+          </div>
+          <div className="bg-card border border-border p-1.5 text-center">
+            <div className="text-[10px] text-accent font-bold">Média</div>
+            <div className="text-[9px] text-muted-foreground">20 de espaço</div>
+            <div className="text-[10px] text-foreground font-bold mt-0.5">💰 25.000 Ryos</div>
+          </div>
+          <div className="bg-card border border-border p-1.5 text-center">
+            <div className="text-[10px] text-accent font-bold">Grande</div>
+            <div className="text-[9px] text-muted-foreground">30 de espaço</div>
+            <div className="text-[10px] text-foreground font-bold mt-0.5">💰 50.000 Ryos</div>
+          </div>
+        </div>
+      </div>
+
       {loading ? (
         <div className="retro-panel p-4 text-center text-muted-foreground text-xs">
           Carregando itens...

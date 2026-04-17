@@ -50,6 +50,31 @@ const TRASEIRA_SIZES: Record<string, number> = {
 
 const PAPEL_LACRADO_PESO = 0.5;
 
+
+// Local-state input — only commits on blur or Enter, prevents focus loss on each keystroke
+const QtdInput = ({ value, onCommit }: { value: number; onCommit: (n: number) => void }) => {
+  const [local, setLocal] = useState(String(value));
+  useEffect(() => { setLocal(String(value)); }, [value]);
+  const commit = () => {
+    const n = parseInt(local) || 1;
+    if (n !== value) onCommit(n);
+    else setLocal(String(value));
+  };
+  return (
+    <input
+      type="number"
+      className="retro-input w-12 text-center text-[10px]"
+      value={local}
+      min={1}
+      onChange={(e) => setLocal(e.target.value)}
+      onBlur={commit}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") { e.currentTarget.blur(); }
+      }}
+    />
+  );
+};
+
 const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, dinheiro, onTamanhoChange, onDinheiroChange, onOpenItem }: CharacterBagsProps) => {
   const [bagItems, setBagItems] = useState<BagItem[]>([]);
   const [allItems, setAllItems] = useState<Item[]>([]);
@@ -127,10 +152,16 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
     return bi.is_papel_lacrado ? PAPEL_LACRADO_PESO : bi.item.peso;
   };
 
+  const isLateralEligible = (nome: string) => {
+    const n = nome.toLowerCase();
+    if (n.includes("fuma")) return false;
+    return n.includes("kunai") || n.includes("shuriken");
+  };
+
   const getAvailableItems = (bagType: string) => {
     if (bagType === "equipado") return personalizados;
     if (bagType === "lateral") {
-      return allItems.filter((i) => i.nome.toLowerCase().includes("kunai") || i.nome.toLowerCase().includes("shuriken"));
+      return allItems.filter((i) => isLateralEligible(i.nome));
     }
     // traseira - show both based on itemSource
     if (itemSource === "personalizados") return personalizados;
@@ -146,9 +177,8 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
     if (!item) return;
 
     if (bagType === "lateral") {
-      const isKunaiShuriken = item.nome.toLowerCase().includes("kunai") || item.nome.toLowerCase().includes("shuriken");
-      if (!isKunaiShuriken) {
-        toast.error("A bolsa lateral aceita apenas Kunais e Shurikens!");
+      if (!isLateralEligible(item.nome)) {
+        toast.error("A bolsa lateral aceita apenas Kunais e Shurikens (exceto Fuma Shuriken)!");
         return;
       }
       const itemPeso = addAsPapelLacrado ? PAPEL_LACRADO_PESO : item.peso;
@@ -288,13 +318,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
                 )}
                 <td className="py-1 text-center">
                   {editing && canEdit ? (
-                    <input
-                      type="number"
-                      className="retro-input w-10 text-center text-[10px]"
-                      value={bi.quantidade}
-                      min={1}
-                      onChange={(e) => handleChangeQtd(bi.id, parseInt(e.target.value) || 1)}
-                    />
+                    <QtdInput value={bi.quantidade} onCommit={(n) => handleChangeQtd(bi.id, n)} />
                   ) : (
                     <span className="text-foreground">{bi.quantidade}</span>
                   )}
