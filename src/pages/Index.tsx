@@ -118,6 +118,7 @@ const Index = () => {
                 ip={ip || "unknown"}
                 refreshKey={refreshKey}
                 onOpenJutsu={(jutsu) => openWindow("jutsu", jutsu.id, jutsu)}
+                onOpenItem={(item) => openWindow("item", item.id, item)}
               />
             ) : activeTab === "criar" ? (
               <CharacterForm ip={ip || "unknown"} onCreated={handleCreated} />

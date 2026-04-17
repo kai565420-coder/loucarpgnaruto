@@ -12,6 +12,8 @@ interface BagItem {
     nome: string;
     peso: number;
     imagem_url: string | null;
+    descricao?: string;
+    valor?: string;
   };
 }
 
@@ -37,6 +39,7 @@ interface CharacterBagsProps {
   dinheiro: number;
   onTamanhoChange?: (tamanho: string) => void;
   onDinheiroChange?: (value: number) => void;
+  onOpenItem?: (item: { id: string; nome: string; descricao: string; valor: string; peso?: number; imagem_url: string | null }) => void;
 }
 
 const TRASEIRA_SIZES: Record<string, number> = {
@@ -47,7 +50,7 @@ const TRASEIRA_SIZES: Record<string, number> = {
 
 const PAPEL_LACRADO_PESO = 0.5;
 
-const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, dinheiro, onTamanhoChange, onDinheiroChange }: CharacterBagsProps) => {
+const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, dinheiro, onTamanhoChange, onDinheiroChange, onOpenItem }: CharacterBagsProps) => {
   const [bagItems, setBagItems] = useState<BagItem[]>([]);
   const [allItems, setAllItems] = useState<Item[]>([]);
   const [personalizados, setPersonalizados] = useState<PersonalizadoItem[]>([]);
@@ -70,8 +73,8 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
       
       // Fetch from both items and personalizados
       const [{ data: itemsData }, { data: persData }] = await Promise.all([
-        supabase.from("items").select("id, nome, peso, imagem_url").in("id", itemIds),
-        supabase.from("personalizados").select("id, nome, peso, imagem_url").in("id", itemIds),
+        supabase.from("items").select("id, nome, peso, imagem_url, descricao, valor").in("id", itemIds),
+        supabase.from("personalizados").select("id, nome, peso, imagem_url, descricao, valor").in("id", itemIds),
       ]);
 
       const itemsMap = new Map([
@@ -108,8 +111,11 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
   const traseiraItems = bagItems.filter((b) => b.bag_type === "traseira");
   const equipadoItems = bagItems.filter((b) => b.bag_type === "equipado");
 
-  const lateralUsed = lateralItems.reduce((s, b) => s + b.quantidade, 0);
   const lateralMax = 4;
+  const lateralUsed = lateralItems.reduce((s, b) => {
+    const itemPeso = b.is_papel_lacrado ? PAPEL_LACRADO_PESO : b.item.peso;
+    return s + itemPeso * b.quantidade;
+  }, 0);
 
   const traseiraMax = TRASEIRA_SIZES[bolsaTraseiraTamanho] || 10;
   const traseiraUsed = traseiraItems.reduce((s, b) => {
@@ -145,8 +151,10 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
         toast.error("A bolsa lateral aceita apenas Kunais e Shurikens!");
         return;
       }
-      if (lateralUsed + addQtd > lateralMax) {
-        toast.error(`Espaço insuficiente na bolsa lateral! (${lateralMax - lateralUsed} restantes)`);
+      const itemPeso = addAsPapelLacrado ? PAPEL_LACRADO_PESO : item.peso;
+      const spaceNeeded = itemPeso * addQtd;
+      if (lateralUsed + spaceNeeded > lateralMax) {
+        toast.error(`Espaço insuficiente na bolsa lateral! (${(lateralMax - lateralUsed).toFixed(2)} restantes)`);
         return;
       }
     }
@@ -216,7 +224,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
         <span className="text-accent font-bold text-[11px]">{label}</span>
         {used !== null && max !== null && (
           <span className={`text-[10px] font-bold ${used > max ? "text-destructive" : "text-muted-foreground"}`}>
-            {Number(used.toFixed(1))}/{max} {bagType === "lateral" ? "slots" : "peso"}
+            {Number(used.toFixed(2))}/{max} peso
           </span>
         )}
       </div>
@@ -248,11 +256,32 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
             {items.map((bi) => (
               <tr key={bi.id} className="border-b border-border last:border-0">
                 <td className="py-1 text-foreground">
-                  {bi.is_papel_lacrado ? (
-                    <span title="Papel Lacrado">📜 {bi.item.nome}: Papel Selado</span>
-                  ) : (
-                    bi.item.nome
-                  )}
+                  {(() => {
+                    const canOpen = !!onOpenItem && (!!bi.item.descricao || !!bi.item.valor || !!bi.item.imagem_url);
+                    const content = bi.is_papel_lacrado ? (
+                      <span title="Papel Lacrado">📜 {bi.item.nome}: Papel Selado</span>
+                    ) : (
+                      <span>{bi.item.nome}</span>
+                    );
+                    if (canOpen) {
+                      return (
+                        <button
+                          onClick={() => onOpenItem?.({
+                            id: bi.item_id,
+                            nome: bi.item.nome,
+                            descricao: bi.item.descricao || "",
+                            valor: bi.item.valor || "",
+                            peso: bi.item.peso,
+                            imagem_url: bi.item.imagem_url,
+                          })}
+                          className="text-left hover:text-accent transition-colors underline-offset-2 hover:underline"
+                        >
+                          {content}
+                        </button>
+                      );
+                    }
+                    return content;
+                  })()}
                 </td>
                 {bagType !== "equipado" && (
                   <td className="py-1 text-center text-muted-foreground">{getItemWeight(bi)}</td>

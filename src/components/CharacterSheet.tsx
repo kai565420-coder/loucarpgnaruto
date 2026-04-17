@@ -14,6 +14,7 @@ interface CharacterSheetProps {
   onDelete?: () => void;
   onUpdated?: () => void;
   onOpenJutsu?: (jutsu: Jutsu) => void;
+  onOpenItem?: (item: { id: string; nome: string; descricao: string; valor: string; peso?: number; imagem_url: string | null }) => void;
 }
 
 interface Jutsu {
@@ -112,7 +113,7 @@ const pericias = [
   },
 ];
 
-const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: CharacterSheetProps) => {
+const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOpenItem }: CharacterSheetProps) => {
   const { isAdminMode } = useAdmin();
   const canEdit = isOwner || isAdminMode;
   const [expanded, setExpanded] = useState(false);
@@ -390,32 +391,32 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
       {/* Atributos */}
       <div className="mt-3">
         <div className="retro-section-title text-xs">Atributos</div>
-        <div className="flex gap-4 flex-wrap">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
           {atributos.map(({ key, label }) => (
-            <div key={key} className="text-xs retro-atributo-highlight p-2 border border-accent">
-              <span className="retro-label">{label}: </span>
+            <div key={key} className="bg-card border-2 border-accent/60 hover:border-accent transition-colors p-2 flex flex-col items-center justify-center gap-1 min-h-[64px] shadow-[2px_2px_0_hsl(var(--accent)/0.3)]">
+              <span className="retro-label text-[10px] uppercase tracking-wider">{label}</span>
               {editing && canEdit ? (
-                <input type="number" className="retro-input w-14 text-center text-xs" value={form[key] ?? 0} onChange={(e) => handleNumberChange(key, e.target.value)} />
+                <input type="number" className="retro-input w-16 text-center text-sm font-bold" value={form[key] ?? 0} onChange={(e) => handleNumberChange(key, e.target.value)} />
               ) : (
-                <span className="text-accent font-bold text-sm">{(sheet as any)[key]}</span>
+                <span className="text-accent font-bold text-xl leading-none">{(sheet as any)[key]}</span>
               )}
             </div>
           ))}
           {/* Deslocamento with "m" */}
-          <div className="text-xs retro-atributo-highlight p-2 border border-accent">
-            <span className="retro-label">Deslocamento: </span>
+          <div className="bg-card border-2 border-accent/60 hover:border-accent transition-colors p-2 flex flex-col items-center justify-center gap-1 min-h-[64px] shadow-[2px_2px_0_hsl(var(--accent)/0.3)]">
+            <span className="retro-label text-[10px] uppercase tracking-wider">Deslocamento</span>
             {editing && canEdit ? (
               <span className="inline-flex items-center gap-0.5">
-                <input type="number" className="retro-input w-14 text-center text-xs" value={form.deslocamento ?? 0} onChange={(e) => handleNumberChange("deslocamento", e.target.value)} />
+                <input type="number" className="retro-input w-14 text-center text-sm font-bold" value={form.deslocamento ?? 0} onChange={(e) => handleNumberChange("deslocamento", e.target.value)} />
                 <span className="text-muted-foreground text-[10px]">m</span>
               </span>
             ) : (
-              <span className="text-accent font-bold text-sm">{(sheet as any).deslocamento}m</span>
+              <span className="text-accent font-bold text-xl leading-none">{(sheet as any).deslocamento}<span className="text-xs text-muted-foreground ml-0.5">m</span></span>
             )}
           </div>
           {/* Selos Manuais */}
-          <div className="text-xs retro-atributo-highlight p-2 border border-accent min-w-[180px]">
-            <span className="retro-label block mb-1">Selos Manuais: </span>
+          <div className="bg-card border-2 border-accent/60 hover:border-accent transition-colors p-2 flex flex-col items-center justify-center gap-1 min-h-[64px] shadow-[2px_2px_0_hsl(var(--accent)/0.3)]">
+            <span className="retro-label text-[10px] uppercase tracking-wider">Selos Manuais</span>
             <SelosManuaisSelector
               value={editing ? (form.selos_manuais ?? "") : ((sheet as any).selos_manuais ?? "")}
               onChange={(v) => handleTextChange("selos_manuais", v)}
@@ -466,6 +467,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu }: Ch
             dinheiro={editing ? (form.dinheiro ?? 0) : ((sheet as any).dinheiro ?? 0)}
             onTamanhoChange={(t) => handleTextChange("bolsa_traseira_tamanho", t)}
             onDinheiroChange={(v) => setForm((prev) => ({ ...prev, dinheiro: v }))}
+            onOpenItem={onOpenItem}
           />
         </div>
       </div>
