@@ -248,6 +248,25 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
     fetchBagItems();
   };
 
+  const handleTogglePapelLacrado = async (bi: BagItem) => {
+    const newVal = !bi.is_papel_lacrado;
+    if (!newVal && bi.bag_type === "traseira") {
+      const newWeight = bi.item.peso * bi.quantidade;
+      const oldWeight = PAPEL_LACRADO_PESO * bi.quantidade;
+      if (traseiraUsed - oldWeight + newWeight > traseiraMax) {
+        toast.error("Não há espaço suficiente para desselar o item!");
+        return;
+      }
+    }
+    const { error } = await supabase
+      .from("character_bag_items")
+      .update({ is_papel_lacrado: newVal })
+      .eq("id", bi.id);
+    if (error) { toast.error("Erro ao atualizar"); return; }
+    toast.success(newVal ? "Item selado em papel!" : "Item desselado!");
+    fetchBagItems();
+  };
+
   const renderBagTable = (items: BagItem[], bagType: string, used: number | null, max: number | null, label: string) => (
     <div className="mb-3">
       <div className="flex justify-between items-center mb-1">
@@ -331,6 +350,15 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
                     )}
                     {bagType === "traseira" && personalizados.some(p => p.id === bi.item_id) && (
                       <button onClick={() => handleMoveTo(bi.id, "equipado")} className="text-[9px] text-accent hover:underline" title="Equipar">⚔️</button>
+                    )}
+                    {bagType === "traseira" && (
+                      <button
+                        onClick={() => handleTogglePapelLacrado(bi)}
+                        className="text-[10px] hover:opacity-70"
+                        title={bi.is_papel_lacrado ? "Desselar papel" : "Selar em papel"}
+                      >
+                        {bi.is_papel_lacrado ? "🔓" : "📜"}
+                      </button>
                     )}
                     <button onClick={() => handleRemove(bi.id)} className="text-destructive hover:text-destructive/80 text-[10px]">✕</button>
                   </td>

@@ -192,7 +192,8 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
         maestria_fogo: form.maestria_fogo, maestria_vento: form.maestria_vento,
         maestria_terra: form.maestria_terra, maestria_agua: form.maestria_agua, maestria_raio: form.maestria_raio,
         inventario: form.inventario,
-      })
+        ...(isAdminMode ? { pontos_acao: form.pontos_acao ?? 0 } : {}),
+      } as any)
       .eq("id", sheet.id);
 
     setSaving(false);
@@ -474,7 +475,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
 
       {/* Jutsus / Habilidades Section */}
       <div className="mt-3">
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-2 mb-2 flex-wrap">
           <button onClick={() => setShowJutsus(!showJutsus)} className="retro-button text-xs">
             🌀 Jutsus ({jutsusList.length}) / Habilidades ({habilidadesList.length})
           </button>
@@ -483,6 +484,21 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
               ➕ Adicionar
             </button>
           )}
+          {/* Pontos de Ação */}
+          <div className="ml-auto flex items-center gap-2 bg-card border-2 border-accent/60 px-2 py-1 shadow-[2px_2px_0_hsl(var(--accent)/0.3)]">
+            <span className="retro-label text-[10px] uppercase tracking-wider">⚡ Pontos de Ação:</span>
+            {editing && isAdminMode ? (
+              <select
+                className="retro-input text-xs font-bold"
+                value={form.pontos_acao ?? 0}
+                onChange={(e) => handleNumberChange("pontos_acao", e.target.value)}
+              >
+                {[0,1,2,3,4,5].map((n) => <option key={n} value={n}>{n}</option>)}
+              </select>
+            ) : (
+              <span className="text-accent font-bold text-lg leading-none">{(sheet as any).pontos_acao ?? 0}<span className="text-muted-foreground text-xs font-normal">/5</span></span>
+            )}
+          </div>
         </div>
 
         {showJutsuSelector && editing && canEdit && (
