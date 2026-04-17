@@ -37,6 +37,7 @@ interface CharacterBagsProps {
   dinheiro: number;
   onTamanhoChange?: (tamanho: string) => void;
   onDinheiroChange?: (value: number) => void;
+  onOpenItem?: (item: { id: string; nome: string; descricao: string; valor: string; peso?: number; imagem_url: string | null }) => void;
 }
 
 const TRASEIRA_SIZES: Record<string, number> = {
