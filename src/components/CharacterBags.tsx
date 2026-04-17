@@ -248,6 +248,25 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
     fetchBagItems();
   };
 
+  const handleTogglePapelLacrado = async (bi: BagItem) => {
+    const newVal = !bi.is_papel_lacrado;
+    if (!newVal && bi.bag_type === "traseira") {
+      const newWeight = bi.item.peso * bi.quantidade;
+      const oldWeight = PAPEL_LACRADO_PESO * bi.quantidade;
+      if (traseiraUsed - oldWeight + newWeight > traseiraMax) {
+        toast.error("Não há espaço suficiente para desselar o item!");
+        return;
+      }
+    }
+    const { error } = await supabase
+      .from("character_bag_items")
+      .update({ is_papel_lacrado: newVal })
+      .eq("id", bi.id);
+    if (error) { toast.error("Erro ao atualizar"); return; }
+    toast.success(newVal ? "Item selado em papel!" : "Item desselado!");
+    fetchBagItems();
+  };
+
   const renderBagTable = (items: BagItem[], bagType: string, used: number | null, max: number | null, label: string) => (
     <div className="mb-3">
       <div className="flex justify-between items-center mb-1">
