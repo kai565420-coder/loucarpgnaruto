@@ -48,7 +48,7 @@ const ItemWindow = ({ item, onClose, onMinimize, initialPosition, admin, onEdit,
       )}
       <div className="flex gap-3 mb-2 items-center">
         {item.valor && (
-          <span className="text-sm font-bold text-accent">💰 {item.valor}</span>
+          <span className="text-sm font-bold text-accent">両 {item.valor}</span>
         )}
         {(item.peso ?? 0) > 0 && (
           <span className="text-xs text-muted-foreground">⚖️ Peso: {item.peso}</span>
