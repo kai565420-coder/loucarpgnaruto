@@ -48,7 +48,7 @@ const TRASEIRA_SIZES: Record<string, number> = {
 
 const PAPEL_LACRADO_PESO = 0.5;
 
-const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, dinheiro, onTamanhoChange, onDinheiroChange }: CharacterBagsProps) => {
+const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, dinheiro, onTamanhoChange, onDinheiroChange, onOpenItem }: CharacterBagsProps) => {
   const [bagItems, setBagItems] = useState<BagItem[]>([]);
   const [allItems, setAllItems] = useState<Item[]>([]);
   const [personalizados, setPersonalizados] = useState<PersonalizadoItem[]>([]);
