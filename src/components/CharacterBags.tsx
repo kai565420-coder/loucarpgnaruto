@@ -224,7 +224,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
         <span className="text-accent font-bold text-[11px]">{label}</span>
         {used !== null && max !== null && (
           <span className={`text-[10px] font-bold ${used > max ? "text-destructive" : "text-muted-foreground"}`}>
-            {Number(used.toFixed(1))}/{max} {bagType === "lateral" ? "slots" : "peso"}
+            {Number(used.toFixed(2))}/{max} peso
           </span>
         )}
       </div>
