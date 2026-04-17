@@ -50,6 +50,36 @@ const TRASEIRA_SIZES: Record<string, number> = {
 
 const PAPEL_LACRADO_PESO = 0.5;
 
+const BOLSA_PRECOS = [
+  { tamanho: "Pequena", capacidade: 10, preco: "Inicial" },
+  { tamanho: "Média", capacidade: 20, preco: "25.000 Ryos" },
+  { tamanho: "Grande", capacidade: 30, preco: "50.000 Ryos" },
+];
+
+// Local-state input — only commits on blur or Enter, prevents focus loss on each keystroke
+const QtdInput = ({ value, onCommit }: { value: number; onCommit: (n: number) => void }) => {
+  const [local, setLocal] = useState(String(value));
+  useEffect(() => { setLocal(String(value)); }, [value]);
+  const commit = () => {
+    const n = parseInt(local) || 1;
+    if (n !== value) onCommit(n);
+    else setLocal(String(value));
+  };
+  return (
+    <input
+      type="number"
+      className="retro-input w-12 text-center text-[10px]"
+      value={local}
+      min={1}
+      onChange={(e) => setLocal(e.target.value)}
+      onBlur={commit}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") { e.currentTarget.blur(); }
+      }}
+    />
+  );
+};
+
 const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, dinheiro, onTamanhoChange, onDinheiroChange, onOpenItem }: CharacterBagsProps) => {
   const [bagItems, setBagItems] = useState<BagItem[]>([]);
   const [allItems, setAllItems] = useState<Item[]>([]);
