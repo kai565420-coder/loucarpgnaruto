@@ -12,13 +12,23 @@ interface Jutsu {
   imagem_url: string | null;
 }
 
+interface OpenItem {
+  id: string;
+  nome: string;
+  descricao: string;
+  valor: string;
+  peso?: number;
+  imagem_url: string | null;
+}
+
 interface CharacterListProps {
   ip: string;
   refreshKey: number;
   onOpenJutsu?: (jutsu: Jutsu) => void;
+  onOpenItem?: (item: OpenItem) => void;
 }
 
-const CharacterList = ({ ip, refreshKey, onOpenJutsu }: CharacterListProps) => {
+const CharacterList = ({ ip, refreshKey, onOpenJutsu, onOpenItem }: CharacterListProps) => {
   const { isAdminMode } = useAdmin();
   const [sheets, setSheets] = useState<Tables<"character_sheets">[]>([]);
   const [loading, setLoading] = useState(true);
