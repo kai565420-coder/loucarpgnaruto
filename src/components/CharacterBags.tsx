@@ -151,8 +151,10 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
         toast.error("A bolsa lateral aceita apenas Kunais e Shurikens!");
         return;
       }
-      if (lateralUsed + addQtd > lateralMax) {
-        toast.error(`Espaço insuficiente na bolsa lateral! (${lateralMax - lateralUsed} restantes)`);
+      const itemPeso = addAsPapelLacrado ? PAPEL_LACRADO_PESO : item.peso;
+      const spaceNeeded = itemPeso * addQtd;
+      if (lateralUsed + spaceNeeded > lateralMax) {
+        toast.error(`Espaço insuficiente na bolsa lateral! (${(lateralMax - lateralUsed).toFixed(2)} restantes)`);
         return;
       }
     }
