@@ -192,7 +192,8 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
         maestria_fogo: form.maestria_fogo, maestria_vento: form.maestria_vento,
         maestria_terra: form.maestria_terra, maestria_agua: form.maestria_agua, maestria_raio: form.maestria_raio,
         inventario: form.inventario,
-      })
+        ...(isAdminMode ? { pontos_acao: form.pontos_acao ?? 0 } : {}),
+      } as any)
       .eq("id", sheet.id);
 
     setSaving(false);
