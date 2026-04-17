@@ -323,13 +323,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
                 )}
                 <td className="py-1 text-center">
                   {editing && canEdit ? (
-                    <input
-                      type="number"
-                      className="retro-input w-10 text-center text-[10px]"
-                      value={bi.quantidade}
-                      min={1}
-                      onChange={(e) => handleChangeQtd(bi.id, parseInt(e.target.value) || 1)}
-                    />
+                    <QtdInput value={bi.quantidade} onCommit={(n) => handleChangeQtd(bi.id, n)} />
                   ) : (
                     <span className="text-foreground">{bi.quantidade}</span>
                   )}
