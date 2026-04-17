@@ -50,11 +50,6 @@ const TRASEIRA_SIZES: Record<string, number> = {
 
 const PAPEL_LACRADO_PESO = 0.5;
 
-const BOLSA_PRECOS = [
-  { tamanho: "Pequena", capacidade: 10, preco: "Inicial" },
-  { tamanho: "Média", capacidade: 20, preco: "25.000 Ryos" },
-  { tamanho: "Grande", capacidade: 30, preco: "50.000 Ryos" },
-];
 
 // Local-state input — only commits on blur or Enter, prevents focus loss on each keystroke
 const QtdInput = ({ value, onCommit }: { value: number; onCommit: (n: number) => void }) => {
