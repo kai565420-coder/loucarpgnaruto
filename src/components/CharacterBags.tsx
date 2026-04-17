@@ -256,11 +256,32 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
             {items.map((bi) => (
               <tr key={bi.id} className="border-b border-border last:border-0">
                 <td className="py-1 text-foreground">
-                  {bi.is_papel_lacrado ? (
-                    <span title="Papel Lacrado">📜 {bi.item.nome}: Papel Selado</span>
-                  ) : (
-                    bi.item.nome
-                  )}
+                  {(() => {
+                    const canOpen = !!onOpenItem && (!!bi.item.descricao || !!bi.item.valor || !!bi.item.imagem_url);
+                    const content = bi.is_papel_lacrado ? (
+                      <span title="Papel Lacrado">📜 {bi.item.nome}: Papel Selado</span>
+                    ) : (
+                      <span>{bi.item.nome}</span>
+                    );
+                    if (canOpen) {
+                      return (
+                        <button
+                          onClick={() => onOpenItem?.({
+                            id: bi.item_id,
+                            nome: bi.item.nome,
+                            descricao: bi.item.descricao || "",
+                            valor: bi.item.valor || "",
+                            peso: bi.item.peso,
+                            imagem_url: bi.item.imagem_url,
+                          })}
+                          className="text-left hover:text-accent transition-colors underline-offset-2 hover:underline"
+                        >
+                          {content}
+                        </button>
+                      );
+                    }
+                    return content;
+                  })()}
                 </td>
                 {bagType !== "equipado" && (
                   <td className="py-1 text-center text-muted-foreground">{getItemWeight(bi)}</td>
