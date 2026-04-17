@@ -14,6 +14,7 @@ interface CharacterSheetProps {
   onDelete?: () => void;
   onUpdated?: () => void;
   onOpenJutsu?: (jutsu: Jutsu) => void;
+  onOpenItem?: (item: { id: string; nome: string; descricao: string; valor: string; peso?: number; imagem_url: string | null }) => void;
 }
 
 interface Jutsu {
