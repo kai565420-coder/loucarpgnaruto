@@ -127,10 +127,16 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
     return bi.is_papel_lacrado ? PAPEL_LACRADO_PESO : bi.item.peso;
   };
 
+  const isLateralEligible = (nome: string) => {
+    const n = nome.toLowerCase();
+    if (n.includes("fuma")) return false;
+    return n.includes("kunai") || n.includes("shuriken");
+  };
+
   const getAvailableItems = (bagType: string) => {
     if (bagType === "equipado") return personalizados;
     if (bagType === "lateral") {
-      return allItems.filter((i) => i.nome.toLowerCase().includes("kunai") || i.nome.toLowerCase().includes("shuriken"));
+      return allItems.filter((i) => isLateralEligible(i.nome));
     }
     // traseira - show both based on itemSource
     if (itemSource === "personalizados") return personalizados;
