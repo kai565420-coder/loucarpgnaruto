@@ -467,6 +467,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
             dinheiro={editing ? (form.dinheiro ?? 0) : ((sheet as any).dinheiro ?? 0)}
             onTamanhoChange={(t) => handleTextChange("bolsa_traseira_tamanho", t)}
             onDinheiroChange={(v) => setForm((prev) => ({ ...prev, dinheiro: v }))}
+            onOpenItem={onOpenItem}
           />
         </div>
       </div>
