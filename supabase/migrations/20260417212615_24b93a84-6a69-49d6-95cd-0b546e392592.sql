@@ -1,0 +1,1 @@
+ALTER TABLE public.character_sheets ADD COLUMN IF NOT EXISTS pontos_acao integer NOT NULL DEFAULT 0;
