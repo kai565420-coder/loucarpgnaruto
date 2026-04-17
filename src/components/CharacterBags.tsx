@@ -111,8 +111,11 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
   const traseiraItems = bagItems.filter((b) => b.bag_type === "traseira");
   const equipadoItems = bagItems.filter((b) => b.bag_type === "equipado");
 
-  const lateralUsed = lateralItems.reduce((s, b) => s + b.quantidade, 0);
   const lateralMax = 4;
+  const lateralUsed = lateralItems.reduce((s, b) => {
+    const itemPeso = b.is_papel_lacrado ? PAPEL_LACRADO_PESO : b.item.peso;
+    return s + itemPeso * b.quantidade;
+  }, 0);
 
   const traseiraMax = TRASEIRA_SIZES[bolsaTraseiraTamanho] || 10;
   const traseiraUsed = traseiraItems.reduce((s, b) => {
