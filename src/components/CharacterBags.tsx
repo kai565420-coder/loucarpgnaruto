@@ -12,6 +12,8 @@ interface BagItem {
     nome: string;
     peso: number;
     imagem_url: string | null;
+    descricao?: string;
+    valor?: string;
   };
 }
 
