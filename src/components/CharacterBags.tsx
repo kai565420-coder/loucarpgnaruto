@@ -152,9 +152,8 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
     if (!item) return;
 
     if (bagType === "lateral") {
-      const isKunaiShuriken = item.nome.toLowerCase().includes("kunai") || item.nome.toLowerCase().includes("shuriken");
-      if (!isKunaiShuriken) {
-        toast.error("A bolsa lateral aceita apenas Kunais e Shurikens!");
+      if (!isLateralEligible(item.nome)) {
+        toast.error("A bolsa lateral aceita apenas Kunais e Shurikens (exceto Fuma Shuriken)!");
         return;
       }
       const itemPeso = addAsPapelLacrado ? PAPEL_LACRADO_PESO : item.peso;
