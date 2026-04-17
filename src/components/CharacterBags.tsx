@@ -351,6 +351,15 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
                     {bagType === "traseira" && personalizados.some(p => p.id === bi.item_id) && (
                       <button onClick={() => handleMoveTo(bi.id, "equipado")} className="text-[9px] text-accent hover:underline" title="Equipar">⚔️</button>
                     )}
+                    {bagType === "traseira" && (
+                      <button
+                        onClick={() => handleTogglePapelLacrado(bi)}
+                        className="text-[10px] hover:opacity-70"
+                        title={bi.is_papel_lacrado ? "Desselar papel" : "Selar em papel"}
+                      >
+                        {bi.is_papel_lacrado ? "🔓" : "📜"}
+                      </button>
+                    )}
                     <button onClick={() => handleRemove(bi.id)} className="text-destructive hover:text-destructive/80 text-[10px]">✕</button>
                   </td>
                 )}
