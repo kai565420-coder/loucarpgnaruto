@@ -87,6 +87,7 @@ const CharacterList = ({ ip, refreshKey, onOpenJutsu, onOpenItem }: CharacterLis
           onDelete={() => handleDelete(sheet.id)}
           onUpdated={fetchSheets}
           onOpenJutsu={onOpenJutsu}
+          onOpenItem={onOpenItem}
         />
       ))}
     </div>
