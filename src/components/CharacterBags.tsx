@@ -73,8 +73,8 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
       
       // Fetch from both items and personalizados
       const [{ data: itemsData }, { data: persData }] = await Promise.all([
-        supabase.from("items").select("id, nome, peso, imagem_url").in("id", itemIds),
-        supabase.from("personalizados").select("id, nome, peso, imagem_url").in("id", itemIds),
+        supabase.from("items").select("id, nome, peso, imagem_url, descricao, valor").in("id", itemIds),
+        supabase.from("personalizados").select("id, nome, peso, imagem_url, descricao, valor").in("id", itemIds),
       ]);
 
       const itemsMap = new Map([
