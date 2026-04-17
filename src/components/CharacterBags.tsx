@@ -429,7 +429,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
       {/* Dinheiro */}
       <div className="mt-2 border-t border-border pt-2">
         <div className="flex items-center gap-2">
-          <span className="text-accent font-bold text-[11px]">💰 Ryos: 両</span>
+          <span className="text-accent font-bold text-[11px]">両 Ryos:</span>
           {editing && canEdit ? (
             <input
               type="text"

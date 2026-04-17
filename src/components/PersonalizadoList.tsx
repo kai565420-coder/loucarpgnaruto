@@ -206,7 +206,7 @@ const PersonalizadoList = ({ ip, onOpenItem }: PersonalizadoListProps) => {
               {isMobile && expandedId === item.id && (
                 <div className="mt-2 border-t border-border pt-2" onClick={(e) => e.stopPropagation()}>
                   {item.descricao && <p className="text-[11px] text-foreground whitespace-pre-wrap leading-relaxed mb-1">{renderBoldText(item.descricao)}</p>}
-                  {item.valor && <div className="mb-1 mt-1"><span className="text-sm font-bold text-accent">💰 {item.valor}</span></div>}
+                  {item.valor && <div className="mb-1 mt-1"><span className="text-sm font-bold text-accent">両 {item.valor}</span></div>}
                   {admin && (
                     <div className="flex gap-2 mt-2 justify-end">
                       <button onClick={() => startEdit(item)} className="text-[10px] text-muted-foreground hover:text-accent">✏️ Editar</button>

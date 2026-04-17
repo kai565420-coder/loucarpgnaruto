@@ -306,12 +306,12 @@ const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
           <div className="bg-card border border-border p-1.5 text-center">
             <div className="text-[10px] text-accent font-bold">Média</div>
             <div className="text-[9px] text-muted-foreground">20 de espaço</div>
-            <div className="text-[10px] text-foreground font-bold mt-0.5">💰 25.000 Ryos</div>
+            <div className="text-[10px] text-foreground font-bold mt-0.5">両 25.000 Ryos</div>
           </div>
           <div className="bg-card border border-border p-1.5 text-center">
             <div className="text-[10px] text-accent font-bold">Grande</div>
             <div className="text-[9px] text-muted-foreground">30 de espaço</div>
-            <div className="text-[10px] text-foreground font-bold mt-0.5">💰 50.000 Ryos</div>
+            <div className="text-[10px] text-foreground font-bold mt-0.5">両 50.000 Ryos</div>
           </div>
         </div>
       </div>
@@ -362,7 +362,7 @@ const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
                   )}
                   {item.valor && (
                     <div className="mb-1 mt-1">
-                      <span className="text-sm font-bold text-accent">💰 {item.valor}</span>
+                      <span className="text-sm font-bold text-accent">両 {item.valor}</span>
                     </div>
                   )}
                   {admin && (
