@@ -347,6 +347,7 @@ export type Database = {
         Row: {
           created_at: string
           descricao: string
+          durabilidade_inicial: number
           id: string
           imagem_url: string | null
           ip_address: string
@@ -357,6 +358,7 @@ export type Database = {
         Insert: {
           created_at?: string
           descricao?: string
+          durabilidade_inicial?: number
           id?: string
           imagem_url?: string | null
           ip_address: string
@@ -367,6 +369,7 @@ export type Database = {
         Update: {
           created_at?: string
           descricao?: string
+          durabilidade_inicial?: number
           id?: string
           imagem_url?: string | null
           ip_address?: string

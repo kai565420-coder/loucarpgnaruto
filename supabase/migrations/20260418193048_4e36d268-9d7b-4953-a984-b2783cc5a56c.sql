@@ -1,0 +1,1 @@
+ALTER TABLE public.personalizados ADD COLUMN IF NOT EXISTS durabilidade_inicial integer NOT NULL DEFAULT 0;
