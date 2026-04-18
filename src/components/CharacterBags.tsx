@@ -354,15 +354,15 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
                   <td className="py-1 text-center text-muted-foreground">{getItemWeight(bi)}</td>
                 )}
                 <td className="py-1 text-center">
-                  {isCotaMalha(bi.item.nome) ? (
+                  {bi.durabilidade != null ? (
                     editing && canEdit ? (
                       <QtdInput
-                        value={bi.durabilidade ?? COTA_MALHA_DURABILIDADE_INICIAL}
+                        value={bi.durabilidade}
                         onCommit={(n) => handleChangeDurabilidade(bi.id, n)}
                       />
                     ) : (
-                      <span className={`font-bold ${(bi.durabilidade ?? 0) <= 50 ? "text-destructive" : "text-foreground"}`}>
-                        {bi.durabilidade ?? COTA_MALHA_DURABILIDADE_INICIAL}
+                      <span className={`font-bold ${bi.durabilidade <= 50 ? "text-destructive" : "text-foreground"}`}>
+                        {bi.durabilidade}
                       </span>
                     )
                   ) : (
