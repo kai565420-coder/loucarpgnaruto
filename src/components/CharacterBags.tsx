@@ -246,6 +246,13 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
     fetchBagItems();
   };
 
+  const handleChangeDurabilidade = async (bagItemId: string, newDur: number) => {
+    const clamped = Math.max(0, newDur);
+    const { error } = await supabase.from("character_bag_items").update({ durabilidade: clamped }).eq("id", bagItemId);
+    if (error) { toast.error("Erro ao atualizar durabilidade"); return; }
+    fetchBagItems();
+  };
+
   const handleMoveTo = async (bagItemId: string, newBagType: string) => {
     const { error } = await supabase.from("character_bag_items").update({ bag_type: newBagType }).eq("id", bagItemId);
     if (error) { toast.error("Erro ao mover"); return; }
