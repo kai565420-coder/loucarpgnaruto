@@ -364,7 +364,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
                 <td className="py-1 text-center">
                   {bi.durabilidade != null ? (
                     editing && canEdit ? (
-                      <QtdInput
+                      <DurInput
                         value={bi.durabilidade}
                         onCommit={(n) => handleChangeDurabilidade(bi.id, n)}
                       />
