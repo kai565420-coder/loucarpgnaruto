@@ -8,6 +8,7 @@ interface BagItem {
   bag_type: string;
   quantidade: number;
   is_papel_lacrado: boolean;
+  durabilidade: number | null;
   item: {
     nome: string;
     peso: number;
@@ -16,6 +17,9 @@ interface BagItem {
     valor?: string;
   };
 }
+
+const COTA_MALHA_DURABILIDADE_INICIAL = 200;
+const isCotaMalha = (nome: string) => nome.toLowerCase().includes("cota de malha");
 
 interface Item {
   id: string;
