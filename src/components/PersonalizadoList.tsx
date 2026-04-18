@@ -12,6 +12,7 @@ interface Personalizado {
   peso: number;
   imagem_url: string | null;
   created_at: string;
+  durabilidade_inicial?: number;
 }
 
 interface PersonalizadoListProps {
