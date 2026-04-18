@@ -213,13 +213,17 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
         .eq("id", existing.id);
       if (error) { toast.error("Erro ao atualizar"); return; }
     } else {
+      const persItem = personalizados.find((p) => p.id === selectedItemId);
+      const initialDur = isCotaMalha(item.nome)
+        ? COTA_MALHA_DURABILIDADE_INICIAL
+        : (persItem?.durabilidade_inicial && persItem.durabilidade_inicial > 0 ? persItem.durabilidade_inicial : null);
       const { error } = await supabase.from("character_bag_items").insert({
         character_id: characterId,
         item_id: selectedItemId,
         bag_type: bagType,
         quantidade: addQtd,
         is_papel_lacrado: bagType === "equipado" ? false : addAsPapelLacrado,
-        durabilidade: isCotaMalha(item.nome) ? COTA_MALHA_DURABILIDADE_INICIAL : null,
+        durabilidade: initialDur,
       });
       if (error) { toast.error("Erro ao adicionar"); return; }
     }
