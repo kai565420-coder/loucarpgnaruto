@@ -1,0 +1,1 @@
+ALTER TABLE public.character_bag_items ADD COLUMN IF NOT EXISTS durabilidade integer;

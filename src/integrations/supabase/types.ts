@@ -19,6 +19,7 @@ export type Database = {
           bag_type: string
           character_id: string
           created_at: string
+          durabilidade: number | null
           id: string
           is_papel_lacrado: boolean
           item_id: string
@@ -28,6 +29,7 @@ export type Database = {
           bag_type?: string
           character_id: string
           created_at?: string
+          durabilidade?: number | null
           id?: string
           is_papel_lacrado?: boolean
           item_id: string
@@ -37,6 +39,7 @@ export type Database = {
           bag_type?: string
           character_id?: string
           created_at?: string
+          durabilidade?: number | null
           id?: string
           is_papel_lacrado?: boolean
           item_id?: string
