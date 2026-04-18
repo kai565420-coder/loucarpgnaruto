@@ -309,6 +309,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
             <tr className="border-b border-border">
               <th className="text-left retro-label py-1">Nome</th>
               {bagType !== "equipado" && <th className="text-center retro-label py-1 w-12">Peso</th>}
+              <th className="text-center retro-label py-1 w-16">Dur.</th>
               <th className="text-center retro-label py-1 w-12">Qtd.</th>
               {editing && canEdit && <th className="w-16"></th>}
             </tr>
@@ -347,6 +348,22 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
                 {bagType !== "equipado" && (
                   <td className="py-1 text-center text-muted-foreground">{getItemWeight(bi)}</td>
                 )}
+                <td className="py-1 text-center">
+                  {isCotaMalha(bi.item.nome) ? (
+                    editing && canEdit ? (
+                      <QtdInput
+                        value={bi.durabilidade ?? COTA_MALHA_DURABILIDADE_INICIAL}
+                        onCommit={(n) => handleChangeDurabilidade(bi.id, n)}
+                      />
+                    ) : (
+                      <span className={`font-bold ${(bi.durabilidade ?? 0) <= 50 ? "text-destructive" : "text-foreground"}`}>
+                        {bi.durabilidade ?? COTA_MALHA_DURABILIDADE_INICIAL}
+                      </span>
+                    )
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  )}
+                </td>
                 <td className="py-1 text-center">
                   {editing && canEdit ? (
                     <QtdInput value={bi.quantidade} onCommit={(n) => handleChangeQtd(bi.id, n)} />
