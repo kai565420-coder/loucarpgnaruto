@@ -172,7 +172,11 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
   };
 
   const getAvailableItems = (bagType: string) => {
-    if (bagType === "equipado") return personalizados;
+    if (bagType === "equipado") {
+      // Equipados: itens personalizados + Cota de Malha (item normal equipável)
+      const cotas = allItems.filter((i) => isCotaMalha(i.nome));
+      return [...personalizados, ...cotas];
+    }
     if (bagType === "lateral") {
       return allItems.filter((i) => isLateralEligible(i.nome));
     }
