@@ -94,7 +94,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
     setLoading(true);
     const { data } = await supabase
       .from("character_bag_items")
-      .select("id, item_id, bag_type, quantidade, is_papel_lacrado")
+      .select("id, item_id, bag_type, quantidade, is_papel_lacrado, durabilidade")
       .eq("character_id", characterId);
 
     if (data && data.length > 0) {
