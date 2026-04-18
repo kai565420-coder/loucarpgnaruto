@@ -83,19 +83,19 @@ const PersonalizadoList = ({ ip, onOpenItem }: PersonalizadoListProps) => {
       }
 
       if (editingId) {
-        const updateData: Record<string, any> = { nome, descricao, valor, peso };
+        const updateData: Record<string, any> = { nome, descricao, valor, peso, durabilidade_inicial: durabilidadeInicial };
         if (imagem_url) updateData.imagem_url = imagem_url;
         const { error } = await supabase.from("personalizados").update(updateData).eq("id", editingId);
         if (error) throw error;
         toast.success("Item personalizado atualizado!");
         setEditingId(null);
       } else {
-        const { error } = await supabase.from("personalizados").insert({ nome, descricao, valor, peso, imagem_url, ip_address: ip });
+        const { error } = await supabase.from("personalizados").insert({ nome, descricao, valor, peso, imagem_url, ip_address: ip, durabilidade_inicial: durabilidadeInicial });
         if (error) throw error;
         toast.success("Item personalizado criado!");
       }
 
-      setNome(""); setDescricao(""); setValor(""); setPeso(0); setImageFile(null); setShowForm(false);
+      setNome(""); setDescricao(""); setValor(""); setPeso(0); setDurabilidadeInicial(0); setImageFile(null); setShowForm(false);
       fetchItems();
     } catch (err: any) {
       toast.error("Erro: " + err.message);
