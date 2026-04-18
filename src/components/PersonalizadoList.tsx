@@ -12,6 +12,7 @@ interface Personalizado {
   peso: number;
   imagem_url: string | null;
   created_at: string;
+  durabilidade_inicial?: number;
 }
 
 interface PersonalizadoListProps {
@@ -33,6 +34,7 @@ const PersonalizadoList = ({ ip, onOpenItem }: PersonalizadoListProps) => {
   const [descricao, setDescricao] = useState("");
   const [valor, setValor] = useState("");
   const [peso, setPeso] = useState(0);
+  const [durabilidadeInicial, setDurabilidadeInicial] = useState(0);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -81,19 +83,19 @@ const PersonalizadoList = ({ ip, onOpenItem }: PersonalizadoListProps) => {
       }
 
       if (editingId) {
-        const updateData: Record<string, any> = { nome, descricao, valor, peso };
+        const updateData: Record<string, any> = { nome, descricao, valor, peso, durabilidade_inicial: durabilidadeInicial };
         if (imagem_url) updateData.imagem_url = imagem_url;
         const { error } = await supabase.from("personalizados").update(updateData).eq("id", editingId);
         if (error) throw error;
         toast.success("Item personalizado atualizado!");
         setEditingId(null);
       } else {
-        const { error } = await supabase.from("personalizados").insert({ nome, descricao, valor, peso, imagem_url, ip_address: ip });
+        const { error } = await supabase.from("personalizados").insert({ nome, descricao, valor, peso, imagem_url, ip_address: ip, durabilidade_inicial: durabilidadeInicial });
         if (error) throw error;
         toast.success("Item personalizado criado!");
       }
 
-      setNome(""); setDescricao(""); setValor(""); setPeso(0); setImageFile(null); setShowForm(false);
+      setNome(""); setDescricao(""); setValor(""); setPeso(0); setDurabilidadeInicial(0); setImageFile(null); setShowForm(false);
       fetchItems();
     } catch (err: any) {
       toast.error("Erro: " + err.message);
@@ -107,11 +109,11 @@ const PersonalizadoList = ({ ip, onOpenItem }: PersonalizadoListProps) => {
   };
 
   const startEdit = (item: Personalizado) => {
-    setEditingId(item.id); setNome(item.nome); setDescricao(item.descricao); setValor(item.valor); setPeso(item.peso || 0); setImageFile(null); setShowForm(true);
+    setEditingId(item.id); setNome(item.nome); setDescricao(item.descricao); setValor(item.valor); setPeso(item.peso || 0); setDurabilidadeInicial(item.durabilidade_inicial || 0); setImageFile(null); setShowForm(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const cancelEdit = () => { setEditingId(null); setNome(""); setDescricao(""); setValor(""); setPeso(0); setImageFile(null); setShowForm(false); };
+  const cancelEdit = () => { setEditingId(null); setNome(""); setDescricao(""); setValor(""); setPeso(0); setDurabilidadeInicial(0); setImageFile(null); setShowForm(false); };
 
   const renderBoldText = (text: string) => {
     const parts = text.split(/(\*\*[^*]+\*\*)/g);
@@ -154,7 +156,7 @@ const PersonalizadoList = ({ ip, onOpenItem }: PersonalizadoListProps) => {
                 onKeyDown={(e) => { if (e.ctrlKey && e.key === "b") { e.preventDefault(); handleBold(); } }}
                 placeholder="Descreva o item... Use **texto** para negrito." />
             </div>
-            <div className="grid grid-cols-2 gap-2 mb-3">
+            <div className="grid grid-cols-3 gap-2 mb-3">
               <div>
                 <label className="retro-label block mb-1">Valor:</label>
                 <input type="text" className="retro-input w-full" value={valor} onChange={(e) => setValor(e.target.value)} placeholder="Ex: 500 ryō" />
@@ -162,6 +164,10 @@ const PersonalizadoList = ({ ip, onOpenItem }: PersonalizadoListProps) => {
               <div>
                 <label className="retro-label block mb-1">Peso:</label>
                 <input type="number" className="retro-input w-full" value={peso} onChange={(e) => setPeso(parseFloat(e.target.value) || 0)} placeholder="Ex: 0.16" min={0} step="0.001" />
+              </div>
+              <div>
+                <label className="retro-label block mb-1">Durabilidade:</label>
+                <input type="number" className="retro-input w-full" value={durabilidadeInicial} onChange={(e) => setDurabilidadeInicial(parseInt(e.target.value) || 0)} placeholder="0 = sem dur." min={0} step="1" />
               </div>
             </div>
             <div>

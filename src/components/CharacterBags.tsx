@@ -33,6 +33,7 @@ interface PersonalizadoItem {
   nome: string;
   peso: number;
   imagem_url: string | null;
+  durabilidade_inicial?: number;
 }
 
 interface CharacterBagsProps {
@@ -125,7 +126,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
   const fetchAllItems = useCallback(async () => {
     const [{ data: items }, { data: pers }] = await Promise.all([
       supabase.from("items").select("id, nome, peso, imagem_url").order("nome"),
-      supabase.from("personalizados").select("id, nome, peso, imagem_url").order("nome"),
+      supabase.from("personalizados").select("id, nome, peso, imagem_url, durabilidade_inicial").order("nome"),
     ]);
     setAllItems(items || []);
     setPersonalizados(pers || []);
@@ -212,13 +213,17 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
         .eq("id", existing.id);
       if (error) { toast.error("Erro ao atualizar"); return; }
     } else {
+      const persItem = personalizados.find((p) => p.id === selectedItemId);
+      const initialDur = isCotaMalha(item.nome)
+        ? COTA_MALHA_DURABILIDADE_INICIAL
+        : (persItem?.durabilidade_inicial && persItem.durabilidade_inicial > 0 ? persItem.durabilidade_inicial : null);
       const { error } = await supabase.from("character_bag_items").insert({
         character_id: characterId,
         item_id: selectedItemId,
         bag_type: bagType,
         quantidade: addQtd,
         is_papel_lacrado: bagType === "equipado" ? false : addAsPapelLacrado,
-        durabilidade: isCotaMalha(item.nome) ? COTA_MALHA_DURABILIDADE_INICIAL : null,
+        durabilidade: initialDur,
       });
       if (error) { toast.error("Erro ao adicionar"); return; }
     }
@@ -349,15 +354,15 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
                   <td className="py-1 text-center text-muted-foreground">{getItemWeight(bi)}</td>
                 )}
                 <td className="py-1 text-center">
-                  {isCotaMalha(bi.item.nome) ? (
+                  {bi.durabilidade != null ? (
                     editing && canEdit ? (
                       <QtdInput
-                        value={bi.durabilidade ?? COTA_MALHA_DURABILIDADE_INICIAL}
+                        value={bi.durabilidade}
                         onCommit={(n) => handleChangeDurabilidade(bi.id, n)}
                       />
                     ) : (
-                      <span className={`font-bold ${(bi.durabilidade ?? 0) <= 50 ? "text-destructive" : "text-foreground"}`}>
-                        {bi.durabilidade ?? COTA_MALHA_DURABILIDADE_INICIAL}
+                      <span className={`font-bold ${bi.durabilidade <= 50 ? "text-destructive" : "text-foreground"}`}>
+                        {bi.durabilidade}
                       </span>
                     )
                   ) : (
