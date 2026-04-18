@@ -126,7 +126,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
   const fetchAllItems = useCallback(async () => {
     const [{ data: items }, { data: pers }] = await Promise.all([
       supabase.from("items").select("id, nome, peso, imagem_url").order("nome"),
-      supabase.from("personalizados").select("id, nome, peso, imagem_url").order("nome"),
+      supabase.from("personalizados").select("id, nome, peso, imagem_url, durabilidade_inicial").order("nome"),
     ]);
     setAllItems(items || []);
     setPersonalizados(pers || []);
