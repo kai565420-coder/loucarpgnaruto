@@ -394,7 +394,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
                     {bagType === "equipado" && (
                       <button onClick={() => handleMoveTo(bi.id, "traseira")} className="text-[9px] text-accent hover:underline" title="Mover para bolsa">🎒</button>
                     )}
-                    {bagType === "traseira" && personalizados.some(p => p.id === bi.item_id) && (
+                    {bagType === "traseira" && (personalizados.some(p => p.id === bi.item_id) || isCotaMalha(bi.item.nome)) && (
                       <button onClick={() => handleMoveTo(bi.id, "equipado")} className="text-[9px] text-accent hover:underline" title="Equipar">⚔️</button>
                     )}
                     {bagType === "traseira" && (
