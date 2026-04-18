@@ -218,6 +218,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
         bag_type: bagType,
         quantidade: addQtd,
         is_papel_lacrado: bagType === "equipado" ? false : addAsPapelLacrado,
+        durabilidade: isCotaMalha(item.nome) ? COTA_MALHA_DURABILIDADE_INICIAL : null,
       });
       if (error) { toast.error("Erro ao adicionar"); return; }
     }
