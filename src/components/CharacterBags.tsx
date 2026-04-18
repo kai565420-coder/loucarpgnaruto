@@ -56,29 +56,37 @@ const TRASEIRA_SIZES: Record<string, number> = {
 const PAPEL_LACRADO_PESO = 0.5;
 
 
-// Local-state input — only commits on blur or Enter, prevents focus loss on each keystroke
-const QtdInput = ({ value, onCommit }: { value: number; onCommit: (n: number) => void }) => {
+// Local-state numeric input — only commits on blur or Enter, prevents focus loss on each keystroke
+const NumInput = ({ value, onCommit, min = 0, width = "w-12" }: { value: number; onCommit: (n: number) => void; min?: number; width?: string }) => {
   const [local, setLocal] = useState(String(value));
   useEffect(() => { setLocal(String(value)); }, [value]);
   const commit = () => {
-    const n = parseInt(local) || 1;
+    const parsed = parseInt(local);
+    const n = isNaN(parsed) ? value : Math.max(min, parsed);
     if (n !== value) onCommit(n);
-    else setLocal(String(value));
+    setLocal(String(n));
   };
   return (
     <input
       type="number"
-      className="retro-input w-12 text-center text-[10px]"
+      className={`retro-input ${width} text-center text-[10px]`}
       value={local}
-      min={1}
+      min={min}
       onChange={(e) => setLocal(e.target.value)}
       onBlur={commit}
       onKeyDown={(e) => {
-        if (e.key === "Enter") { e.currentTarget.blur(); }
+        if (e.key === "Enter") { (e.currentTarget as HTMLInputElement).blur(); }
       }}
     />
   );
 };
+
+const QtdInput = ({ value, onCommit }: { value: number; onCommit: (n: number) => void }) => (
+  <NumInput value={value} onCommit={onCommit} min={1} width="w-12" />
+);
+const DurInput = ({ value, onCommit }: { value: number; onCommit: (n: number) => void }) => (
+  <NumInput value={value} onCommit={onCommit} min={0} width="w-14" />
+);
 
 const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, dinheiro, onTamanhoChange, onDinheiroChange, onOpenItem }: CharacterBagsProps) => {
   const [bagItems, setBagItems] = useState<BagItem[]>([]);
@@ -356,7 +364,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
                 <td className="py-1 text-center">
                   {bi.durabilidade != null ? (
                     editing && canEdit ? (
-                      <QtdInput
+                      <DurInput
                         value={bi.durabilidade}
                         onCommit={(n) => handleChangeDurabilidade(bi.id, n)}
                       />
