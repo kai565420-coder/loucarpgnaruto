@@ -109,11 +109,11 @@ const PersonalizadoList = ({ ip, onOpenItem }: PersonalizadoListProps) => {
   };
 
   const startEdit = (item: Personalizado) => {
-    setEditingId(item.id); setNome(item.nome); setDescricao(item.descricao); setValor(item.valor); setPeso(item.peso || 0); setImageFile(null); setShowForm(true);
+    setEditingId(item.id); setNome(item.nome); setDescricao(item.descricao); setValor(item.valor); setPeso(item.peso || 0); setDurabilidadeInicial(item.durabilidade_inicial || 0); setImageFile(null); setShowForm(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const cancelEdit = () => { setEditingId(null); setNome(""); setDescricao(""); setValor(""); setPeso(0); setImageFile(null); setShowForm(false); };
+  const cancelEdit = () => { setEditingId(null); setNome(""); setDescricao(""); setValor(""); setPeso(0); setDurabilidadeInicial(0); setImageFile(null); setShowForm(false); };
 
   const renderBoldText = (text: string) => {
     const parts = text.split(/(\*\*[^*]+\*\*)/g);
