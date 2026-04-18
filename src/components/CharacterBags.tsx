@@ -8,6 +8,7 @@ interface BagItem {
   bag_type: string;
   quantidade: number;
   is_papel_lacrado: boolean;
+  durabilidade: number | null;
   item: {
     nome: string;
     peso: number;
@@ -16,6 +17,9 @@ interface BagItem {
     valor?: string;
   };
 }
+
+const COTA_MALHA_DURABILIDADE_INICIAL = 200;
+const isCotaMalha = (nome: string) => nome.toLowerCase().includes("cota de malha");
 
 interface Item {
   id: string;
@@ -90,7 +94,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
     setLoading(true);
     const { data } = await supabase
       .from("character_bag_items")
-      .select("id, item_id, bag_type, quantidade, is_papel_lacrado")
+      .select("id, item_id, bag_type, quantidade, is_papel_lacrado, durabilidade")
       .eq("character_id", characterId);
 
     if (data && data.length > 0) {
@@ -214,6 +218,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
         bag_type: bagType,
         quantidade: addQtd,
         is_papel_lacrado: bagType === "equipado" ? false : addAsPapelLacrado,
+        durabilidade: isCotaMalha(item.nome) ? COTA_MALHA_DURABILIDADE_INICIAL : null,
       });
       if (error) { toast.error("Erro ao adicionar"); return; }
     }
@@ -238,6 +243,13 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
     if (newQtd < 1) return;
     const { error } = await supabase.from("character_bag_items").update({ quantidade: newQtd }).eq("id", bagItemId);
     if (error) { toast.error("Erro ao atualizar"); return; }
+    fetchBagItems();
+  };
+
+  const handleChangeDurabilidade = async (bagItemId: string, newDur: number) => {
+    const clamped = Math.max(0, newDur);
+    const { error } = await supabase.from("character_bag_items").update({ durabilidade: clamped }).eq("id", bagItemId);
+    if (error) { toast.error("Erro ao atualizar durabilidade"); return; }
     fetchBagItems();
   };
 
@@ -297,6 +309,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
             <tr className="border-b border-border">
               <th className="text-left retro-label py-1">Nome</th>
               {bagType !== "equipado" && <th className="text-center retro-label py-1 w-12">Peso</th>}
+              <th className="text-center retro-label py-1 w-16">Dur.</th>
               <th className="text-center retro-label py-1 w-12">Qtd.</th>
               {editing && canEdit && <th className="w-16"></th>}
             </tr>
@@ -335,6 +348,22 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
                 {bagType !== "equipado" && (
                   <td className="py-1 text-center text-muted-foreground">{getItemWeight(bi)}</td>
                 )}
+                <td className="py-1 text-center">
+                  {isCotaMalha(bi.item.nome) ? (
+                    editing && canEdit ? (
+                      <QtdInput
+                        value={bi.durabilidade ?? COTA_MALHA_DURABILIDADE_INICIAL}
+                        onCommit={(n) => handleChangeDurabilidade(bi.id, n)}
+                      />
+                    ) : (
+                      <span className={`font-bold ${(bi.durabilidade ?? 0) <= 50 ? "text-destructive" : "text-foreground"}`}>
+                        {bi.durabilidade ?? COTA_MALHA_DURABILIDADE_INICIAL}
+                      </span>
+                    )
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  )}
+                </td>
                 <td className="py-1 text-center">
                   {editing && canEdit ? (
                     <QtdInput value={bi.quantidade} onCommit={(n) => handleChangeQtd(bi.id, n)} />
