@@ -34,6 +34,7 @@ const PersonalizadoList = ({ ip, onOpenItem }: PersonalizadoListProps) => {
   const [descricao, setDescricao] = useState("");
   const [valor, setValor] = useState("");
   const [peso, setPeso] = useState(0);
+  const [durabilidadeInicial, setDurabilidadeInicial] = useState(0);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
