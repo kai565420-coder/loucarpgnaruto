@@ -33,6 +33,7 @@ interface PersonalizadoItem {
   nome: string;
   peso: number;
   imagem_url: string | null;
+  durabilidade_inicial?: number;
 }
 
 interface CharacterBagsProps {
