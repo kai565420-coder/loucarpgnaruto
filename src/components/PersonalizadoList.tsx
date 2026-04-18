@@ -156,7 +156,7 @@ const PersonalizadoList = ({ ip, onOpenItem }: PersonalizadoListProps) => {
                 onKeyDown={(e) => { if (e.ctrlKey && e.key === "b") { e.preventDefault(); handleBold(); } }}
                 placeholder="Descreva o item... Use **texto** para negrito." />
             </div>
-            <div className="grid grid-cols-2 gap-2 mb-3">
+            <div className="grid grid-cols-3 gap-2 mb-3">
               <div>
                 <label className="retro-label block mb-1">Valor:</label>
                 <input type="text" className="retro-input w-full" value={valor} onChange={(e) => setValor(e.target.value)} placeholder="Ex: 500 ryō" />
@@ -164,6 +164,10 @@ const PersonalizadoList = ({ ip, onOpenItem }: PersonalizadoListProps) => {
               <div>
                 <label className="retro-label block mb-1">Peso:</label>
                 <input type="number" className="retro-input w-full" value={peso} onChange={(e) => setPeso(parseFloat(e.target.value) || 0)} placeholder="Ex: 0.16" min={0} step="0.001" />
+              </div>
+              <div>
+                <label className="retro-label block mb-1">Durabilidade:</label>
+                <input type="number" className="retro-input w-full" value={durabilidadeInicial} onChange={(e) => setDurabilidadeInicial(parseInt(e.target.value) || 0)} placeholder="0 = sem dur." min={0} step="1" />
               </div>
             </div>
             <div>
