@@ -30,7 +30,7 @@ interface CharacterJutsuLink {
   maestria_nivel: string;
 }
 
-const MAESTRIA_LEVELS = ["I", "II", "III", "IV", "V"];
+const MAESTRIA_LEVELS = ["Nula", "I", "II", "III", "IV", "V"];
 
 const atributos = [
   { key: "forca_fisica", label: "Força Física" },
