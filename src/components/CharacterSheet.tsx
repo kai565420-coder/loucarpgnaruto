@@ -30,7 +30,7 @@ interface CharacterJutsuLink {
   maestria_nivel: string;
 }
 
-const MAESTRIA_LEVELS = ["I", "II", "III", "IV", "V"];
+const MAESTRIA_LEVELS = ["Nula", "I", "II", "III", "IV", "V"];
 
 const atributos = [
   { key: "forca_fisica", label: "Força Física" },
@@ -309,12 +309,12 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
               onClick={(e) => e.stopPropagation()}
             >
               {MAESTRIA_LEVELS.map((lvl) => (
-                <option key={lvl} value={lvl}>Maestria {lvl}</option>
+                <option key={lvl} value={lvl}>{lvl === "Nula" ? "Sem Maestria" : `Maestria ${lvl}`}</option>
               ))}
             </select>
           ) : (
             <span className="text-[9px] text-muted-foreground border border-border px-1 py-0.5">
-              Maestria {maestria}
+              {maestria === "Nula" ? "Sem Maestria" : `Maestria ${maestria}`}
             </span>
           )}
         </div>
