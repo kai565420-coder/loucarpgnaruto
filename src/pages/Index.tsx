@@ -7,7 +7,7 @@ import CharacterForm from "@/components/CharacterForm";
 import JutsuForm from "@/components/JutsuForm";
 import ItemList from "@/components/ItemList";
 import PersonalizadoList from "@/components/PersonalizadoList";
-import JutsuWindow from "@/components/JutsuWindow";
+import JutsuWindow, { type JutsuTaticaContext } from "@/components/JutsuWindow";
 import ItemWindow from "@/components/ItemWindow";
 import { useUserIp } from "@/hooks/useUserIp";
 import { useAdmin } from "@/contexts/AdminContext";
@@ -18,6 +18,8 @@ interface Jutsu {
   nome: string;
   informacoes: string;
   imagem_url: string | null;
+  qtd_selos?: number | null;
+  alcance?: string | null;
 }
 
 interface Item {
@@ -29,11 +31,11 @@ interface Item {
 }
 
 type WindowEntry =
-  | { type: "jutsu"; id: string; data: Jutsu; position: { x: number; y: number } }
+  | { type: "jutsu"; id: string; data: Jutsu; position: { x: number; y: number }; tatica?: JutsuTaticaContext }
   | { type: "item"; id: string; data: Item; position: { x: number; y: number } };
 
 type MinimizedEntry =
-  | { type: "jutsu"; id: string; data: Jutsu }
+  | { type: "jutsu"; id: string; data: Jutsu; tatica?: JutsuTaticaContext }
   | { type: "item"; id: string; data: Item };
 
 const Index = () => {
@@ -50,12 +52,12 @@ const Index = () => {
     setActiveTab("fichas");
   };
 
-  const openWindow = (type: "jutsu" | "item", id: string, data: any) => {
+  const openWindow = (type: "jutsu" | "item", id: string, data: any, tatica?: JutsuTaticaContext) => {
     setMinimizedWindows((prev) => prev.filter((m) => m.id !== id));
     setOpenWindows((prev) => {
       if (prev.some((w) => w.id === id)) return prev;
       const offset = prev.length * 30;
-      return [...prev, { type, id, data, position: { x: 150 + offset, y: 100 + offset } }];
+      return [...prev, { type, id, data, tatica, position: { x: 150 + offset, y: 100 + offset } }];
     });
   };
 
@@ -117,7 +119,7 @@ const Index = () => {
               <CharacterList
                 ip={ip || "unknown"}
                 refreshKey={refreshKey}
-                onOpenJutsu={(jutsu) => openWindow("jutsu", jutsu.id, jutsu)}
+                onOpenJutsu={(jutsu, tatica) => openWindow("jutsu", tatica ? `${jutsu.id}-${tatica.personagem}` : jutsu.id, jutsu, tatica)}
                 onOpenItem={(item) => openWindow("item", item.id, item)}
               />
             ) : activeTab === "criar" ? (
@@ -159,6 +161,7 @@ const Index = () => {
           <JutsuWindow
             key={w.id}
             jutsu={w.data as Jutsu}
+            tatica={w.tatica}
             initialPosition={w.position}
             onClose={() => closeWindow(w.id)}
             onMinimize={() => minimizeWindow(w.id)}
