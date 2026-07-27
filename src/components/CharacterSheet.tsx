@@ -13,7 +13,7 @@ interface CharacterSheetProps {
   isOwner: boolean;
   onDelete?: () => void;
   onUpdated?: () => void;
-  onOpenJutsu?: (jutsu: Jutsu) => void;
+  onOpenJutsu?: (jutsu: Jutsu, tatica?: { personagem: string; maestria: string; selosManuais: string }) => void;
   onOpenItem?: (item: { id: string; nome: string; descricao: string; valor: string; peso?: number; imagem_url: string | null }) => void;
 }
 
@@ -23,6 +23,8 @@ interface Jutsu {
   informacoes: string;
   imagem_url: string | null;
   categoria: string;
+  qtd_selos?: number | null;
+  alcance?: string | null;
 }
 
 interface CharacterJutsuLink {
@@ -207,7 +209,11 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
   };
 
   const handleOpenJutsu = (jutsu: Jutsu) => {
-    onOpenJutsu?.(jutsu);
+    onOpenJutsu?.(jutsu, {
+      personagem: sheet.nome,
+      maestria: getMaestriaForJutsu(jutsu.id),
+      selosManuais: (sheet as any).selos_manuais || "",
+    });
   };
 
   const handleMaestriaChange = async (jutsuId: string, newLevel: string) => {

@@ -315,6 +315,7 @@ export type Database = {
       }
       jutsus: {
         Row: {
+          alcance: string
           categoria: string
           created_at: string
           id: string
@@ -322,8 +323,10 @@ export type Database = {
           informacoes: string
           ip_address: string
           nome: string
+          qtd_selos: number
         }
         Insert: {
+          alcance?: string
           categoria?: string
           created_at?: string
           id?: string
@@ -331,8 +334,10 @@ export type Database = {
           informacoes?: string
           ip_address: string
           nome: string
+          qtd_selos?: number
         }
         Update: {
+          alcance?: string
           categoria?: string
           created_at?: string
           id?: string
@@ -340,6 +345,7 @@ export type Database = {
           informacoes?: string
           ip_address?: string
           nome?: string
+          qtd_selos?: number
         }
         Relationships: []
       }

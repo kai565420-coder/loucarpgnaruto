@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { getJutsuEmoji } from "@/lib/jutsuEmoji";
 import JutsuWindow from "./JutsuWindow";
+import { ALCANCES } from "@/lib/jutsuTatica";
 
 interface JutsuFormProps {
   ip: string;
@@ -16,12 +17,16 @@ interface Jutsu {
   imagem_url: string | null;
   categoria: string;
   created_at: string;
+  qtd_selos?: number | null;
+  alcance?: string | null;
 }
 
 const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
   const [nome, setNome] = useState("");
   const [informacoes, setInformacoes] = useState("");
   const [categoria, setCategoria] = useState("jutsu");
+  const [qtdSelos, setQtdSelos] = useState("0");
+  const [alcance, setAlcance] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [jutsus, setJutsus] = useState<Jutsu[]>([]);
@@ -81,6 +86,8 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
     setNome(jutsu.nome);
     setInformacoes(jutsu.informacoes);
     setCategoria(jutsu.categoria || "jutsu");
+    setQtdSelos(String(jutsu.qtd_selos ?? 0));
+    setAlcance(jutsu.alcance || "");
     setImageFile(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -90,6 +97,8 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
     setNome("");
     setInformacoes("");
     setCategoria("jutsu");
+    setQtdSelos("0");
+    setAlcance("");
     setImageFile(null);
   };
 
@@ -119,7 +128,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
       }
 
       if (editingId) {
-        const updateData: Record<string, any> = { nome, informacoes, categoria };
+        const updateData: Record<string, any> = { nome, informacoes, categoria, qtd_selos: parseInt(qtdSelos) || 0, alcance };
         if (imagem_url) updateData.imagem_url = imagem_url;
         const { error } = await supabase.from("jutsus").update(updateData).eq("id", editingId);
         if (error) throw error;
@@ -130,6 +139,8 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
           nome,
           informacoes,
           categoria,
+          qtd_selos: parseInt(qtdSelos) || 0,
+          alcance,
           imagem_url,
           ip_address: ip,
         });
@@ -140,6 +151,8 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
       setNome("");
       setInformacoes("");
       setCategoria("jutsu");
+      setQtdSelos("0");
+      setAlcance("");
       setImageFile(null);
       fetchJutsus();
       onCreated();
@@ -189,6 +202,28 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
               <option value="jutsu">Jutsu</option>
               <option value="habilidade">Habilidade</option>
             </select>
+          </div>
+
+          <div className="mb-3 grid grid-cols-2 gap-2">
+            <div>
+              <label className="retro-label block mb-1">Qtd. de Selos:</label>
+              <input
+                type="number"
+                min={0}
+                className="retro-input w-full text-xs"
+                value={qtdSelos}
+                onChange={(e) => setQtdSelos(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="retro-label block mb-1">Alcance:</label>
+              <select className="retro-input w-full text-xs" value={alcance} onChange={(e) => setAlcance(e.target.value)}>
+                <option value="">Não definido</option>
+                {ALCANCES.map((a) => (
+                  <option key={a.id} value={a.id}>{a.label} — {a.dist}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="mb-3">
