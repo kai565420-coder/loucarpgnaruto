@@ -1,0 +1,3 @@
+ALTER TABLE public.jutsus
+  ADD COLUMN IF NOT EXISTS qtd_selos integer NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS alcance text NOT NULL DEFAULT '';
