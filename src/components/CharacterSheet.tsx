@@ -13,7 +13,7 @@ interface CharacterSheetProps {
   isOwner: boolean;
   onDelete?: () => void;
   onUpdated?: () => void;
-  onOpenJutsu?: (jutsu: Jutsu, tatica?: { personagem: string; maestria: string; selosManuais: string }) => void;
+  onOpenJutsu?: (jutsu: Jutsu, tatica?: { personagem: string; maestria: string; selosManuais: string; taijutsu?: number }) => void;
   onOpenItem?: (item: { id: string; nome: string; descricao: string; valor: string; peso?: number; imagem_url: string | null }) => void;
 }
 
@@ -213,6 +213,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
       personagem: sheet.nome,
       maestria: getMaestriaForJutsu(jutsu.id),
       selosManuais: (sheet as any).selos_manuais || "",
+      taijutsu: (sheet as any).taijutsu ?? 0,
     });
   };
 

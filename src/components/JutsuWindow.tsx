@@ -1,5 +1,5 @@
 import ResizableWindow from "./ResizableWindow";
-import { calcularTatica, fmtMod, ALCANCES } from "@/lib/jutsuTatica";
+import { calcularTatica, fmtMod, ALCANCES, ALCANCE_TAIJUTSU } from "@/lib/jutsuTatica";
 import { getJutsuEmoji } from "@/lib/jutsuEmoji";
 
 interface Jutsu {
@@ -15,6 +15,7 @@ export interface JutsuTaticaContext {
   personagem: string;
   maestria: string;
   selosManuais: string;
+  taijutsu?: number;
 }
 
 interface JutsuWindowProps {
@@ -42,10 +43,14 @@ const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition, tatica }: Ju
         qtdSelos: jutsu.qtd_selos ?? 0,
         maestria: tatica.maestria,
         selosManuais: tatica.selosManuais,
+        taijutsu: tatica.taijutsu,
       })
     : null;
 
-  const alcanceLabel = ALCANCES.find((a) => a.id === jutsu.alcance)?.label;
+  const alcanceLabel =
+    jutsu.alcance === "taijutsu"
+      ? ALCANCE_TAIJUTSU.label
+      : ALCANCES.find((a) => a.id === jutsu.alcance)?.label;
 
   return (
     <ResizableWindow
@@ -64,7 +69,9 @@ const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition, tatica }: Ju
 
       {tatica && (
         <div className="mt-4 border-t-2 border-accent/50 pt-2">
-          <div className="retro-section-title text-xs">⚔️ Moldagem Elemental — {tatica.personagem}</div>
+          <div className="retro-section-title text-xs">
+            {resultado?.taijutsu ? "💪 Taijutsu" : "⚔️ Moldagem Elemental"} — {tatica.personagem}
+          </div>
 
           {!resultado ? (
             <p className="text-[10px] text-muted-foreground">
@@ -73,28 +80,43 @@ const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition, tatica }: Ju
           ) : (
             <>
               <div className="text-[10px] text-muted-foreground mb-2 leading-relaxed">
-                <div>
-                  Alcance base: <span className="text-accent font-bold">{alcanceLabel}</span> · Selos:{" "}
-                  <span className="text-accent font-bold">
-                    {resultado.selosBase}
-                    {resultado.selosEfetivos !== resultado.selosBase && ` → ${resultado.selosEfetivos}`}
-                  </span>{" "}
-                  {resultado.selosEfetivos !== resultado.selosBase && (
-                    <span>
-                      (Maestria {tatica.maestria === "Nula" ? "—" : tatica.maestria})
-                    </span>
-                  )}
-                </div>
-                <div>{resultado.selosCountLabel} → {fmtMod(resultado.selosCountMod)}</div>
-                <div>
-                  Selos Manuais {tatica.selosManuais || "—"} → {fmtMod(resultado.selosManuaisMod)}
-                  {resultado.selosEfetivos === 0 && " (não acumula com 0 selos)"}
-                </div>
-                <div className="text-accent font-bold">
-                  Ajuste fixo aplicado: {fmtMod(resultado.bonusTotal)} nos Reflexos Ninja do oponente
-                  {resultado.vantagem && " · oponente com vantagem de roll"}
-                </div>
+                {resultado.taijutsu ? (
+                  <>
+                    <div>
+                      Alcance base: <span className="text-accent font-bold">{alcanceLabel}</span> · Sem selos manuais
+                    </div>
+                    <div className="text-accent font-bold">
+                      Perícia de Taijutsu: {resultado.taijutsuValor} → penalidade nos Reflexos Ninja do oponente,
+                      reduzindo 1 por faixa de distância
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      Alcance base: <span className="text-accent font-bold">{alcanceLabel}</span> · Selos:{" "}
+                      <span className="text-accent font-bold">
+                        {resultado.selosBase}
+                        {resultado.selosEfetivos !== resultado.selosBase && ` → ${resultado.selosEfetivos}`}
+                      </span>{" "}
+                      {resultado.selosEfetivos !== resultado.selosBase && (
+                        <span>
+                          (Maestria {tatica.maestria === "Nula" ? "—" : tatica.maestria})
+                        </span>
+                      )}
+                    </div>
+                    <div>{resultado.selosCountLabel} → {fmtMod(resultado.selosCountMod)}</div>
+                    <div>
+                      Selos Manuais {tatica.selosManuais || "—"} → {fmtMod(resultado.selosManuaisMod)}
+                      {resultado.selosEfetivos === 0 && " (não acumula com 0 selos)"}
+                    </div>
+                    <div className="text-accent font-bold">
+                      Ajuste fixo aplicado: {fmtMod(resultado.bonusTotal)} nos Reflexos Ninja do oponente
+                      {resultado.vantagem && " · oponente com vantagem de roll"}
+                    </div>
+                  </>
+                )}
               </div>
+
 
               <table className="retro-table text-[10px] w-full">
                 <thead>

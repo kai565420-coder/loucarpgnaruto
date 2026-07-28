@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { getJutsuEmoji } from "@/lib/jutsuEmoji";
 import JutsuWindow from "./JutsuWindow";
-import { ALCANCES } from "@/lib/jutsuTatica";
+import { ALCANCES, ALCANCE_TAIJUTSU } from "@/lib/jutsuTatica";
 
 interface JutsuFormProps {
   ip: string;
@@ -222,6 +222,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
                 {ALCANCES.map((a) => (
                   <option key={a.id} value={a.id}>{a.label} — {a.dist}</option>
                 ))}
+                <option value={ALCANCE_TAIJUTSU.id}>{ALCANCE_TAIJUTSU.label} — {ALCANCE_TAIJUTSU.dist}</option>
               </select>
             </div>
           </div>
