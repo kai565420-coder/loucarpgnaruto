@@ -370,37 +370,49 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
           ) : jutsus.length === 0 ? (
             <p className="text-muted-foreground text-[11px] text-center py-2">Nenhuma habilidade cadastrada ainda.</p>
           ) : (
-            [...jutsus]
-              .sort((a, b) => a.nome.localeCompare(b.nome))
-              .filter((j) => j.nome.toLowerCase().includes(searchQuery.toLowerCase()))
-              .map((jutsu) => (
-              <div key={jutsu.id} className="border-b border-border last:border-0 py-2 px-1">
-                <div className="flex items-center justify-between">
-                  <button
-                    onClick={() => setPreviewJutsu(jutsu)}
-                    className="text-xs text-accent font-bold hover:underline text-left"
-                  >
-                    {getJutsuEmoji(jutsu.nome)} {jutsu.nome}
-                  </button>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => startEdit(jutsu)}
-                      className="text-[10px] text-muted-foreground hover:text-accent"
-                      title="Editar"
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      onClick={() => handleDelete(jutsu.id)}
-                      className="text-[10px] text-muted-foreground hover:text-destructive"
-                      title="Deletar"
-                    >
-                      🗑️
-                    </button>
+            (["jutsu", "habilidade", "invocacao"] as const).map((cat) => {
+              const lista = [...jutsus]
+                .filter((j) => (j.categoria || "jutsu") === cat)
+                .filter((j) => j.nome.toLowerCase().includes(searchQuery.toLowerCase()))
+                .sort((a, b) => a.nome.localeCompare(b.nome));
+              if (lista.length === 0) return null;
+              const titulo = cat === "jutsu" ? "🌀 Jutsus" : cat === "habilidade" ? "✨ Habilidades" : "🦁 Invocações";
+              return (
+                <div key={cat} className="mb-2">
+                  <div className="text-accent font-bold text-[11px] border-b border-border pb-1 mb-1">
+                    {titulo} ({lista.length})
                   </div>
+                  {lista.map((jutsu) => (
+                    <div key={jutsu.id} className="border-b border-border last:border-0 py-2 px-1">
+                      <div className="flex items-center justify-between">
+                        <button
+                          onClick={() => setPreviewJutsu(jutsu)}
+                          className="text-xs text-accent font-bold hover:underline text-left"
+                        >
+                          {getJutsuEmoji(jutsu.nome, jutsu.categoria)} {jutsu.nome}
+                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => startEdit(jutsu)}
+                            className="text-[10px] text-muted-foreground hover:text-accent"
+                            title="Editar"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() => handleDelete(jutsu.id)}
+                            className="text-[10px] text-muted-foreground hover:text-destructive"
+                            title="Deletar"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
