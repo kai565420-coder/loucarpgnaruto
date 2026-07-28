@@ -10,6 +10,7 @@ interface Jutsu {
   qtd_selos?: number | null;
   alcance?: string | null;
   dt_captura?: number | null;
+  categoria?: string | null;
 }
 
 export interface JutsuTaticaContext {
@@ -39,7 +40,8 @@ const renderBoldText = (text: string) => {
 };
 
 const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition, tatica }: JutsuWindowProps) => {
-  const resultado = tatica
+  const isInvocacao = jutsu.categoria === "invocacao";
+  const resultado = tatica && !isInvocacao
     ? calcularTatica({
         alcance: jutsu.alcance || "",
         qtdSelos: jutsu.qtd_selos ?? 0,
@@ -73,7 +75,7 @@ const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition, tatica }: Ju
         {renderBoldText(jutsu.informacoes || "Sem informações.")}
       </div>
 
-      {tatica && (
+      {tatica && !isInvocacao && (
         <div className="mt-4 border-t-2 border-accent/50 pt-2">
           <div className="retro-section-title text-xs">
             {resultado?.genjutsu ? "👁️ Genjutsu" : resultado?.taijutsu ? "💪 Taijutsu" : "⚔️ Moldagem Elemental"} — {tatica.personagem}
