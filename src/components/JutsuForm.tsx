@@ -222,6 +222,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
                 {ALCANCES.map((a) => (
                   <option key={a.id} value={a.id}>{a.label} — {a.dist}</option>
                 ))}
+                <option value={ALCANCE_TAIJUTSU.id}>{ALCANCE_TAIJUTSU.label} — {ALCANCE_TAIJUTSU.dist}</option>
               </select>
             </div>
           </div>
