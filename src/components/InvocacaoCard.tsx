@@ -61,6 +61,8 @@ const InvocacaoCard = ({
 
   useEffect(() => { if (open) fetchSubs(); }, [open, fetchSubs]);
 
+  useEffect(() => { if (!editing) setShowSelector(false); }, [editing]);
+
   useEffect(() => {
     if (showSelector && allJutsus.length === 0) {
       supabase.from("jutsus").select("*").neq("categoria", "invocacao").order("nome").then(({ data }) => setAllJutsus(data || []));
@@ -91,6 +93,8 @@ const InvocacaoCard = ({
     await (supabase as any).from("invocacao_jutsus").update({ maestria_nivel: level }).eq("id", id);
   };
 
+  const podeEditar = canEdit && editing;
+
   const bar = (label: string, key: string, maxKey: string, color: string) => {
     const max = jutsu[maxKey] ?? 0;
     const cur = (status as any)[key] ?? 0;
@@ -99,7 +103,7 @@ const InvocacaoCard = ({
       <div className="mb-2">
         <div className="flex justify-between text-[10px] mb-1">
           <span className="retro-label">{label}:</span>
-          {canEdit ? (
+          {podeEditar ? (
             <span className="flex items-center gap-1">
               <input
                 type="number"
@@ -171,12 +175,12 @@ const InvocacaoCard = ({
 
           <div className="flex items-center gap-2 mt-3 mb-1">
             <span className="text-accent font-bold text-[11px]">Jutsus da Invocação ({subs.length})</span>
-            {canEdit && (
+            {podeEditar && (
               <button onClick={() => setShowSelector(!showSelector)} className="retro-button text-[10px] px-2 py-0.5">➕ Adicionar</button>
             )}
           </div>
 
-          {showSelector && canEdit && (
+          {showSelector && podeEditar && (
             <div className="retro-panel p-2 mb-2 max-h-[160px] overflow-y-auto">
               {allJutsus.filter((j) => !subs.some((s) => s.jutsu_id === j.id)).map((j) => (
                 <button key={j.id} onClick={() => addSub(j.id)} className="block w-full text-left text-[11px] py-0.5 px-1 hover:bg-muted text-foreground">
@@ -195,7 +199,7 @@ const InvocacaoCard = ({
                   {getJutsuEmoji(s.nome)} {s.nome}
                 </button>
                 <div className="flex items-center gap-1 shrink-0">
-                  {canEdit ? (
+                  {podeEditar ? (
                     <select className="retro-input text-[9px]" value={s.maestria_nivel} onChange={(e) => changeSubMaestria(s.id, e.target.value)}>
                       {MAESTRIA_LEVELS.map((lvl) => (
                         <option key={lvl} value={lvl}>{lvl === "Nula" ? "Sem Maestria" : `Maestria ${lvl}`}</option>
@@ -206,7 +210,7 @@ const InvocacaoCard = ({
                       {s.maestria_nivel === "Nula" ? "Sem Maestria" : `Maestria ${s.maestria_nivel}`}
                     </span>
                   )}
-                  {canEdit && (
+                  {podeEditar && (
                     <button onClick={() => removeSub(s.id)} className="text-[10px] text-muted-foreground hover:text-destructive" title="Remover">🗑️</button>
                   )}
                 </div>
