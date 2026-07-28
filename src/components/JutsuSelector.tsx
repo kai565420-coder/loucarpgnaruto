@@ -39,16 +39,26 @@ const JutsuSelector = ({ characterId, assignedJutsuIds, onChanged, onClose }: Ju
   const handleSave = async () => {
     setSaving(true);
     try {
-      // Remove all current
-      await supabase.from("character_jutsus").delete().eq("character_id", characterId);
+      const selectedIds = Array.from(selected);
+      const toAdd = selectedIds.filter((id) => !assignedJutsuIds.includes(id));
+      const toRemove = assignedJutsuIds.filter((id) => !selected.has(id));
 
-      // Insert selected
-      if (selected.size > 0) {
-        const rows = Array.from(selected).map((jutsu_id) => ({
+      // Add first so an access error never removes the character's current abilities.
+      if (toAdd.length > 0) {
+        const rows = toAdd.map((jutsu_id) => ({
           character_id: characterId,
           jutsu_id,
         }));
         const { error } = await supabase.from("character_jutsus").insert(rows);
+        if (error) throw error;
+      }
+
+      if (toRemove.length > 0) {
+        const { error } = await supabase
+          .from("character_jutsus")
+          .delete()
+          .eq("character_id", characterId)
+          .in("jutsu_id", toRemove);
         if (error) throw error;
       }
 
