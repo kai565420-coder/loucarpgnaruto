@@ -1,5 +1,5 @@
 import ResizableWindow from "./ResizableWindow";
-import { calcularTatica, fmtMod, ALCANCES } from "@/lib/jutsuTatica";
+import { calcularTatica, fmtMod, ALCANCES, ALCANCE_TAIJUTSU } from "@/lib/jutsuTatica";
 import { getJutsuEmoji } from "@/lib/jutsuEmoji";
 
 interface Jutsu {
@@ -15,6 +15,7 @@ export interface JutsuTaticaContext {
   personagem: string;
   maestria: string;
   selosManuais: string;
+  taijutsu?: number;
 }
 
 interface JutsuWindowProps {
@@ -42,10 +43,14 @@ const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition, tatica }: Ju
         qtdSelos: jutsu.qtd_selos ?? 0,
         maestria: tatica.maestria,
         selosManuais: tatica.selosManuais,
+        taijutsu: tatica.taijutsu,
       })
     : null;
 
-  const alcanceLabel = ALCANCES.find((a) => a.id === jutsu.alcance)?.label;
+  const alcanceLabel =
+    jutsu.alcance === "taijutsu"
+      ? ALCANCE_TAIJUTSU.label
+      : ALCANCES.find((a) => a.id === jutsu.alcance)?.label;
 
   return (
     <ResizableWindow
