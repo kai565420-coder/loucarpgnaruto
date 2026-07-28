@@ -63,7 +63,7 @@ const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition, tatica }: Ju
   return (
     <ResizableWindow
       title={jutsu.nome}
-      icon={getJutsuEmoji(jutsu.nome)}
+      icon={getJutsuEmoji(jutsu.nome, jutsu.categoria)}
       onClose={onClose}
       onMinimize={onMinimize}
       initialPosition={initialPosition}
