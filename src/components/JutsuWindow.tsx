@@ -1,5 +1,5 @@
 import ResizableWindow from "./ResizableWindow";
-import { calcularTatica, fmtMod, ALCANCES, ALCANCE_TAIJUTSU } from "@/lib/jutsuTatica";
+import { calcularTatica, fmtMod, ALCANCES, ALCANCE_TAIJUTSU, ALCANCE_GENJUTSU } from "@/lib/jutsuTatica";
 import { getJutsuEmoji } from "@/lib/jutsuEmoji";
 
 interface Jutsu {
@@ -9,6 +9,7 @@ interface Jutsu {
   imagem_url: string | null;
   qtd_selos?: number | null;
   alcance?: string | null;
+  dt_captura?: number | null;
 }
 
 export interface JutsuTaticaContext {
@@ -16,6 +17,7 @@ export interface JutsuTaticaContext {
   maestria: string;
   selosManuais: string;
   taijutsu?: number;
+  controleChakra?: number;
 }
 
 interface JutsuWindowProps {
@@ -44,12 +46,16 @@ const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition, tatica }: Ju
         maestria: tatica.maestria,
         selosManuais: tatica.selosManuais,
         taijutsu: tatica.taijutsu,
+        controleChakra: tatica.controleChakra,
+        dtCaptura: jutsu.dt_captura ?? 0,
       })
     : null;
 
   const alcanceLabel =
     jutsu.alcance === "taijutsu"
       ? ALCANCE_TAIJUTSU.label
+      : jutsu.alcance === "genjutsu"
+      ? ALCANCE_GENJUTSU.label
       : ALCANCES.find((a) => a.id === jutsu.alcance)?.label;
 
   return (
@@ -70,7 +76,7 @@ const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition, tatica }: Ju
       {tatica && (
         <div className="mt-4 border-t-2 border-accent/50 pt-2">
           <div className="retro-section-title text-xs">
-            {resultado?.taijutsu ? "💪 Taijutsu" : "⚔️ Moldagem Elemental"} — {tatica.personagem}
+            {resultado?.genjutsu ? "👁️ Genjutsu" : resultado?.taijutsu ? "💪 Taijutsu" : "⚔️ Moldagem Elemental"} — {tatica.personagem}
           </div>
 
           {!resultado ? (
@@ -80,7 +86,34 @@ const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition, tatica }: Ju
           ) : (
             <>
               <div className="text-[10px] text-muted-foreground mb-2 leading-relaxed">
-                {resultado.taijutsu ? (
+                {resultado.genjutsu ? (
+                  <>
+                    <div>
+                      Alcance: <span className="text-accent font-bold">Sem limite (Genjutsu)</span> · Selos:{" "}
+                      <span className="text-accent font-bold">
+                        {resultado.selosBase}
+                        {resultado.selosEfetivos !== resultado.selosBase && ` → ${resultado.selosEfetivos}`}
+                      </span>
+                    </div>
+                    <div>{resultado.selosCountLabel} → {fmtMod(resultado.selosCountMod)}</div>
+                    <div>
+                      Selos Manuais {tatica.selosManuais || "—"} → {fmtMod(resultado.selosManuaisMod)}
+                      {resultado.selosEfetivos === 0 && " (não acumula com 0 selos)"}
+                    </div>
+                    <div className="mt-1">
+                      Controle de Chakra <span className="text-accent font-bold">{resultado.controleChakra}</span> + DT de Captura{" "}
+                      <span className="text-accent font-bold">{resultado.dtCaptura}</span>
+                      {resultado.bonusTotal !== 0 && <> {resultado.bonusTotal > 0 ? "−" : "+"} {Math.abs(resultado.bonusTotal)} (selos)</>}
+                    </div>
+                    <div className="text-accent font-bold text-xs mt-1">
+                      DT total de captura: {resultado.capturaTotal}
+                      {resultado.vantagem && " · oponente com vantagem de roll"}
+                    </div>
+                    <div className="mt-1">
+                      O oponente resiste com <b>Conhecimento Shinobi</b> (ou <b>Conhecimento de Clãs</b>) contra essa DT.
+                    </div>
+                  </>
+                ) : resultado.taijutsu ? (
                   <>
                     <div>
                       Alcance base: <span className="text-accent font-bold">{alcanceLabel}</span> · Sem selos manuais
@@ -118,6 +151,8 @@ const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition, tatica }: Ju
               </div>
 
 
+              {!resultado.genjutsu && (
+              <>
               <table className="retro-table text-[10px] w-full">
                 <thead>
                   <tr>
@@ -153,6 +188,8 @@ const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition, tatica }: Ju
               <p className="text-[9px] text-muted-foreground mt-1">
                 Valores negativos = mais difícil para o oponente esquivar (vantagem sua).
               </p>
+              </>
+              )}
             </>
           )}
         </div>
