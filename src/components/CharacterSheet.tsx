@@ -317,7 +317,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
           onClick={() => handleOpenJutsu(jutsu)}
           className="text-left text-xs text-foreground hover:text-accent transition-colors flex-1"
         >
-          {getJutsuEmoji(jutsu.nome)} {jutsu.nome}
+          {getJutsuEmoji(jutsu.nome, jutsu.categoria)} {jutsu.nome}
         </button>
         <div className="flex items-center gap-1 shrink-0">
           {editing && canEdit ? (
