@@ -78,7 +78,9 @@ export interface TaticaLinha {
 }
 
 export interface TaticaResultado {
-  alcanceJutsu: AlcanceId;
+  alcanceJutsu: AlcanceId | "taijutsu";
+  taijutsu?: boolean;
+  taijutsuValor?: number;
   selosBase: number;
   selosEfetivos: number;
   reducao: number;
@@ -95,7 +97,39 @@ export function calcularTatica(params: {
   qtdSelos: number;
   maestria: string;
   selosManuais: string;
+  taijutsu?: number;
 }): TaticaResultado | null {
+  if (params.alcance === "taijutsu") {
+    const valor = Math.max(0, params.taijutsu || 0);
+    const linhas: TaticaLinha[] = ALCANCES.map((a, i) => {
+      if (a.id === "area") {
+        return { label: a.label, dist: a.dist, base: 0, total: 0, obs: "Não tem alcance" };
+      }
+      const mod = -Math.max(0, valor - i);
+      return {
+        label: a.label,
+        dist: a.dist,
+        base: mod,
+        total: mod,
+        obs: a.id === "corpo" ? "Alcance base do taijutsu" : undefined,
+      };
+    });
+    return {
+      alcanceJutsu: "taijutsu",
+      taijutsu: true,
+      taijutsuValor: valor,
+      selosBase: 0,
+      selosEfetivos: 0,
+      reducao: 0,
+      selosManuaisMod: 0,
+      selosCountMod: 0,
+      selosCountLabel: "Taijutsu — não usa selos",
+      vantagem: false,
+      bonusTotal: 0,
+      linhas,
+    };
+  }
+
   const alcance = params.alcance as AlcanceId;
   if (!TABELA[alcance]) return null;
 
