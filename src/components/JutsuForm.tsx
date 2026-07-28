@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { getJutsuEmoji } from "@/lib/jutsuEmoji";
 import JutsuWindow from "./JutsuWindow";
 import { ALCANCES, ALCANCE_TAIJUTSU, ALCANCE_GENJUTSU } from "@/lib/jutsuTatica";
+import { INVOCACAO_ATRIBUTOS, INVOCACAO_PERICIAS, INVOCACAO_NUM_FIELDS } from "@/lib/invocacao";
 
 interface JutsuFormProps {
   ip: string;
@@ -20,6 +21,7 @@ interface Jutsu {
   qtd_selos?: number | null;
   alcance?: string | null;
   dt_captura?: number | null;
+  [key: string]: any;
 }
 
 const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
@@ -36,6 +38,9 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [previewJutsu, setPreviewJutsu] = useState<Jutsu | null>(null);
+  const emptyInv = () => Object.fromEntries(INVOCACAO_NUM_FIELDS.map((k) => [k, 0])) as Record<string, number>;
+  const [invStats, setInvStats] = useState<Record<string, number>>(emptyInv());
+  const setInv = (k: string, v: string) => setInvStats((prev) => ({ ...prev, [k]: parseInt(v) || 0 }));
 
   const fetchJutsus = useCallback(async () => {
     setLoading(true);
@@ -91,6 +96,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
     setQtdSelos(String(jutsu.qtd_selos ?? 0));
     setAlcance(jutsu.alcance || "");
     setDtCaptura(String(jutsu.dt_captura ?? 0));
+    setInvStats(Object.fromEntries(INVOCACAO_NUM_FIELDS.map((k) => [k, (jutsu as any)[k] ?? 0])) as Record<string, number>);
     setImageFile(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -103,6 +109,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
     setQtdSelos("0");
     setAlcance("");
     setDtCaptura("0");
+    setInvStats(emptyInv());
     setImageFile(null);
   };
 
@@ -132,7 +139,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
       }
 
       if (editingId) {
-        const updateData: Record<string, any> = { nome, informacoes, categoria, qtd_selos: parseInt(qtdSelos) || 0, alcance, dt_captura: parseInt(dtCaptura) || 0 };
+        const updateData: Record<string, any> = { nome, informacoes, categoria, qtd_selos: categoria === "invocacao" ? 0 : parseInt(qtdSelos) || 0, alcance: categoria === "invocacao" ? "" : alcance, dt_captura: parseInt(dtCaptura) || 0, ...invStats };
         if (imagem_url) updateData.imagem_url = imagem_url;
         const { error } = await supabase.from("jutsus").update(updateData).eq("id", editingId);
         if (error) throw error;
@@ -143,9 +150,10 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
           nome,
           informacoes,
           categoria,
-          qtd_selos: parseInt(qtdSelos) || 0,
-          alcance,
+          qtd_selos: categoria === "invocacao" ? 0 : parseInt(qtdSelos) || 0,
+          alcance: categoria === "invocacao" ? "" : alcance,
           dt_captura: parseInt(dtCaptura) || 0,
+          ...invStats,
           imagem_url,
           ip_address: ip,
         });
@@ -158,7 +166,8 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
       setCategoria("jutsu");
       setQtdSelos("0");
       setAlcance("");
-    setDtCaptura("0");
+      setDtCaptura("0");
+      setInvStats(emptyInv());
       setImageFile(null);
       fetchJutsus();
       onCreated();
@@ -207,9 +216,11 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
             >
               <option value="jutsu">Jutsu</option>
               <option value="habilidade">Habilidade</option>
+              <option value="invocacao">Invocação</option>
             </select>
           </div>
 
+          {categoria !== "invocacao" && (
           <div className="mb-3 grid grid-cols-2 gap-2">
             <div>
               <label className="retro-label block mb-1">Qtd. de Selos:</label>
@@ -233,8 +244,9 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
               </select>
             </div>
           </div>
+          )}
 
-          {alcance === ALCANCE_GENJUTSU.id && (
+          {categoria !== "invocacao" && alcance === ALCANCE_GENJUTSU.id && (
             <div className="mb-3">
               <label className="retro-label block mb-1">DT de Captura (Genjutsu):</label>
               <input
@@ -244,6 +256,45 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
                 value={dtCaptura}
                 onChange={(e) => setDtCaptura(e.target.value)}
               />
+            </div>
+          )}
+
+          {categoria === "invocacao" && (
+            <div className="mb-3 border-2 border-accent/50 p-2">
+              <div className="retro-section-title text-xs">🦁 Dados da Invocação</div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
+                <div>
+                  <label className="retro-label block mb-1 text-[10px]">Custo de Invocação:</label>
+                  <input type="number" className="retro-input w-full text-xs" value={invStats.custo_invocacao} onChange={(e) => setInv("custo_invocacao", e.target.value)} />
+                </div>
+                <div>
+                  <label className="retro-label block mb-1 text-[10px]">Vida Máx.:</label>
+                  <input type="number" className="retro-input w-full text-xs" value={invStats.inv_vida_max} onChange={(e) => setInv("inv_vida_max", e.target.value)} />
+                </div>
+                <div>
+                  <label className="retro-label block mb-1 text-[10px]">Sanidade Máx.:</label>
+                  <input type="number" className="retro-input w-full text-xs" value={invStats.inv_sanidade_max} onChange={(e) => setInv("inv_sanidade_max", e.target.value)} />
+                </div>
+                <div>
+                  <label className="retro-label block mb-1 text-[10px]">Chakra Máx.:</label>
+                  <input type="number" className="retro-input w-full text-xs" value={invStats.inv_chakra_max} onChange={(e) => setInv("inv_chakra_max", e.target.value)} />
+                </div>
+                {INVOCACAO_ATRIBUTOS.map(({ key, label }) => (
+                  <div key={key}>
+                    <label className="retro-label block mb-1 text-[10px]">{label}:</label>
+                    <input type="number" className="retro-input w-full text-xs" value={invStats[key]} onChange={(e) => setInv(key, e.target.value)} />
+                  </div>
+                ))}
+              </div>
+              <div className="text-accent font-bold text-[11px] border-b border-border pb-1 mb-1">Perícias</div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {INVOCACAO_PERICIAS.map(({ key, label }) => (
+                  <div key={key}>
+                    <label className="retro-label block mb-1 text-[10px]">{label}:</label>
+                    <input type="number" className="retro-input w-full text-xs" value={invStats[key]} onChange={(e) => setInv(key, e.target.value)} />
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

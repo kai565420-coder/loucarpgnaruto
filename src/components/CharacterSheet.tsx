@@ -7,6 +7,7 @@ import { useAdmin } from "@/contexts/AdminContext";
 import { getJutsuEmoji } from "@/lib/jutsuEmoji";
 import CharacterBags from "./CharacterBags";
 import SelosManuaisSelector from "./SelosManuaisSelector";
+import InvocacaoCard from "./InvocacaoCard";
 
 interface CharacterSheetProps {
   sheet: Tables<"character_sheets">;
@@ -25,11 +26,16 @@ interface Jutsu {
   categoria: string;
   qtd_selos?: number | null;
   alcance?: string | null;
+  [key: string]: any;
 }
 
 interface CharacterJutsuLink {
+  id: string;
   jutsu_id: string;
   maestria_nivel: string;
+  inv_vida: number | null;
+  inv_sanidade: number | null;
+  inv_chakra: number | null;
 }
 
 const MAESTRIA_LEVELS = ["Nula", "I", "II", "III", "IV", "V"];
@@ -132,12 +138,16 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
   const fetchJutsus = useCallback(async () => {
     const { data: links } = await supabase
       .from("character_jutsus")
-      .select("jutsu_id, maestria_nivel")
+      .select("id, jutsu_id, maestria_nivel, inv_vida, inv_sanidade, inv_chakra")
       .eq("character_id", sheet.id);
 
     const typedLinks: CharacterJutsuLink[] = (links || []).map((l: any) => ({
+      id: l.id,
       jutsu_id: l.jutsu_id,
       maestria_nivel: l.maestria_nivel || "I",
+      inv_vida: l.inv_vida ?? null,
+      inv_sanidade: l.inv_sanidade ?? null,
+      inv_chakra: l.inv_chakra ?? null,
     }));
     setJutsuLinks(typedLinks);
 
@@ -297,6 +307,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
   // Separate jutsus by categoria
   const jutsusList = [...jutsus].filter(j => (j.categoria || "jutsu") === "jutsu").sort((a, b) => a.nome.localeCompare(b.nome));
   const habilidadesList = [...jutsus].filter(j => (j.categoria || "jutsu") === "habilidade").sort((a, b) => a.nome.localeCompare(b.nome));
+  const invocacoesList = [...jutsus].filter(j => j.categoria === "invocacao").sort((a, b) => a.nome.localeCompare(b.nome));
 
   const renderJutsuItem = (jutsu: Jutsu) => {
     const maestria = getMaestriaForJutsu(jutsu.id);
@@ -485,7 +496,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
       <div className="mt-3">
         <div className="flex items-center gap-2 mb-2 flex-wrap">
           <button onClick={() => setShowJutsus(!showJutsus)} className="retro-button text-xs">
-            🌀 Jutsus ({jutsusList.length}) / Habilidades ({habilidadesList.length})
+            🌀 Jutsus ({jutsusList.length}) / Habilidades ({habilidadesList.length}) / Invocações ({invocacoesList.length})
           </button>
           {editing && canEdit && (
             <button onClick={() => setShowJutsuSelector(!showJutsuSelector)} className="retro-button text-xs">
@@ -532,7 +543,31 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
                 {habilidadesList.map((jutsu) => renderJutsuItem(jutsu))}
               </>
             )}
-            {jutsusList.length === 0 && habilidadesList.length === 0 && (
+            {invocacoesList.length > 0 && (
+              <>
+                <div className="text-accent font-bold text-[11px] border-b border-border pb-1 mb-1 mt-2">🦁 Invocações</div>
+                {invocacoesList.map((inv) => {
+                  const link = jutsuLinks.find((l) => l.jutsu_id === inv.id);
+                  if (!link) return null;
+                  return (
+                    <InvocacaoCard
+                      key={inv.id}
+                      linkId={link.id}
+                      jutsu={inv}
+                      maestria={link.maestria_nivel}
+                      vida={link.inv_vida}
+                      sanidade={link.inv_sanidade}
+                      chakra={link.inv_chakra}
+                      canEdit={canEdit}
+                      editing={editing}
+                      onMaestriaChange={handleMaestriaChange}
+                      onOpenJutsu={(j) => handleOpenJutsu(j)}
+                    />
+                  );
+                })}
+              </>
+            )}
+            {jutsusList.length === 0 && habilidadesList.length === 0 && invocacoesList.length === 0 && (
               <p className="text-muted-foreground text-[11px]">Nenhuma habilidade atribuída.</p>
             )}
           </div>
