@@ -24,7 +24,7 @@ interface OpenItem {
 interface CharacterListProps {
   ip: string;
   refreshKey: number;
-  onOpenJutsu?: (jutsu: Jutsu, tatica?: { personagem: string; maestria: string; selosManuais: string; taijutsu?: number }) => void;
+  onOpenJutsu?: (jutsu: Jutsu, tatica?: { personagem: string; maestria: string; selosManuais: string; taijutsu?: number; controleChakra?: number }) => void;
   onOpenItem?: (item: OpenItem) => void;
 }
 

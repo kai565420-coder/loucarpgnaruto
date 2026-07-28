@@ -10,6 +10,7 @@ export type AlcanceId = (typeof ALCANCES)[number]["id"];
 
 // Opções extras disponíveis no cadastro (não são alcances "normais")
 export const ALCANCE_TAIJUTSU = { id: "taijutsu", label: "Taijutsu (corpo-a-corpo)", dist: "1 bloco (1,5m)" } as const;
+export const ALCANCE_GENJUTSU = { id: "genjutsu", label: "Genjutsu (sem limite de alcance)", dist: "Sem limite" } as const;
 
 interface Cell {
   mod: number | null; // null = sem valor numérico (não tem / acerto garantido)
@@ -78,9 +79,13 @@ export interface TaticaLinha {
 }
 
 export interface TaticaResultado {
-  alcanceJutsu: AlcanceId | "taijutsu";
+  alcanceJutsu: AlcanceId | "taijutsu" | "genjutsu";
   taijutsu?: boolean;
   taijutsuValor?: number;
+  genjutsu?: boolean;
+  controleChakra?: number;
+  dtCaptura?: number;
+  capturaTotal?: number;
   selosBase: number;
   selosEfetivos: number;
   reducao: number;
@@ -98,6 +103,8 @@ export function calcularTatica(params: {
   maestria: string;
   selosManuais: string;
   taijutsu?: number;
+  controleChakra?: number;
+  dtCaptura?: number;
 }): TaticaResultado | null {
   if (params.alcance === "taijutsu") {
     const valor = Math.max(0, params.taijutsu || 0);
@@ -127,6 +134,38 @@ export function calcularTatica(params: {
       vantagem: false,
       bonusTotal: 0,
       linhas,
+    };
+  }
+
+  if (params.alcance === "genjutsu") {
+    const reducaoRaw = MAESTRIA_REDUCAO[params.maestria] ?? 0;
+    const selosBase = Math.max(0, params.qtdSelos || 0);
+    const reducao = Math.min(reducaoRaw, selosBase);
+    const selosEfetivos = Math.max(0, selosBase - reducaoRaw);
+    const count = selosCountEffect(selosEfetivos);
+    const selosManuaisMod = selosEfetivos === 0 ? 0 : (SELOS_MANUAIS_MOD[params.selosManuais] ?? 0);
+    const bonusTotal = count.mod + selosManuaisMod;
+
+    const controleChakra = Math.max(0, params.controleChakra || 0);
+    const dtCaptura = Math.max(0, params.dtCaptura || 0);
+    // Selos que ajudam o oponente (mod positivo) reduzem a DT final de captura
+    const capturaTotal = controleChakra + dtCaptura - bonusTotal;
+
+    return {
+      alcanceJutsu: "genjutsu",
+      genjutsu: true,
+      controleChakra,
+      dtCaptura,
+      capturaTotal,
+      selosBase,
+      selosEfetivos,
+      reducao,
+      selosManuaisMod,
+      selosCountMod: count.mod,
+      selosCountLabel: count.label,
+      vantagem: count.vantagem,
+      bonusTotal,
+      linhas: [],
     };
   }
 

@@ -1,0 +1,1 @@
+ALTER TABLE public.jutsus ADD COLUMN IF NOT EXISTS dt_captura integer NOT NULL DEFAULT 0;

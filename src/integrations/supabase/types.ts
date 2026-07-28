@@ -318,6 +318,7 @@ export type Database = {
           alcance: string
           categoria: string
           created_at: string
+          dt_captura: number
           id: string
           imagem_url: string | null
           informacoes: string
@@ -329,6 +330,7 @@ export type Database = {
           alcance?: string
           categoria?: string
           created_at?: string
+          dt_captura?: number
           id?: string
           imagem_url?: string | null
           informacoes?: string
@@ -340,6 +342,7 @@ export type Database = {
           alcance?: string
           categoria?: string
           created_at?: string
+          dt_captura?: number
           id?: string
           imagem_url?: string | null
           informacoes?: string
