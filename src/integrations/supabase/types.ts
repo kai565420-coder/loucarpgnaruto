@@ -60,6 +60,9 @@ export type Database = {
           character_id: string
           created_at: string
           id: string
+          inv_chakra: number | null
+          inv_sanidade: number | null
+          inv_vida: number | null
           jutsu_id: string
           maestria_nivel: string
         }
@@ -67,6 +70,9 @@ export type Database = {
           character_id: string
           created_at?: string
           id?: string
+          inv_chakra?: number | null
+          inv_sanidade?: number | null
+          inv_vida?: number | null
           jutsu_id: string
           maestria_nivel?: string
         }
@@ -74,6 +80,9 @@ export type Database = {
           character_id?: string
           created_at?: string
           id?: string
+          inv_chakra?: number | null
+          inv_sanidade?: number | null
+          inv_vida?: number | null
           jutsu_id?: string
           maestria_nivel?: string
         }
@@ -280,6 +289,30 @@ export type Database = {
         }
         Relationships: []
       }
+      invocacao_jutsus: {
+        Row: {
+          character_jutsu_id: string
+          created_at: string
+          id: string
+          jutsu_id: string
+          maestria_nivel: string
+        }
+        Insert: {
+          character_jutsu_id: string
+          created_at?: string
+          id?: string
+          jutsu_id: string
+          maestria_nivel?: string
+        }
+        Update: {
+          character_jutsu_id?: string
+          created_at?: string
+          id?: string
+          jutsu_id?: string
+          maestria_nivel?: string
+        }
+        Relationships: []
+      }
       items: {
         Row: {
           created_at: string
@@ -318,10 +351,31 @@ export type Database = {
           alcance: string
           categoria: string
           created_at: string
+          custo_invocacao: number
           dt_captura: number
           id: string
           imagem_url: string | null
           informacoes: string
+          inv_analise_combate: number
+          inv_chakra_max: number
+          inv_concentracao: number
+          inv_conhecimento_clas: number
+          inv_conhecimento_shinobi: number
+          inv_controle_chakra: number
+          inv_destreza: number
+          inv_forca_fisica: number
+          inv_furtividade: number
+          inv_genjutsu: number
+          inv_intimidacao: number
+          inv_kenjutsu: number
+          inv_moldagem_elemental: number
+          inv_reflexos_ninja: number
+          inv_resistencia_genjutsu: number
+          inv_sabotagem: number
+          inv_sanidade_max: number
+          inv_shurikenjutsu: number
+          inv_taijutsu: number
+          inv_vida_max: number
           ip_address: string
           nome: string
           qtd_selos: number
@@ -330,10 +384,31 @@ export type Database = {
           alcance?: string
           categoria?: string
           created_at?: string
+          custo_invocacao?: number
           dt_captura?: number
           id?: string
           imagem_url?: string | null
           informacoes?: string
+          inv_analise_combate?: number
+          inv_chakra_max?: number
+          inv_concentracao?: number
+          inv_conhecimento_clas?: number
+          inv_conhecimento_shinobi?: number
+          inv_controle_chakra?: number
+          inv_destreza?: number
+          inv_forca_fisica?: number
+          inv_furtividade?: number
+          inv_genjutsu?: number
+          inv_intimidacao?: number
+          inv_kenjutsu?: number
+          inv_moldagem_elemental?: number
+          inv_reflexos_ninja?: number
+          inv_resistencia_genjutsu?: number
+          inv_sabotagem?: number
+          inv_sanidade_max?: number
+          inv_shurikenjutsu?: number
+          inv_taijutsu?: number
+          inv_vida_max?: number
           ip_address: string
           nome: string
           qtd_selos?: number
@@ -342,10 +417,31 @@ export type Database = {
           alcance?: string
           categoria?: string
           created_at?: string
+          custo_invocacao?: number
           dt_captura?: number
           id?: string
           imagem_url?: string | null
           informacoes?: string
+          inv_analise_combate?: number
+          inv_chakra_max?: number
+          inv_concentracao?: number
+          inv_conhecimento_clas?: number
+          inv_conhecimento_shinobi?: number
+          inv_controle_chakra?: number
+          inv_destreza?: number
+          inv_forca_fisica?: number
+          inv_furtividade?: number
+          inv_genjutsu?: number
+          inv_intimidacao?: number
+          inv_kenjutsu?: number
+          inv_moldagem_elemental?: number
+          inv_reflexos_ninja?: number
+          inv_resistencia_genjutsu?: number
+          inv_sabotagem?: number
+          inv_sanidade_max?: number
+          inv_shurikenjutsu?: number
+          inv_taijutsu?: number
+          inv_vida_max?: number
           ip_address?: string
           nome?: string
           qtd_selos?: number
