@@ -7,7 +7,6 @@ import { ALCANCES, ALCANCE_TAIJUTSU, ALCANCE_GENJUTSU } from "@/lib/jutsuTatica"
 import { INVOCACAO_ATRIBUTOS, INVOCACAO_PERICIAS, INVOCACAO_NUM_FIELDS } from "@/lib/invocacao";
 
 interface JutsuFormProps {
-  ip: string;
   onCreated: () => void;
 }
 
@@ -24,7 +23,7 @@ interface Jutsu {
   [key: string]: any;
 }
 
-const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
+const JutsuForm = ({ onCreated }: JutsuFormProps) => {
   const [nome, setNome] = useState("");
   const [informacoes, setInformacoes] = useState("");
   const [categoria, setCategoria] = useState("jutsu");
@@ -126,7 +125,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
 
       if (imageFile) {
         const ext = imageFile.name.split(".").pop();
-        const path = `jutsu_${ip.replace(/\./g, "_")}_${Date.now()}.${ext}`;
+        const path = `jutsu/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
         const { error: uploadError } = await supabase.storage
           .from("character-images")
           .upload(path, imageFile);
@@ -155,7 +154,6 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
           dt_captura: parseInt(dtCaptura) || 0,
           ...invStats,
           imagem_url,
-          ip_address: ip,
         });
         if (error) throw error;
         toast.success("Habilidade criada com sucesso!");
