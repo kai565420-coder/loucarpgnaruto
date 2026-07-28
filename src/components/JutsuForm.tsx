@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { getJutsuEmoji } from "@/lib/jutsuEmoji";
 import JutsuWindow from "./JutsuWindow";
-import { ALCANCES, ALCANCE_TAIJUTSU } from "@/lib/jutsuTatica";
+import { ALCANCES, ALCANCE_TAIJUTSU, ALCANCE_GENJUTSU } from "@/lib/jutsuTatica";
 
 interface JutsuFormProps {
   ip: string;
@@ -19,6 +19,7 @@ interface Jutsu {
   created_at: string;
   qtd_selos?: number | null;
   alcance?: string | null;
+  dt_captura?: number | null;
 }
 
 const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
@@ -27,6 +28,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
   const [categoria, setCategoria] = useState("jutsu");
   const [qtdSelos, setQtdSelos] = useState("0");
   const [alcance, setAlcance] = useState("");
+  const [dtCaptura, setDtCaptura] = useState("0");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [jutsus, setJutsus] = useState<Jutsu[]>([]);
@@ -88,6 +90,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
     setCategoria(jutsu.categoria || "jutsu");
     setQtdSelos(String(jutsu.qtd_selos ?? 0));
     setAlcance(jutsu.alcance || "");
+    setDtCaptura(String(jutsu.dt_captura ?? 0));
     setImageFile(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -99,6 +102,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
     setCategoria("jutsu");
     setQtdSelos("0");
     setAlcance("");
+    setDtCaptura("0");
     setImageFile(null);
   };
 
@@ -128,7 +132,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
       }
 
       if (editingId) {
-        const updateData: Record<string, any> = { nome, informacoes, categoria, qtd_selos: parseInt(qtdSelos) || 0, alcance };
+        const updateData: Record<string, any> = { nome, informacoes, categoria, qtd_selos: parseInt(qtdSelos) || 0, alcance, dt_captura: parseInt(dtCaptura) || 0 };
         if (imagem_url) updateData.imagem_url = imagem_url;
         const { error } = await supabase.from("jutsus").update(updateData).eq("id", editingId);
         if (error) throw error;
@@ -141,6 +145,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
           categoria,
           qtd_selos: parseInt(qtdSelos) || 0,
           alcance,
+          dt_captura: parseInt(dtCaptura) || 0,
           imagem_url,
           ip_address: ip,
         });
@@ -153,6 +158,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
       setCategoria("jutsu");
       setQtdSelos("0");
       setAlcance("");
+    setDtCaptura("0");
       setImageFile(null);
       fetchJutsus();
       onCreated();
@@ -223,9 +229,23 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
                   <option key={a.id} value={a.id}>{a.label} — {a.dist}</option>
                 ))}
                 <option value={ALCANCE_TAIJUTSU.id}>{ALCANCE_TAIJUTSU.label} — {ALCANCE_TAIJUTSU.dist}</option>
+                <option value={ALCANCE_GENJUTSU.id}>{ALCANCE_GENJUTSU.label}</option>
               </select>
             </div>
           </div>
+
+          {alcance === ALCANCE_GENJUTSU.id && (
+            <div className="mb-3">
+              <label className="retro-label block mb-1">DT de Captura (Genjutsu):</label>
+              <input
+                type="number"
+                min={0}
+                className="retro-input w-full text-xs"
+                value={dtCaptura}
+                onChange={(e) => setDtCaptura(e.target.value)}
+              />
+            </div>
+          )}
 
           <div className="mb-3">
             <label className="retro-label block mb-1">Informações:</label>
