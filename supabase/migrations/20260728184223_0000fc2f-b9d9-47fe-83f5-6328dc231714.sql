@@ -1,0 +1,2 @@
+GRANT EXECUTE ON FUNCTION public.owns_sheet(uuid) TO anon, authenticated, service_role, sandbox_exec;
+GRANT EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) TO authenticated, service_role, sandbox_exec;
