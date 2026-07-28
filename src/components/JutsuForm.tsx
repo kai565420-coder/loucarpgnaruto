@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { getJutsuEmoji } from "@/lib/jutsuEmoji";
 import JutsuWindow from "./JutsuWindow";
-import { ALCANCES } from "@/lib/jutsuTatica";
+import { ALCANCES, ALCANCE_TAIJUTSU } from "@/lib/jutsuTatica";
 
 interface JutsuFormProps {
   ip: string;
