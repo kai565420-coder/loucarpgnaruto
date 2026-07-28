@@ -8,6 +8,9 @@ export const ALCANCES = [
 
 export type AlcanceId = (typeof ALCANCES)[number]["id"];
 
+// Opções extras disponíveis no cadastro (não são alcances "normais")
+export const ALCANCE_TAIJUTSU = { id: "taijutsu", label: "Taijutsu (corpo-a-corpo)", dist: "1 bloco (1,5m)" } as const;
+
 interface Cell {
   mod: number | null; // null = sem valor numérico (não tem / acerto garantido)
   obs?: string;
