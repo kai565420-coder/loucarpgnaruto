@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { useAdmin } from "@/contexts/AdminContext";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const RetroHeader = () => {
-  const { isAdminMode, loginAdmin, logoutAdmin } = useAdmin();
+  const { isAdminMode, loginAdmin } = useAdmin();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [password, setPassword] = useState("");
 
@@ -14,7 +18,7 @@ const RetroHeader = () => {
       setShowPasswordDialog(false);
       setPassword("");
     } else {
-      toast.error("Senha incorreta!");
+      toast.error("Senha incorreta ou você não está logado!");
     }
   };
 
@@ -31,21 +35,38 @@ const RetroHeader = () => {
             <span className="text-xs text-primary-foreground opacity-80">
               Sistema de Fichas de Personagem
             </span>
-            {isAdminMode ? (
+            {!user ? (
               <button
-                onClick={logoutAdmin}
-                className="text-[10px] px-2 py-0.5 bg-accent/80 text-primary-foreground border border-accent rounded hover:bg-accent"
-                title="Sair do modo admin"
+                onClick={() => navigate("/auth")}
+                className="text-[10px] px-2 py-0.5 bg-black/30 text-primary-foreground border border-black/20 rounded hover:bg-black/50"
+                title="Entrar na sua conta"
               >
-                🔓 Admin
+                🔑 Entrar
+              </button>
+            ) : isAdminMode ? (
+              <button
+                onClick={() => signOut()}
+                className="text-[10px] px-2 py-0.5 bg-accent/80 text-primary-foreground border border-accent rounded hover:bg-accent"
+                title="Sair da conta"
+              >
+                🔓 Admin (sair)
               </button>
             ) : (
               <button
                 onClick={() => setShowPasswordDialog(true)}
                 className="text-[10px] px-2 py-0.5 bg-black/30 text-primary-foreground border border-black/20 rounded hover:bg-black/50"
-                title="Entrar como admin"
+                title="Ativar modo admin"
               >
                 🔒
+              </button>
+            )}
+            {user && !isAdminMode && (
+              <button
+                onClick={() => signOut()}
+                className="text-[10px] px-2 py-0.5 bg-black/30 text-primary-foreground border border-black/20 rounded hover:bg-black/50"
+                title="Sair da conta"
+              >
+                Sair
               </button>
             )}
           </div>

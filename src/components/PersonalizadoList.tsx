@@ -16,11 +16,10 @@ interface Personalizado {
 }
 
 interface PersonalizadoListProps {
-  ip: string;
   onOpenItem?: (item: Personalizado) => void;
 }
 
-const PersonalizadoList = ({ ip, onOpenItem }: PersonalizadoListProps) => {
+const PersonalizadoList = ({ onOpenItem }: PersonalizadoListProps) => {
   const { isAdminMode: admin } = useAdmin();
   const isMobile = useIsMobile();
   const [items, setItems] = useState<Personalizado[]>([]);
@@ -75,7 +74,7 @@ const PersonalizadoList = ({ ip, onOpenItem }: PersonalizadoListProps) => {
       let imagem_url = "";
       if (imageFile) {
         const ext = imageFile.name.split(".").pop();
-        const path = `pers_${ip.replace(/\./g, "_")}_${Date.now()}.${ext}`;
+        const path = `pers/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
         const { error: uploadError } = await supabase.storage.from("character-images").upload(path, imageFile);
         if (uploadError) throw uploadError;
         const { data: urlData } = supabase.storage.from("character-images").getPublicUrl(path);
@@ -90,7 +89,7 @@ const PersonalizadoList = ({ ip, onOpenItem }: PersonalizadoListProps) => {
         toast.success("Item personalizado atualizado!");
         setEditingId(null);
       } else {
-        const { error } = await supabase.from("personalizados").insert({ nome, descricao, valor, peso, imagem_url, ip_address: ip, durabilidade_inicial: durabilidadeInicial });
+        const { error } = await supabase.from("personalizados").insert({ nome, descricao, valor, peso, imagem_url, durabilidade_inicial: durabilidadeInicial });
         if (error) throw error;
         toast.success("Item personalizado criado!");
       }
