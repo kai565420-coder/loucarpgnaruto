@@ -16,10 +16,11 @@ interface Item {
 }
 
 interface ItemListProps {
+  ip: string;
   onOpenItem?: (item: Item) => void;
 }
 
-const ItemList = ({ onOpenItem }: ItemListProps) => {
+const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
   const { isAdminMode: admin } = useAdmin();
   const isMobile = useIsMobile();
   const [items, setItems] = useState<Item[]>([]);
@@ -82,7 +83,7 @@ const ItemList = ({ onOpenItem }: ItemListProps) => {
       let imagem_url = "";
       if (imageFile) {
         const ext = imageFile.name.split(".").pop();
-        const path = `item/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const path = `item_${ip.replace(/\./g, "_")}_${Date.now()}.${ext}`;
         const { error: uploadError } = await supabase.storage
           .from("character-images")
           .upload(path, imageFile);
@@ -107,6 +108,7 @@ const ItemList = ({ onOpenItem }: ItemListProps) => {
           valor,
           peso,
           imagem_url,
+          ip_address: ip,
         });
         if (error) throw error;
         toast.success("Item criado!");

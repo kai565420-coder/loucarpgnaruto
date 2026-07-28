@@ -134,6 +134,7 @@ export type Database = {
           iniciativa: number
           intimidacao: number
           inventario: string
+          ip_address: string
           kenjutsu: number
           maestria_agua: string
           maestria_fogo: string
@@ -160,7 +161,6 @@ export type Database = {
           talento: string
           tolerancia_dor: number
           updated_at: string
-          user_id: string | null
           vida: number
           vida_max: number
           vontade_ninja: number
@@ -195,6 +195,7 @@ export type Database = {
           iniciativa?: number
           intimidacao?: number
           inventario?: string
+          ip_address: string
           kenjutsu?: number
           maestria_agua?: string
           maestria_fogo?: string
@@ -221,7 +222,6 @@ export type Database = {
           talento?: string
           tolerancia_dor?: number
           updated_at?: string
-          user_id?: string | null
           vida?: number
           vida_max?: number
           vontade_ninja?: number
@@ -256,6 +256,7 @@ export type Database = {
           iniciativa?: number
           intimidacao?: number
           inventario?: string
+          ip_address?: string
           kenjutsu?: number
           maestria_agua?: string
           maestria_fogo?: string
@@ -282,7 +283,6 @@ export type Database = {
           talento?: string
           tolerancia_dor?: number
           updated_at?: string
-          user_id?: string | null
           vida?: number
           vida_max?: number
           vontade_ninja?: number
@@ -319,6 +319,7 @@ export type Database = {
           descricao: string
           id: string
           imagem_url: string | null
+          ip_address: string
           nome: string
           peso: number
           valor: string
@@ -328,6 +329,7 @@ export type Database = {
           descricao?: string
           id?: string
           imagem_url?: string | null
+          ip_address: string
           nome: string
           peso?: number
           valor?: string
@@ -337,6 +339,7 @@ export type Database = {
           descricao?: string
           id?: string
           imagem_url?: string | null
+          ip_address?: string
           nome?: string
           peso?: number
           valor?: string
@@ -373,6 +376,7 @@ export type Database = {
           inv_shurikenjutsu: number
           inv_taijutsu: number
           inv_vida_max: number
+          ip_address: string
           nome: string
           qtd_selos: number
         }
@@ -405,6 +409,7 @@ export type Database = {
           inv_shurikenjutsu?: number
           inv_taijutsu?: number
           inv_vida_max?: number
+          ip_address: string
           nome: string
           qtd_selos?: number
         }
@@ -437,6 +442,7 @@ export type Database = {
           inv_shurikenjutsu?: number
           inv_taijutsu?: number
           inv_vida_max?: number
+          ip_address?: string
           nome?: string
           qtd_selos?: number
         }
@@ -449,6 +455,7 @@ export type Database = {
           durabilidade_inicial: number
           id: string
           imagem_url: string | null
+          ip_address: string
           nome: string
           peso: number
           valor: string
@@ -459,6 +466,7 @@ export type Database = {
           durabilidade_inicial?: number
           id?: string
           imagem_url?: string | null
+          ip_address: string
           nome: string
           peso?: number
           valor?: string
@@ -469,30 +477,10 @@ export type Database = {
           durabilidade_inicial?: number
           id?: string
           imagem_url?: string | null
+          ip_address?: string
           nome?: string
           peso?: number
           valor?: string
-        }
-        Relationships: []
-      }
-      user_roles: {
-        Row: {
-          created_at: string
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
         }
         Relationships: []
       }
@@ -501,17 +489,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
-      owns_sheet: { Args: { _sheet_id: string }; Returns: boolean }
+      [_ in never]: never
     }
     Enums: {
-      app_role: "admin" | "user"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -638,8 +619,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      app_role: ["admin", "user"],
-    },
+    Enums: {},
   },
 } as const

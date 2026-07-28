@@ -1,6 +1,4 @@
-import { createContext, useContext, ReactNode } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 interface AdminContextType {
   isAdminMode: boolean;
@@ -17,25 +15,26 @@ const AdminContext = createContext<AdminContextType>({
 export const useAdmin = () => useContext(AdminContext);
 
 export const AdminProvider = ({ children }: { children: ReactNode }) => {
-  const { isAdmin, refreshRole, user } = useAuth();
+  const [isAdminMode, setIsAdminMode] = useState(() => {
+    return localStorage.getItem("admin_mode") === "true";
+  });
 
   const loginAdmin = async (password: string): Promise<boolean> => {
-    if (!user) return false;
-    const { data, error } = await supabase.functions.invoke("claim-admin", {
-      body: { password },
-    });
-    if (error || !data?.ok) return false;
-    await refreshRole();
-    return true;
+    if (password === "punhetadasfortegames") {
+      setIsAdminMode(true);
+      localStorage.setItem("admin_mode", "true");
+      return true;
+    }
+    return false;
   };
 
   const logoutAdmin = () => {
-    // O papel de administrador é permanente na conta; sair do modo = sair da conta.
-    supabase.auth.signOut();
+    setIsAdminMode(false);
+    localStorage.removeItem("admin_mode");
   };
 
   return (
-    <AdminContext.Provider value={{ isAdminMode: isAdmin, loginAdmin, logoutAdmin }}>
+    <AdminContext.Provider value={{ isAdminMode, loginAdmin, logoutAdmin }}>
       {children}
     </AdminContext.Provider>
   );

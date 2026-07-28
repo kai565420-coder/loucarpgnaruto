@@ -9,8 +9,8 @@ import ItemList from "@/components/ItemList";
 import PersonalizadoList from "@/components/PersonalizadoList";
 import JutsuWindow, { type JutsuTaticaContext } from "@/components/JutsuWindow";
 import ItemWindow from "@/components/ItemWindow";
+import { useUserIp } from "@/hooks/useUserIp";
 import { useAdmin } from "@/contexts/AdminContext";
-import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Jutsu {
@@ -39,7 +39,7 @@ type MinimizedEntry =
   | { type: "item"; id: string; data: Item };
 
 const Index = () => {
-  const { loading } = useAuth();
+  const { ip, loading } = useUserIp();
   const isMobile = useIsMobile();
   const { isAdminMode } = useAdmin();
   const [activeTab, setActiveTab] = useState("fichas");
@@ -117,20 +117,23 @@ const Index = () => {
               </div>
             ) : activeTab === "fichas" ? (
               <CharacterList
+                ip={ip || "unknown"}
                 refreshKey={refreshKey}
                 onOpenJutsu={(jutsu, tatica) => openWindow("jutsu", tatica ? `${jutsu.id}-${tatica.personagem}` : jutsu.id, jutsu, tatica)}
                 onOpenItem={(item) => openWindow("item", item.id, item)}
               />
             ) : activeTab === "criar" ? (
-              <CharacterForm onCreated={handleCreated} />
+              <CharacterForm ip={ip || "unknown"} onCreated={handleCreated} />
             ) : activeTab === "criar-jutsu" && isAdminMode ? (
-              <JutsuForm onCreated={() => setActiveTab("fichas")} />
+              <JutsuForm ip={ip || "unknown"} onCreated={() => setActiveTab("fichas")} />
             ) : activeTab === "itens" ? (
               <ItemList
+                ip={ip || "unknown"}
                 onOpenItem={(item) => openWindow("item", item.id, item)}
               />
             ) : activeTab === "personalizados" && isAdminMode ? (
               <PersonalizadoList
+                ip={ip || "unknown"}
                 onOpenItem={(item) => openWindow("item", item.id, item)}
               />
             ) : activeTab === "sobre" ? (
@@ -138,8 +141,8 @@ const Index = () => {
                 <div className="retro-section-title">📖 Sobre o Sistema</div>
                 <p className="text-xs text-foreground leading-relaxed">
                   Sistema de fichas para RPG de Naruto. Cada jogador pode criar fichas de personagem
-                  com atributos, perícias e imagem. Cada jogador entra com sua conta e
-                  só pode editar as próprias fichas — os administradores podem editar todas.
+                  com atributos, perícias e imagem. O sistema identifica jogadores pelo IP,
+                  então não é necessário criar conta.
                 </p>
                 <p className="text-xs text-muted-foreground mt-3">
                   Personagens e universo © Masashi Kishimoto

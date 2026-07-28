@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/useAuth";
 
 interface CharacterFormProps {
+  ip: string;
   onCreated: () => void;
 }
 
@@ -107,8 +107,7 @@ const pericias = [
   },
 ];
 
-const CharacterForm = ({ onCreated }: CharacterFormProps) => {
-  const { user } = useAuth();
+const CharacterForm = ({ ip, onCreated }: CharacterFormProps) => {
   const [form, setForm] = useState(defaultValues);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
@@ -129,18 +128,13 @@ const CharacterForm = ({ onCreated }: CharacterFormProps) => {
       return;
     }
 
-    if (!user) {
-      toast.error("Entre na sua conta para criar uma ficha.");
-      return;
-    }
-
     setSaving(true);
     try {
       let imagem_url = "";
 
       if (imageFile) {
         const ext = imageFile.name.split(".").pop();
-        const path = `${user!.id}/${Date.now()}.${ext}`;
+        const path = `${ip.replace(/\./g, "_")}_${Date.now()}.${ext}`;
         const { error: uploadError } = await supabase.storage
           .from("character-images")
           .upload(path, imageFile);
@@ -154,7 +148,7 @@ const CharacterForm = ({ onCreated }: CharacterFormProps) => {
 
       const { error } = await supabase.from("character_sheets").insert({
         ...form,
-        user_id: user!.id,
+        ip_address: ip,
         imagem_url,
       });
 

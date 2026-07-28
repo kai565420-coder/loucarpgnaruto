@@ -4,7 +4,6 @@ import type { Tables } from "@/integrations/supabase/types";
 import CharacterSheet from "./CharacterSheet";
 import { toast } from "sonner";
 import { useAdmin } from "@/contexts/AdminContext";
-import { useAuth } from "@/hooks/useAuth";
 
 interface Jutsu {
   id: string;
@@ -23,14 +22,14 @@ interface OpenItem {
 }
 
 interface CharacterListProps {
+  ip: string;
   refreshKey: number;
   onOpenJutsu?: (jutsu: Jutsu, tatica?: { personagem: string; maestria: string; selosManuais: string; taijutsu?: number; controleChakra?: number }) => void;
   onOpenItem?: (item: OpenItem) => void;
 }
 
-const CharacterList = ({ refreshKey, onOpenJutsu, onOpenItem }: CharacterListProps) => {
+const CharacterList = ({ ip, refreshKey, onOpenJutsu, onOpenItem }: CharacterListProps) => {
   const { isAdminMode } = useAdmin();
-  const { user } = useAuth();
   const [sheets, setSheets] = useState<Tables<"character_sheets">[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -84,7 +83,7 @@ const CharacterList = ({ refreshKey, onOpenJutsu, onOpenItem }: CharacterListPro
         <CharacterSheet
           key={sheet.id}
           sheet={sheet}
-          isOwner={(!!user && sheet.user_id === user.id) || isAdminMode}
+          isOwner={sheet.ip_address === ip || isAdminMode}
           onDelete={() => handleDelete(sheet.id)}
           onUpdated={fetchSheets}
           onOpenJutsu={onOpenJutsu}
