@@ -108,7 +108,7 @@ const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
           valor,
           peso,
           imagem_url,
-          ip_address: ip,
+
         });
         if (error) throw error;
         toast.success("Item criado!");

@@ -90,7 +90,7 @@ const PersonalizadoList = ({ ip, onOpenItem }: PersonalizadoListProps) => {
         toast.success("Item personalizado atualizado!");
         setEditingId(null);
       } else {
-        const { error } = await supabase.from("personalizados").insert({ nome, descricao, valor, peso, imagem_url, ip_address: ip, durabilidade_inicial: durabilidadeInicial });
+        const { error } = await supabase.from("personalizados").insert({ nome, descricao, valor, peso, imagem_url, durabilidade_inicial: durabilidadeInicial });
         if (error) throw error;
         toast.success("Item personalizado criado!");
       }

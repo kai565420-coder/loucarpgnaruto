@@ -148,7 +148,7 @@ const CharacterForm = ({ ip, onCreated }: CharacterFormProps) => {
 
       const { error } = await supabase.from("character_sheets").insert({
         ...form,
-        ip_address: ip,
+
         imagem_url,
       });
 
