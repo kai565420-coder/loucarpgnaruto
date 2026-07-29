@@ -155,7 +155,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
           dt_captura: parseInt(dtCaptura) || 0,
           ...invStats,
           imagem_url,
-          ip_address: ip,
+
         });
         if (error) throw error;
         toast.success("Habilidade criada com sucesso!");
