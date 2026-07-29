@@ -83,7 +83,7 @@ const CharacterList = ({ ip, refreshKey, onOpenJutsu, onOpenItem }: CharacterLis
         <CharacterSheet
           key={sheet.id}
           sheet={sheet}
-          isOwner={sheet.user_id === null || isAdminMode}
+          isOwner={isAdminMode}
           onDelete={() => handleDelete(sheet.id)}
           onUpdated={fetchSheets}
           onOpenJutsu={onOpenJutsu}
