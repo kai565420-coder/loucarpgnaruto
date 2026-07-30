@@ -131,6 +131,26 @@ export type Database = {
           dominio_terra: number
           dominio_vento: number
           elementos: string
+          est_adaptacao: number
+          est_bukijutsu: number
+          est_controle_chakra: number
+          est_destreza: number
+          est_forca_fisica: number
+          est_fuinjutsu: number
+          est_infiltracao: number
+          est_int_combate: number
+          est_inteligencia: number
+          est_kenjutsu: number
+          est_ninjutsu: number
+          est_qtd_chakra: number
+          est_resistencia: number
+          est_selos_mao: number
+          est_taijutsu: number
+          est_trabalho_equipe: number
+          est_velocidade: number
+          est_vigor: number
+          est_yang: number
+          est_yin: number
           estrategia_tatica: number
           forca_bruta: number
           forca_fisica: number
@@ -211,6 +231,26 @@ export type Database = {
           dominio_terra?: number
           dominio_vento?: number
           elementos?: string
+          est_adaptacao?: number
+          est_bukijutsu?: number
+          est_controle_chakra?: number
+          est_destreza?: number
+          est_forca_fisica?: number
+          est_fuinjutsu?: number
+          est_infiltracao?: number
+          est_int_combate?: number
+          est_inteligencia?: number
+          est_kenjutsu?: number
+          est_ninjutsu?: number
+          est_qtd_chakra?: number
+          est_resistencia?: number
+          est_selos_mao?: number
+          est_taijutsu?: number
+          est_trabalho_equipe?: number
+          est_velocidade?: number
+          est_vigor?: number
+          est_yang?: number
+          est_yin?: number
           estrategia_tatica?: number
           forca_bruta?: number
           forca_fisica?: number
@@ -291,6 +331,26 @@ export type Database = {
           dominio_terra?: number
           dominio_vento?: number
           elementos?: string
+          est_adaptacao?: number
+          est_bukijutsu?: number
+          est_controle_chakra?: number
+          est_destreza?: number
+          est_forca_fisica?: number
+          est_fuinjutsu?: number
+          est_infiltracao?: number
+          est_int_combate?: number
+          est_inteligencia?: number
+          est_kenjutsu?: number
+          est_ninjutsu?: number
+          est_qtd_chakra?: number
+          est_resistencia?: number
+          est_selos_mao?: number
+          est_taijutsu?: number
+          est_trabalho_equipe?: number
+          est_velocidade?: number
+          est_vigor?: number
+          est_yang?: number
+          est_yin?: number
           estrategia_tatica?: number
           forca_bruta?: number
           forca_fisica?: number

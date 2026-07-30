@@ -2,6 +2,8 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAdmin } from "@/contexts/AdminContext";
+import StatsIcosagon, { ESTATISTICAS, clampStat } from "@/components/StatsIcosagon";
+
 
 interface RelatorioWindowProps {
   sheet: any;
@@ -44,6 +46,8 @@ const RelatorioWindow = ({ sheet, onClose, onUpdated }: RelatorioWindowProps) =>
       reconhecimento: form.reconhecimento ?? "",
     };
     MISSOES.forEach((m) => (payload[m.key] = Number(form[m.key]) || 0));
+    ESTATISTICAS.forEach((e) => (payload[e.key] = clampStat(form[e.key])));
+
 
     const { error } = await supabase.from("character_sheets").update(payload).eq("id", sheet.id);
     setSaving(false);
@@ -114,6 +118,15 @@ const RelatorioWindow = ({ sheet, onClose, onUpdated }: RelatorioWindowProps) =>
               </tr>
             </tbody>
           </table>
+
+          <div className="retro-section-title text-xs mt-3">Estatísticas Ninja</div>
+          <StatsIcosagon
+            values={form}
+            editing={isAdminMode}
+            onChange={(k, v) => setForm((p) => ({ ...p, [k]: v }))}
+          />
+
+
 
           {isAdminMode && (
             <div className="flex gap-2 mt-3">
