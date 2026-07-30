@@ -8,6 +8,7 @@ import { getJutsuEmoji } from "@/lib/jutsuEmoji";
 import CharacterBags from "./CharacterBags";
 import SelosManuaisSelector from "./SelosManuaisSelector";
 import InvocacaoCard from "./InvocacaoCard";
+import ElementPentagon, { ELEMENTOS } from "./ElementPentagon";
 
 interface CharacterSheetProps {
   sheet: Tables<"character_sheets">;
