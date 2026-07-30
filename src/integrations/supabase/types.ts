@@ -111,6 +111,7 @@ export type Database = {
           afinidade_raio: number
           afinidade_terra: number
           afinidade_vento: number
+          alcunha: string
           analise_combate: number
           bolsa_traseira_tamanho: string
           chakra: number
@@ -150,13 +151,21 @@ export type Database = {
           maestria_raio: string
           maestria_terra: string
           maestria_vento: string
+          missoes_a: number
+          missoes_b: number
+          missoes_c: number
+          missoes_d: number
+          missoes_s: number
           moldagem_elemental: number
           ninjutsu_medico: number
           nome: string
           pontos_acao: number
           rank_ninja: string
+          reconhecimento: string
           recuperacao: number
           reflexos_ninja: number
+          registro_ninja: string
+          reputacao: string
           resistencia_fisica: number
           resistencia_genjutsu: number
           sabotagem: number
@@ -182,6 +191,7 @@ export type Database = {
           afinidade_raio?: number
           afinidade_terra?: number
           afinidade_vento?: number
+          alcunha?: string
           analise_combate?: number
           bolsa_traseira_tamanho?: string
           chakra?: number
@@ -221,13 +231,21 @@ export type Database = {
           maestria_raio?: string
           maestria_terra?: string
           maestria_vento?: string
+          missoes_a?: number
+          missoes_b?: number
+          missoes_c?: number
+          missoes_d?: number
+          missoes_s?: number
           moldagem_elemental?: number
           ninjutsu_medico?: number
           nome: string
           pontos_acao?: number
           rank_ninja?: string
+          reconhecimento?: string
           recuperacao?: number
           reflexos_ninja?: number
+          registro_ninja?: string
+          reputacao?: string
           resistencia_fisica?: number
           resistencia_genjutsu?: number
           sabotagem?: number
@@ -253,6 +271,7 @@ export type Database = {
           afinidade_raio?: number
           afinidade_terra?: number
           afinidade_vento?: number
+          alcunha?: string
           analise_combate?: number
           bolsa_traseira_tamanho?: string
           chakra?: number
@@ -292,13 +311,21 @@ export type Database = {
           maestria_raio?: string
           maestria_terra?: string
           maestria_vento?: string
+          missoes_a?: number
+          missoes_b?: number
+          missoes_c?: number
+          missoes_d?: number
+          missoes_s?: number
           moldagem_elemental?: number
           ninjutsu_medico?: number
           nome?: string
           pontos_acao?: number
           rank_ninja?: string
+          reconhecimento?: string
           recuperacao?: number
           reflexos_ninja?: number
+          registro_ninja?: string
+          reputacao?: string
           resistencia_fisica?: number
           resistencia_genjutsu?: number
           sabotagem?: number
