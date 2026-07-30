@@ -72,10 +72,11 @@ const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagon
             <image
               key={e.key}
               href={e.icon}
-              x={x - 16}
-              y={y - 16}
-              width={32}
-              height={32}
+              x={x - 17}
+              y={y - 17}
+              width={34}
+              height={34}
+              preserveAspectRatio="xMidYMid slice"
             />
           );
         })}
@@ -96,7 +97,7 @@ const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagon
           const dm = clamp(values[`dominio_${e.key}`] ?? 0);
           return (
             <div key={e.key} className="grid grid-cols-[24px_minmax(0,1fr)_auto] items-center gap-2 text-[11px]">
-              <img src={e.icon} alt={e.label} className="w-5 h-5 object-contain" />
+              <img src={e.icon} alt={e.label} className="w-5 h-5 object-cover" />
               <span className="retro-label leading-tight">{e.label}</span>
               {editing && canEdit ? (
                 <span className="flex items-center gap-1">
