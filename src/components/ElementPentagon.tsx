@@ -30,6 +30,19 @@ const polygon = (ratios: number[]) =>
 
 const clamp = (n: number) => Math.max(0, Math.min(100, isNaN(n) ? 0 : n));
 
+// arcos de presa/predador: Fogo -> Vento -> Raio -> Terra -> Água -> Fogo
+const ARC_R = R * 1.16;
+const PAD = 22; // graus de folga perto dos ícones
+const arcPath = (i: number) => {
+  const a1 = (-90 + i * 72 + PAD) * (Math.PI / 180);
+  const a2 = (-90 + (i + 1) * 72 - PAD) * (Math.PI / 180);
+  const x1 = CX + Math.cos(a1) * ARC_R;
+  const y1 = CY + Math.sin(a1) * ARC_R;
+  const x2 = CX + Math.cos(a2) * ARC_R;
+  const y2 = CY + Math.sin(a2) * ARC_R;
+  return `M ${x1} ${y1} A ${ARC_R} ${ARC_R} 0 0 1 ${x2} ${y2}`;
+};
+
 const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagonProps) => {
   const [view, setView] = useState<"afinidade" | "dominio">("afinidade");
   const data = ELEMENTOS.map((e) => clamp(values[`${view}_${e.key}`] ?? 0) / 100);
@@ -56,6 +69,33 @@ const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagon
       </div>
 
       <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-full max-w-[280px] mx-auto block">
+        <defs>
+          <marker
+            id="pent-arrow"
+            viewBox="0 0 10 10"
+            refX="8"
+            refY="5"
+            markerWidth="5"
+            markerHeight="5"
+            orient="auto-start-reverse"
+          >
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="hsl(var(--muted-foreground))" />
+          </marker>
+        </defs>
+
+        {/* ciclo presa/predador */}
+        {ELEMENTOS.map((_, i) => (
+          <path
+            key={`arc-${i}`}
+            d={arcPath(i)}
+            fill="none"
+            stroke="hsl(var(--muted-foreground))"
+            strokeWidth={1.5}
+            markerEnd="url(#pent-arrow)"
+            opacity={0.75}
+          />
+        ))}
+
         {/* grid */}
         {[0.25, 0.5, 0.75, 1].map((r) => (
           <polygon
