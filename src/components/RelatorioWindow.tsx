@@ -2,6 +2,8 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAdmin } from "@/contexts/AdminContext";
+import StatsIcosagon, { ESTATISTICAS, clampStat } from "@/components/StatsIcosagon";
+
 
 interface RelatorioWindowProps {
   sheet: any;
