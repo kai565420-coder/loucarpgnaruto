@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface ElementPentagonProps {
-  values: Record<string, number>;
+  values: Record<string, any>;
   editing: boolean;
   canEdit: boolean;
-  onChange: (key: string, value: number) => void;
+  onChange: (key: string, value: any) => void;
 }
 
 export const ELEMENTOS = [
@@ -45,6 +46,8 @@ const arcPath = (i: number) => {
 
 const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagonProps) => {
   const [view, setView] = useState<"afinidade" | "dominio">("afinidade");
+  const [openEl, setOpenEl] = useState<string | null>(null);
+  const atual = ELEMENTOS.find((e) => e.key === openEl);
   const data = ELEMENTOS.map((e) => clamp(values[`${view}_${e.key}`] ?? 0) / 100);
   const color = view === "afinidade" ? "hsl(var(--accent))" : "hsl(200 80% 55%)";
   const fill = view === "afinidade" ? "hsl(var(--accent) / 0.25)" : "hsl(200 80% 50% / 0.25)";
@@ -126,10 +129,55 @@ const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagon
               width={s}
               height={s}
               preserveAspectRatio="xMidYMid slice"
-            />
+              className="cursor-pointer"
+              onClick={() => setOpenEl(e.key)}
+            >
+              <title>{e.label}</title>
+            </image>
           );
         })}
       </svg>
+
+      <Dialog open={!!openEl} onOpenChange={(o) => !o && setOpenEl(null)}>
+        <DialogContent className="retro-panel max-w-md">
+          {atual && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 retro-label">
+                  <img src={atual.icon} alt={atual.label} className="w-6 h-6 object-cover" />
+                  Buffs de {atual.label}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="text-[11px] flex gap-4 mb-2">
+                <span>
+                  Afinidade: <span className="text-accent font-bold">{clamp(values[`afinidade_${atual.key}`] ?? 0)}%</span>
+                </span>
+                <span>
+                  Domínio:{" "}
+                  <span className="font-bold" style={{ color: "hsl(200 80% 55%)" }}>
+                    {clamp(values[`dominio_${atual.key}`] ?? 0)}%
+                  </span>
+                </span>
+              </div>
+              {editing && canEdit ? (
+                <textarea
+                  className="retro-input w-full min-h-[160px] text-xs"
+                  value={values[`maestria_${atual.key}`] ?? ""}
+                  onChange={(ev) => onChange(`maestria_${atual.key}`, ev.target.value)}
+                  placeholder="Descreva os buffs deste elemento..."
+                />
+              ) : (
+                <div className="text-xs whitespace-pre-wrap leading-relaxed">
+                  {values[`maestria_${atual.key}`]?.trim()
+                    ? values[`maestria_${atual.key}`]
+                    : <span className="text-muted-foreground">Nenhum buff cadastrado.</span>}
+                </div>
+              )}
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
 
       <div className="space-y-1 mt-2">
 
