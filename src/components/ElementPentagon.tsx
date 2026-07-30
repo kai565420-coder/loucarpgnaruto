@@ -29,7 +29,13 @@ const point = (i: number, ratio: number) => {
 const polygon = (ratios: number[]) =>
   ratios.map((r, i) => point(i, r).join(",")).join(" ");
 
-const clamp = (n: number) => Math.max(0, Math.min(100, isNaN(n) ? 0 : n));
+const clamp = (n: any) => {
+  const v = typeof n === "number" ? n : parseFloat(n);
+  return Math.max(0, Math.min(100, isNaN(v) ? 0 : v));
+};
+
+// evita que valores 0 colapsem o polígono no centro (vira "risco")
+const MIN_RATIO = 0.04;
 
 // arcos de presa/predador: Fogo -> Vento -> Raio -> Terra -> Água -> Fogo
 const ARC_R = R * 1.16;
@@ -48,7 +54,8 @@ const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagon
   const [view, setView] = useState<"afinidade" | "dominio">("afinidade");
   const [openEl, setOpenEl] = useState<string | null>(null);
   const atual = ELEMENTOS.find((e) => e.key === openEl);
-  const data = ELEMENTOS.map((e) => clamp(values[`${view}_${e.key}`] ?? 0) / 100);
+  const raw = ELEMENTOS.map((e) => clamp(values[`${view}_${e.key}`] ?? 0) / 100);
+  const data = raw.map((r) => Math.max(MIN_RATIO, r));
   const color = view === "afinidade" ? "hsl(var(--accent))" : "hsl(200 80% 55%)";
   const fill = view === "afinidade" ? "hsl(var(--accent) / 0.25)" : "hsl(200 80% 50% / 0.25)";
 
@@ -114,7 +121,17 @@ const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagon
           return <line key={i} x1={CX} y1={CY} x2={x} y2={y} stroke="hsl(var(--border))" strokeWidth={1} />;
         })}
 
-        <polygon points={polygon(data)} fill={fill} stroke={color} strokeWidth={2} />
+        <polygon
+          points={polygon(data)}
+          fill={fill}
+          stroke={color}
+          strokeWidth={2}
+          strokeLinejoin="round"
+        />
+        {data.map((r, i) => {
+          const [x, y] = point(i, r);
+          return <circle key={`pt-${i}`} cx={x} cy={y} r={2.5} fill={color} />;
+        })}
 
         {/* icons */}
         {ELEMENTOS.map((e, i) => {
