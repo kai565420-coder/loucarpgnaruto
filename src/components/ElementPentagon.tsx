@@ -30,6 +30,19 @@ const polygon = (ratios: number[]) =>
 
 const clamp = (n: number) => Math.max(0, Math.min(100, isNaN(n) ? 0 : n));
 
+// arcos de presa/predador: Fogo -> Vento -> Raio -> Terra -> Água -> Fogo
+const ARC_R = R * 1.16;
+const PAD = 22; // graus de folga perto dos ícones
+const arcPath = (i: number) => {
+  const a1 = (-90 + i * 72 + PAD) * (Math.PI / 180);
+  const a2 = (-90 + (i + 1) * 72 - PAD) * (Math.PI / 180);
+  const x1 = CX + Math.cos(a1) * ARC_R;
+  const y1 = CY + Math.sin(a1) * ARC_R;
+  const x2 = CX + Math.cos(a2) * ARC_R;
+  const y2 = CY + Math.sin(a2) * ARC_R;
+  return `M ${x1} ${y1} A ${ARC_R} ${ARC_R} 0 0 1 ${x2} ${y2}`;
+};
+
 const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagonProps) => {
   const [view, setView] = useState<"afinidade" | "dominio">("afinidade");
   const data = ELEMENTOS.map((e) => clamp(values[`${view}_${e.key}`] ?? 0) / 100);
