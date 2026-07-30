@@ -4,34 +4,35 @@ interface StatsIcosagonProps {
   onChange: (key: string, value: number) => void;
 }
 
-export const ESTATISTICAS: { key: string; label: string }[] = [
-  { key: "est_taijutsu", label: "Taijutsu" },
-  { key: "est_ninjutsu", label: "Ninjutsu" },
-  { key: "est_yin", label: "Compreensão de Yin (Genjutsu)" },
-  { key: "est_yang", label: "Compreensão de Yang" },
-  { key: "est_bukijutsu", label: "Bukijutsu" },
-  { key: "est_kenjutsu", label: "Kenjutsu" },
-  { key: "est_fuinjutsu", label: "Fūinjutsu" },
-  { key: "est_selos_mao", label: "Selos de Mão" },
-  { key: "est_qtd_chakra", label: "Quantidade de Chakra" },
-  { key: "est_controle_chakra", label: "Controle de Chakra" },
-  { key: "est_forca_fisica", label: "Força Física" },
-  { key: "est_destreza", label: "Destreza" },
-  { key: "est_resistencia", label: "Resistência" },
-  { key: "est_vigor", label: "Vigor" },
-  { key: "est_velocidade", label: "Velocidade" },
-  { key: "est_inteligencia", label: "Inteligência" },
-  { key: "est_int_combate", label: "Inteligência de Combate" },
-  { key: "est_trabalho_equipe", label: "Trabalho em Equipe" },
-  { key: "est_infiltracao", label: "Infiltração" },
-  { key: "est_adaptacao", label: "Adaptação" },
+export const ESTATISTICAS: { key: string; label: string; short?: string }[] = [
+  { key: "est_taijutsu", label: "Taijutsu", short: "Taijutsu" },
+  { key: "est_ninjutsu", label: "Ninjutsu", short: "Ninjutsu" },
+  { key: "est_yin", label: "Compreensão de Yin (Genjutsu)", short: "Yin" },
+  { key: "est_yang", label: "Compreensão de Yang", short: "Yang" },
+  { key: "est_bukijutsu", label: "Bukijutsu", short: "Bukijutsu" },
+  { key: "est_kenjutsu", label: "Kenjutsu", short: "Kenjutsu" },
+  { key: "est_fuinjutsu", label: "Fūinjutsu", short: "Fūinjutsu" },
+  { key: "est_selos_mao", label: "Selos de Mão", short: "Selos" },
+  { key: "est_qtd_chakra", label: "Quantidade de Chakra", short: "Qtd. Chakra" },
+  { key: "est_controle_chakra", label: "Controle de Chakra", short: "Ctrl. Chakra" },
+  { key: "est_forca_fisica", label: "Força Física", short: "Força" },
+  { key: "est_destreza", label: "Destreza", short: "Destreza" },
+  { key: "est_resistencia", label: "Resistência", short: "Resist." },
+  { key: "est_vigor", label: "Vigor", short: "Vigor" },
+  { key: "est_velocidade", label: "Velocidade", short: "Veloc." },
+  { key: "est_inteligencia", label: "Inteligência", short: "Intel." },
+  { key: "est_int_combate", label: "Inteligência de Combate", short: "Int. Combate" },
+  { key: "est_trabalho_equipe", label: "Trabalho em Equipe", short: "Equipe" },
+  { key: "est_infiltracao", label: "Infiltração", short: "Infiltr." },
+  { key: "est_adaptacao", label: "Adaptação", short: "Adapt." },
 ];
 
 const N = ESTATISTICAS.length;
-const SIZE = 240;
+const SIZE = 340;
 const CX = SIZE / 2;
 const CY = SIZE / 2;
-const R = 92;
+const R = 100;
+const LABEL_R = R + 16;
 const MIN_RATIO = 0.03;
 
 export const clampStat = (n: any) => {
@@ -55,7 +56,7 @@ const StatsIcosagon = ({ values, editing, onChange }: StatsIcosagonProps) => {
 
   return (
     <div>
-      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-full max-w-[260px] mx-auto block">
+      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-full max-w-[360px] mx-auto block">
         {[0.2, 0.4, 0.6, 0.8, 1].map((r) => (
           <polygon
             key={r}
@@ -79,6 +80,27 @@ const StatsIcosagon = ({ values, editing, onChange }: StatsIcosagonProps) => {
         {data.map((r, i) => {
           const [x, y] = point(i, r);
           return <circle key={`p-${i}`} cx={x} cy={y} r={2} fill="hsl(var(--accent))" />;
+        })}
+        {ESTATISTICAS.map((e, i) => {
+          const angle = (-90 + i * (360 / N)) * (Math.PI / 180);
+          const x = CX + Math.cos(angle) * LABEL_R;
+          const y = CY + Math.sin(angle) * LABEL_R;
+          const cos = Math.cos(angle);
+          const anchor = Math.abs(cos) < 0.2 ? "middle" : cos > 0 ? "start" : "end";
+          return (
+            <text
+              key={`l-${i}`}
+              x={x}
+              y={y}
+              textAnchor={anchor}
+              dominantBaseline="middle"
+              fontSize={9}
+              fill="hsl(var(--muted-foreground))"
+              fontFamily="monospace"
+            >
+              {e.short ?? e.label} {nums[i].toFixed(1)}
+            </text>
+          );
         })}
       </svg>
 
@@ -109,7 +131,7 @@ const StatsIcosagon = ({ values, editing, onChange }: StatsIcosagonProps) => {
             <td className="text-right text-[11px] font-bold text-accent">{soma.toFixed(1)}</td>
           </tr>
           <tr>
-            <td className="retro-label">Resultado Ninja (÷20):</td>
+            <td className="retro-label">Resultado Ninja:</td>
             <td className="text-right text-[11px] font-bold text-accent">{media.toFixed(2)}</td>
           </tr>
         </tbody>
