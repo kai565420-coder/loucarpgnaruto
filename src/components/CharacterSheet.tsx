@@ -603,6 +603,10 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
           )}
         </div>
       )}
+
+      {showRelatorio && (
+        <RelatorioWindow sheet={sheet} onClose={() => setShowRelatorio(false)} onUpdated={onUpdated} />
+      )}
     </div>
   );
 };
