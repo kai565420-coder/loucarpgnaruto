@@ -470,13 +470,13 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
       {/* Maestria + Bolsa */}
       <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
         <div className="retro-panel p-2">
-          <div className="retro-section-title text-xs">Maestria</div>
-          {maestrias.map(({ key, label }) => (
-            <div key={key} className="flex justify-between text-[11px] items-center mb-1">
-              <span className="retro-label">{label}:</span>
-              {renderValue(key, "text")}
-            </div>
-          ))}
+          <div className="retro-section-title text-xs">Maestria Elemental</div>
+          <ElementPentagon
+            values={editing ? (form as any) : (sheet as any)}
+            editing={editing}
+            canEdit={canEdit}
+            onChange={(key, value) => setForm((prev) => ({ ...prev, [key]: value }))}
+          />
         </div>
         <div className="retro-panel p-2">
           <CharacterBags
