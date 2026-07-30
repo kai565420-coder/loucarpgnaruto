@@ -29,7 +29,13 @@ const point = (i: number, ratio: number) => {
 const polygon = (ratios: number[]) =>
   ratios.map((r, i) => point(i, r).join(",")).join(" ");
 
-const clamp = (n: number) => Math.max(0, Math.min(100, isNaN(n) ? 0 : n));
+const clamp = (n: any) => {
+  const v = typeof n === "number" ? n : parseFloat(n);
+  return Math.max(0, Math.min(100, isNaN(v) ? 0 : v));
+};
+
+// evita que valores 0 colapsem o polígono no centro (vira "risco")
+const MIN_RATIO = 0.04;
 
 // arcos de presa/predador: Fogo -> Vento -> Raio -> Terra -> Água -> Fogo
 const ARC_R = R * 1.16;
