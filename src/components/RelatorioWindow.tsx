@@ -31,13 +31,13 @@ const REPUTACOES: { value: string; color: string }[] = [
   { value: "Péssima", color: "#b91c1c" },
 ];
 
-const RECONHECIMENTOS: { value: string; stars: number }[] = [
-  { value: "Desconhecido", stars: 0 },
-  { value: "Localmente", stars: 1 },
-  { value: "Dentro da Aldeia", stars: 2 },
-  { value: "Dentro do País", stars: 3 },
-  { value: "Reconhecimento Continental", stars: 4 },
-  { value: "Fama Mundial", stars: 5 },
+const RECONHECIMENTOS: { value: string; stars: number; label: string }[] = [
+  { value: "Desconhecido", stars: 0, label: "Desconhecido 0 Estrelas" },
+  { value: "Localmente", stars: 1, label: "Localmente 1 Estrela" },
+  { value: "Dentro da Aldeia", stars: 2, label: "Dentro da Aldeia 2 Estrelas" },
+  { value: "Dentro do País", stars: 3, label: "Dentro do País 3 Estrelas" },
+  { value: "Reconhecimento Continental", stars: 4, label: "Reconhecimento Continental 4 Estrelas" },
+  { value: "Fama Mundial", stars: 5, label: "Fama Mundial 5 Estrelas" },
 ];
 
 const MISSOES: { key: string; label: string }[] = [
@@ -125,15 +125,13 @@ const RelatorioWindow = ({ sheet, onClose, onUpdated }: RelatorioWindowProps) =>
                         >
                           <option value="">—</option>
                           {RECONHECIMENTOS.map((r) => (
-                            <option key={r.value} value={r.value}>{r.value}</option>
+                            <option key={r.value} value={r.value}>{r.label}</option>
                           ))}
                         </select>
                       ) : (
                         <span className="text-[11px] font-bold text-accent">
-                          {rec && rec.stars > 0
-                            ? "★".repeat(rec.stars) + "☆".repeat(5 - rec.stars) + `  ${rec.value}`
-                            : rec
-                            ? "☆☆☆☆☆"
+                          {rec
+                            ? `${"★".repeat(rec.stars)}${"☆".repeat(5 - rec.stars)}  ${rec.value}`
                             : "—"}
                         </span>
                       )
