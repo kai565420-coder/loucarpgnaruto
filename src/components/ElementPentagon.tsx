@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface ElementPentagonProps {
-  values: Record<string, number>;
+  values: Record<string, any>;
   editing: boolean;
   canEdit: boolean;
-  onChange: (key: string, value: number) => void;
+  onChange: (key: string, value: any) => void;
 }
 
 export const ELEMENTOS = [
