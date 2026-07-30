@@ -119,6 +119,15 @@ const RelatorioWindow = ({ sheet, onClose, onUpdated }: RelatorioWindowProps) =>
             </tbody>
           </table>
 
+          <div className="retro-section-title text-xs mt-3">Estatísticas Ninja</div>
+          <StatsIcosagon
+            values={form}
+            editing={isAdminMode}
+            onChange={(k, v) => setForm((p) => ({ ...p, [k]: v }))}
+          />
+
+
+
           {isAdminMode && (
             <div className="flex gap-2 mt-3">
               <button className="retro-button flex-1 text-xs py-1" onClick={onClose}>Fechar</button>
