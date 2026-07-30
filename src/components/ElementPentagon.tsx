@@ -31,11 +31,30 @@ const polygon = (ratios: number[]) =>
 const clamp = (n: number) => Math.max(0, Math.min(100, isNaN(n) ? 0 : n));
 
 const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagonProps) => {
-  const afinidade = ELEMENTOS.map((e) => clamp(values[`afinidade_${e.key}`] ?? 0) / 100);
-  const dominio = ELEMENTOS.map((e) => clamp(values[`dominio_${e.key}`] ?? 0) / 100);
+  const [view, setView] = useState<"afinidade" | "dominio">("afinidade");
+  const data = ELEMENTOS.map((e) => clamp(values[`${view}_${e.key}`] ?? 0) / 100);
+  const color = view === "afinidade" ? "hsl(var(--accent))" : "hsl(200 80% 55%)";
+  const fill = view === "afinidade" ? "hsl(var(--accent) / 0.25)" : "hsl(200 80% 50% / 0.25)";
 
   return (
     <div>
+      <div className="flex items-center justify-center gap-2 mb-2">
+        {(["afinidade", "dominio"] as const).map((v) => (
+          <button
+            key={v}
+            type="button"
+            onClick={() => setView(v)}
+            className={`retro-label text-[10px] px-2 py-1 border-2 ${
+              view === v
+                ? "border-accent text-accent"
+                : "border-border text-muted-foreground"
+            }`}
+          >
+            {v === "afinidade" ? "Afinidade" : "Domínio"}
+          </button>
+        ))}
+      </div>
+
       <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-full max-w-[280px] mx-auto block">
         {/* grid */}
         {[0.25, 0.5, 0.75, 1].map((r) => (
@@ -52,20 +71,7 @@ const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagon
           return <line key={i} x1={CX} y1={CY} x2={x} y2={y} stroke="hsl(var(--border))" strokeWidth={1} />;
         })}
 
-        {/* dominio */}
-        <polygon
-          points={polygon(dominio)}
-          fill="hsl(200 80% 50% / 0.25)"
-          stroke="hsl(200 80% 55%)"
-          strokeWidth={2}
-        />
-        {/* afinidade */}
-        <polygon
-          points={polygon(afinidade)}
-          fill="hsl(var(--accent) / 0.25)"
-          stroke="hsl(var(--accent))"
-          strokeWidth={2}
-        />
+        <polygon points={polygon(data)} fill={fill} stroke={color} strokeWidth={2} />
 
         {/* icons */}
         {ELEMENTOS.map((e, i) => {
@@ -85,16 +91,8 @@ const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagon
         })}
       </svg>
 
-      <div className="flex items-center justify-center gap-4 text-[10px] mt-1 mb-2">
-        <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-2 bg-accent" /> Afinidade
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-2" style={{ background: "hsl(200 80% 55%)" }} /> Domínio
-        </span>
-      </div>
+      <div className="space-y-1 mt-2">
 
-      <div className="space-y-1">
         {ELEMENTOS.map((e) => {
           const af = clamp(values[`afinidade_${e.key}`] ?? 0);
           const dm = clamp(values[`dominio_${e.key}`] ?? 0);
