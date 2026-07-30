@@ -20,6 +20,26 @@ const TEXT_FIELDS: { key: string; label: string }[] = [
   { key: "reconhecimento", label: "Reconhecimento" },
 ];
 
+const REPUTACOES: { value: string; color: string }[] = [
+  { value: "Excelente", color: "#4ade80" },
+  { value: "Muito Boa", color: "#22c55e" },
+  { value: "Boa", color: "#15803d" },
+  { value: "Neutra", color: "#a855f7" },
+  { value: "Indefinido", color: "#9ca3af" },
+  { value: "Ruim", color: "#f87171" },
+  { value: "Muito Ruim", color: "#ef4444" },
+  { value: "Péssima", color: "#b91c1c" },
+];
+
+const RECONHECIMENTOS: { value: string; stars: number }[] = [
+  { value: "Desconhecido", stars: 0 },
+  { value: "Localmente", stars: 1 },
+  { value: "Dentro da Aldeia", stars: 2 },
+  { value: "Dentro do País", stars: 3 },
+  { value: "Reconhecimento Continental", stars: 4 },
+  { value: "Fama Mundial", stars: 5 },
+];
+
 const MISSOES: { key: string; label: string }[] = [
   { key: "missoes_s", label: "Missões de Rank S" },
   { key: "missoes_a", label: "Missões de Rank A" },
