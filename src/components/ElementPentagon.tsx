@@ -8,7 +8,7 @@ interface ElementPentagonProps {
 export const ELEMENTOS = [
   { key: "fogo", label: "Fogo", icon: "https://i.imgur.com/x8Nckrr.png" },
   { key: "vento", label: "Vento", icon: "https://i.imgur.com/g4L1VBn.png" },
-  { key: "raio", label: "Raio", icon: "https://i.imgur.com/Tm6oI2L.png" },
+  { key: "raio", label: "Raio", icon: "https://i.imgur.com/Tm6oI2L.png", scale: 0.82 },
   { key: "terra", label: "Terra", icon: "https://i.imgur.com/hHdV2jX.png" },
   { key: "agua", label: "Água", icon: "https://i.imgur.com/NWSExiv.png" },
 ];
@@ -68,14 +68,15 @@ const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagon
         {/* icons */}
         {ELEMENTOS.map((e, i) => {
           const [x, y] = point(i, 1.32);
+          const s = 34 * ((e as { scale?: number }).scale ?? 1);
           return (
             <image
               key={e.key}
               href={e.icon}
-              x={x - 17}
-              y={y - 17}
-              width={34}
-              height={34}
+              x={x - s / 2}
+              y={y - s / 2}
+              width={s}
+              height={s}
               preserveAspectRatio="xMidYMid slice"
             />
           );
