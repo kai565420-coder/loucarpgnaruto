@@ -46,6 +46,8 @@ const arcPath = (i: number) => {
 
 const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagonProps) => {
   const [view, setView] = useState<"afinidade" | "dominio">("afinidade");
+  const [openEl, setOpenEl] = useState<string | null>(null);
+  const atual = ELEMENTOS.find((e) => e.key === openEl);
   const data = ELEMENTOS.map((e) => clamp(values[`${view}_${e.key}`] ?? 0) / 100);
   const color = view === "afinidade" ? "hsl(var(--accent))" : "hsl(200 80% 55%)";
   const fill = view === "afinidade" ? "hsl(var(--accent) / 0.25)" : "hsl(200 80% 50% / 0.25)";
