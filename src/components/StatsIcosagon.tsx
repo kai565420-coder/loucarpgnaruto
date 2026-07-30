@@ -126,16 +126,19 @@ const StatsIcosagon = ({ values, editing, onChange }: StatsIcosagonProps) => {
               </td>
             </tr>
           ))}
-          <tr>
-            <td className="retro-label">Soma Total:</td>
-            <td className="text-right text-[11px] font-bold text-accent">{soma.toFixed(1)}</td>
-          </tr>
-          <tr>
-            <td className="retro-label">Resultado Ninja:</td>
-            <td className="text-right text-[11px] font-bold text-accent">{media.toFixed(2)}</td>
-          </tr>
         </tbody>
       </table>
+
+      <div className="grid grid-cols-2 gap-2 mt-3">
+        <div className="border-2 border-accent bg-accent/10 p-2 text-center">
+          <div className="text-[9px] uppercase tracking-wider text-muted-foreground">Soma Total</div>
+          <div className="text-lg font-bold text-accent leading-none mt-1">{soma.toFixed(1)}</div>
+        </div>
+        <div className="border-2 border-accent bg-accent p-2 text-center">
+          <div className="text-[9px] uppercase tracking-wider text-accent-foreground">Resultado Ninja</div>
+          <div className="text-lg font-bold text-accent-foreground leading-none mt-1">{media.toFixed(2)}</div>
+        </div>
+      </div>
     </div>
   );
 };
