@@ -69,6 +69,33 @@ const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagon
       </div>
 
       <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-full max-w-[280px] mx-auto block">
+        <defs>
+          <marker
+            id="pent-arrow"
+            viewBox="0 0 10 10"
+            refX="8"
+            refY="5"
+            markerWidth="5"
+            markerHeight="5"
+            orient="auto-start-reverse"
+          >
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="hsl(var(--muted-foreground))" />
+          </marker>
+        </defs>
+
+        {/* ciclo presa/predador */}
+        {ELEMENTOS.map((_, i) => (
+          <path
+            key={`arc-${i}`}
+            d={arcPath(i)}
+            fill="none"
+            stroke="hsl(var(--muted-foreground))"
+            strokeWidth={1.5}
+            markerEnd="url(#pent-arrow)"
+            opacity={0.75}
+          />
+        ))}
+
         {/* grid */}
         {[0.25, 0.5, 0.75, 1].map((r) => (
           <polygon
