@@ -106,6 +106,11 @@ export type Database = {
       character_sheets: {
         Row: {
           acrobacia: number
+          afinidade_agua: number
+          afinidade_fogo: number
+          afinidade_raio: number
+          afinidade_terra: number
+          afinidade_vento: number
           analise_combate: number
           bolsa_traseira_tamanho: string
           chakra: number
@@ -119,6 +124,11 @@ export type Database = {
           deslocamento: number
           destreza: number
           dinheiro: number
+          dominio_agua: number
+          dominio_fogo: number
+          dominio_raio: number
+          dominio_terra: number
+          dominio_vento: number
           elementos: string
           estrategia_tatica: number
           forca_bruta: number
@@ -167,6 +177,11 @@ export type Database = {
         }
         Insert: {
           acrobacia?: number
+          afinidade_agua?: number
+          afinidade_fogo?: number
+          afinidade_raio?: number
+          afinidade_terra?: number
+          afinidade_vento?: number
           analise_combate?: number
           bolsa_traseira_tamanho?: string
           chakra?: number
@@ -180,6 +195,11 @@ export type Database = {
           deslocamento?: number
           destreza?: number
           dinheiro?: number
+          dominio_agua?: number
+          dominio_fogo?: number
+          dominio_raio?: number
+          dominio_terra?: number
+          dominio_vento?: number
           elementos?: string
           estrategia_tatica?: number
           forca_bruta?: number
@@ -228,6 +248,11 @@ export type Database = {
         }
         Update: {
           acrobacia?: number
+          afinidade_agua?: number
+          afinidade_fogo?: number
+          afinidade_raio?: number
+          afinidade_terra?: number
+          afinidade_vento?: number
           analise_combate?: number
           bolsa_traseira_tamanho?: string
           chakra?: number
@@ -241,6 +266,11 @@ export type Database = {
           deslocamento?: number
           destreza?: number
           dinheiro?: number
+          dominio_agua?: number
+          dominio_fogo?: number
+          dominio_raio?: number
+          dominio_terra?: number
+          dominio_vento?: number
           elementos?: string
           estrategia_tatica?: number
           forca_bruta?: number
