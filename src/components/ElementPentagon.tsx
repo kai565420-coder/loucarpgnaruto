@@ -72,10 +72,11 @@ const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagon
             <image
               key={e.key}
               href={e.icon}
-              x={x - 16}
-              y={y - 16}
-              width={32}
-              height={32}
+              x={x - 17}
+              y={y - 17}
+              width={34}
+              height={34}
+              preserveAspectRatio="xMidYMid slice"
             />
           );
         })}
