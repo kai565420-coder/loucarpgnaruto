@@ -202,8 +202,12 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
         tolerancia_dor: form.tolerancia_dor, sobrevivencia: form.sobrevivencia,
         controle_chakra: form.controle_chakra, moldagem_elemental: form.moldagem_elemental,
         ninjutsu_medico: form.ninjutsu_medico, sensorial: form.sensorial,
-        maestria_fogo: form.maestria_fogo, maestria_vento: form.maestria_vento,
-        maestria_terra: form.maestria_terra, maestria_agua: form.maestria_agua, maestria_raio: form.maestria_raio,
+        ...Object.fromEntries(
+          ELEMENTOS.flatMap((e) => [
+            [`afinidade_${e.key}`, (form as any)[`afinidade_${e.key}`] ?? 0],
+            [`dominio_${e.key}`, (form as any)[`dominio_${e.key}`] ?? 0],
+          ])
+        ),
         inventario: form.inventario,
         ...(isAdminMode ? { pontos_acao: form.pontos_acao ?? 0 } : {}),
       } as any)
