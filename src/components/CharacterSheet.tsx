@@ -128,6 +128,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
   const [jutsus, setJutsus] = useState<Jutsu[]>([]);
   const [jutsuLinks, setJutsuLinks] = useState<CharacterJutsuLink[]>([]);
   const [showJutsus, setShowJutsus] = useState(false);
+  const [showRelatorio, setShowRelatorio] = useState(false);
   const [showJutsuSelector, setShowJutsuSelector] = useState(false);
   const [assignedJutsuIds, setAssignedJutsuIds] = useState<string[]>([]);
 
