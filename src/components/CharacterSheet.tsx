@@ -201,6 +201,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
           ELEMENTOS.flatMap((e) => [
             [`afinidade_${e.key}`, (form as any)[`afinidade_${e.key}`] ?? 0],
             [`dominio_${e.key}`, (form as any)[`dominio_${e.key}`] ?? 0],
+            [`maestria_${e.key}`, (form as any)[`maestria_${e.key}`] ?? ""],
           ])
         ),
         inventario: form.inventario,
