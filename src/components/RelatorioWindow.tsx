@@ -92,11 +92,52 @@ const RelatorioWindow = ({ sheet, onClose, onUpdated }: RelatorioWindowProps) =>
         <div className="p-3">
           <table className="retro-table text-xs w-full mb-3">
             <tbody>
-              {TEXT_FIELDS.map(({ key, label }) => (
+              {TEXT_FIELDS.map(({ key, label }) => {
+                const rep = REPUTACOES.find((r) => r.value === form.reputacao);
+                const rec = RECONHECIMENTOS.find((r) => r.value === form.reconhecimento);
+                return (
                 <tr key={key}>
                   <td className="retro-label w-32">{label}:</td>
                   <td>
-                    {isAdminMode ? (
+                    {key === "reputacao" ? (
+                      isAdminMode ? (
+                        <select
+                          className="retro-input w-full text-[11px]"
+                          value={form.reputacao ?? ""}
+                          onChange={(e) => setForm((p) => ({ ...p, reputacao: e.target.value }))}
+                        >
+                          <option value="">—</option>
+                          {REPUTACOES.map((r) => (
+                            <option key={r.value} value={r.value}>{r.value}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span className="text-[11px] font-bold" style={{ color: rep?.color }}>
+                          {form.reputacao || "—"}
+                        </span>
+                      )
+                    ) : key === "reconhecimento" ? (
+                      isAdminMode ? (
+                        <select
+                          className="retro-input w-full text-[11px]"
+                          value={form.reconhecimento ?? ""}
+                          onChange={(e) => setForm((p) => ({ ...p, reconhecimento: e.target.value }))}
+                        >
+                          <option value="">—</option>
+                          {RECONHECIMENTOS.map((r) => (
+                            <option key={r.value} value={r.value}>{r.value}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span className="text-[11px] font-bold text-accent">
+                          {rec && rec.stars > 0
+                            ? "★".repeat(rec.stars) + "☆".repeat(5 - rec.stars) + `  ${rec.value}`
+                            : rec
+                            ? "☆☆☆☆☆"
+                            : "—"}
+                        </span>
+                      )
+                    ) : isAdminMode ? (
                       <input
                         type="text"
                         className="retro-input w-full text-[11px]"
@@ -108,7 +149,8 @@ const RelatorioWindow = ({ sheet, onClose, onUpdated }: RelatorioWindowProps) =>
                     )}
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
 
