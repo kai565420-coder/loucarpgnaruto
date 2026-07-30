@@ -121,7 +121,17 @@ const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagon
           return <line key={i} x1={CX} y1={CY} x2={x} y2={y} stroke="hsl(var(--border))" strokeWidth={1} />;
         })}
 
-        <polygon points={polygon(data)} fill={fill} stroke={color} strokeWidth={2} />
+        <polygon
+          points={polygon(data)}
+          fill={fill}
+          stroke={color}
+          strokeWidth={2}
+          strokeLinejoin="round"
+        />
+        {data.map((r, i) => {
+          const [x, y] = point(i, r);
+          return <circle key={`pt-${i}`} cx={x} cy={y} r={2.5} fill={color} />;
+        })}
 
         {/* icons */}
         {ELEMENTOS.map((e, i) => {
