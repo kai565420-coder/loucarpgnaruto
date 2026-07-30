@@ -68,14 +68,15 @@ const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagon
         {/* icons */}
         {ELEMENTOS.map((e, i) => {
           const [x, y] = point(i, 1.32);
+          const s = 34 * ((e as { scale?: number }).scale ?? 1);
           return (
             <image
               key={e.key}
               href={e.icon}
-              x={x - 17}
-              y={y - 17}
-              width={34}
-              height={34}
+              x={x - s / 2}
+              y={y - s / 2}
+              width={s}
+              height={s}
               preserveAspectRatio="xMidYMid slice"
             />
           );
