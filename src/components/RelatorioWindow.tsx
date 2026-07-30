@@ -46,6 +46,8 @@ const RelatorioWindow = ({ sheet, onClose, onUpdated }: RelatorioWindowProps) =>
       reconhecimento: form.reconhecimento ?? "",
     };
     MISSOES.forEach((m) => (payload[m.key] = Number(form[m.key]) || 0));
+    ESTATISTICAS.forEach((e) => (payload[e.key] = clampStat(form[e.key])));
+
 
     const { error } = await supabase.from("character_sheets").update(payload).eq("id", sheet.id);
     setSaving(false);
