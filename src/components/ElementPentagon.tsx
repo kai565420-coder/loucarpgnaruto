@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 interface ElementPentagonProps {
   values: Record<string, number>;
   editing: boolean;
@@ -8,7 +10,7 @@ interface ElementPentagonProps {
 export const ELEMENTOS = [
   { key: "fogo", label: "Fogo", icon: "https://i.imgur.com/x8Nckrr.png" },
   { key: "vento", label: "Vento", icon: "https://i.imgur.com/g4L1VBn.png" },
-  { key: "raio", label: "Raio", icon: "https://i.imgur.com/Tm6oI2L.png", scale: 0.82 },
+  { key: "raio", label: "Raio", icon: "https://i.imgur.com/Tm6oI2L.png", scale: 0.62 },
   { key: "terra", label: "Terra", icon: "https://i.imgur.com/hHdV2jX.png" },
   { key: "agua", label: "Água", icon: "https://i.imgur.com/NWSExiv.png" },
 ];
