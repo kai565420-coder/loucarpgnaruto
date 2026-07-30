@@ -8,6 +8,7 @@ import { getJutsuEmoji } from "@/lib/jutsuEmoji";
 import CharacterBags from "./CharacterBags";
 import SelosManuaisSelector from "./SelosManuaisSelector";
 import InvocacaoCard from "./InvocacaoCard";
+import ElementPentagon, { ELEMENTOS } from "./ElementPentagon";
 
 interface CharacterSheetProps {
   sheet: Tables<"character_sheets">;
@@ -51,13 +52,8 @@ const barAtributos = [
   { key: "chakra", maxKey: "chakra_max", label: "Chakra", color: "hsl(200 80% 50%)" },
 ];
 
-const maestrias = [
-  { key: "maestria_fogo", label: "Fogo" },
-  { key: "maestria_vento", label: "Vento" },
-  { key: "maestria_terra", label: "Terra" },
-  { key: "maestria_agua", label: "Água" },
-  { key: "maestria_raio", label: "Raio" },
-];
+
+
 
 const pericias = [
   {
@@ -201,8 +197,12 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
         tolerancia_dor: form.tolerancia_dor, sobrevivencia: form.sobrevivencia,
         controle_chakra: form.controle_chakra, moldagem_elemental: form.moldagem_elemental,
         ninjutsu_medico: form.ninjutsu_medico, sensorial: form.sensorial,
-        maestria_fogo: form.maestria_fogo, maestria_vento: form.maestria_vento,
-        maestria_terra: form.maestria_terra, maestria_agua: form.maestria_agua, maestria_raio: form.maestria_raio,
+        ...Object.fromEntries(
+          ELEMENTOS.flatMap((e) => [
+            [`afinidade_${e.key}`, (form as any)[`afinidade_${e.key}`] ?? 0],
+            [`dominio_${e.key}`, (form as any)[`dominio_${e.key}`] ?? 0],
+          ])
+        ),
         inventario: form.inventario,
         ...(isAdminMode ? { pontos_acao: form.pontos_acao ?? 0 } : {}),
       } as any)
@@ -470,13 +470,13 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
       {/* Maestria + Bolsa */}
       <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
         <div className="retro-panel p-2">
-          <div className="retro-section-title text-xs">Maestria</div>
-          {maestrias.map(({ key, label }) => (
-            <div key={key} className="flex justify-between text-[11px] items-center mb-1">
-              <span className="retro-label">{label}:</span>
-              {renderValue(key, "text")}
-            </div>
-          ))}
+          <div className="retro-section-title text-xs">Maestria Elemental</div>
+          <ElementPentagon
+            values={editing ? (form as any) : (sheet as any)}
+            editing={editing}
+            canEdit={canEdit}
+            onChange={(key, value) => setForm((prev) => ({ ...prev, [key]: value }))}
+          />
         </div>
         <div className="retro-panel p-2">
           <CharacterBags

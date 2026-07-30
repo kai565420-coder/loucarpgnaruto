@@ -37,13 +37,8 @@ const barAtributos = [
   { key: "chakra", maxKey: "chakra_max", label: "Chakra" },
 ];
 
-const maestrias = [
-  { key: "maestria_fogo", label: "Fogo" },
-  { key: "maestria_vento", label: "Vento" },
-  { key: "maestria_terra", label: "Terra" },
-  { key: "maestria_agua", label: "Água" },
-  { key: "maestria_raio", label: "Raio" },
-];
+
+
 
 const pericias = [
   {
@@ -277,18 +272,10 @@ const CharacterForm = ({ ip, onCreated }: CharacterFormProps) => {
       {/* Maestria + Bolsa */}
       <div className="retro-panel p-3 mb-3 grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
-          <div className="retro-section-title text-sm">Maestria</div>
-          {maestrias.map(({ key, label }) => (
-            <div key={key} className="flex items-center gap-2 mb-1">
-              <label className="retro-label text-[11px] w-[80px] shrink-0">{label}:</label>
-              <input
-                type="text"
-                className="retro-input w-full text-xs"
-                value={(form as any)[key]}
-                onChange={(e) => handleTextChange(key, e.target.value)}
-              />
-            </div>
-          ))}
+          <div className="retro-section-title text-sm">Maestria Elemental</div>
+          <p className="text-muted-foreground text-[11px]">
+            Afinidade e Domínio dos elementos são definidos no hexágono elemental, ao editar a ficha.
+          </p>
         </div>
         <div>
           <div className="retro-section-title text-sm">Bolsa Traseira</div>
