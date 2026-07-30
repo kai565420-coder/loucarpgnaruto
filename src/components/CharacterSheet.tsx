@@ -393,6 +393,12 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
               )}
             </>
           )}
+          <button
+            className="w-[120px] mt-1 text-[10px] text-center border border-border bg-muted hover:border-accent hover:text-accent px-1 py-0.5"
+            onClick={() => setShowRelatorio(true)}
+          >
+            📋 Relatórios
+          </button>
         </div>
         <div className="flex-1 min-w-[200px]">
           <table className="retro-table text-xs mb-2">
