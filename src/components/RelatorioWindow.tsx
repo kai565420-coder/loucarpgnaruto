@@ -125,15 +125,13 @@ const RelatorioWindow = ({ sheet, onClose, onUpdated }: RelatorioWindowProps) =>
                         >
                           <option value="">—</option>
                           {RECONHECIMENTOS.map((r) => (
-                            <option key={r.value} value={r.value}>{r.value}</option>
+                            <option key={r.value} value={r.value}>{r.label}</option>
                           ))}
                         </select>
                       ) : (
                         <span className="text-[11px] font-bold text-accent">
-                          {rec && rec.stars > 0
-                            ? "★".repeat(rec.stars) + "☆".repeat(5 - rec.stars) + `  ${rec.value}`
-                            : rec
-                            ? "☆☆☆☆☆"
+                          {rec
+                            ? `${"★".repeat(rec.stars)}${"☆".repeat(5 - rec.stars)}  ${rec.value}`
                             : "—"}
                         </span>
                       )
