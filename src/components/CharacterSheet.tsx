@@ -52,13 +52,8 @@ const barAtributos = [
   { key: "chakra", maxKey: "chakra_max", label: "Chakra", color: "hsl(200 80% 50%)" },
 ];
 
-const maestrias = [
-  { key: "maestria_fogo", label: "Fogo" },
-  { key: "maestria_vento", label: "Vento" },
-  { key: "maestria_terra", label: "Terra" },
-  { key: "maestria_agua", label: "Água" },
-  { key: "maestria_raio", label: "Raio" },
-];
+
+
 
 const pericias = [
   {
