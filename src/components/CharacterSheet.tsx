@@ -9,6 +9,7 @@ import CharacterBags from "./CharacterBags";
 import SelosManuaisSelector from "./SelosManuaisSelector";
 import InvocacaoCard from "./InvocacaoCard";
 import ElementPentagon, { ELEMENTOS } from "./ElementPentagon";
+import RelatorioWindow from "./RelatorioWindow";
 
 interface CharacterSheetProps {
   sheet: Tables<"character_sheets">;
