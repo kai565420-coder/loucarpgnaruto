@@ -128,12 +128,22 @@ const RelatorioWindow = ({ sheet, onClose, onUpdated }: RelatorioWindowProps) =>
                             <option key={r.value} value={r.value}>{r.label}</option>
                           ))}
                         </select>
-                      ) : (
-                        <span className="text-[11px] font-bold text-accent">
-                          {rec
-                            ? `${"★".repeat(rec.stars)}${"☆".repeat(5 - rec.stars)}  ${rec.value}`
-                            : "—"}
+                      ) : rec ? (
+                        <span className="text-[11px] font-bold inline-flex items-center gap-1">
+                          <span className="inline-flex">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <span
+                                key={i}
+                                className={i < rec.stars ? "text-accent" : "text-muted-foreground opacity-40"}
+                              >
+                                ★
+                              </span>
+                            ))}
+                          </span>
+                          <span className="text-accent">{rec.value}</span>
                         </span>
+                      ) : (
+                        <span className="text-[11px]">—</span>
                       )
                     ) : isAdminMode ? (
                       <input
