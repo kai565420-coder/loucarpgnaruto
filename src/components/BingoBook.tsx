@@ -199,6 +199,55 @@ const BingoBook = () => {
     </div>
   );
 
+  const renderPage = (entry: BingoEntry | undefined, num: number) => (
+    <div className="absolute inset-0 p-5 flex flex-col overflow-y-auto" style={pageStyle}>
+      <div className="text-[11px] uppercase tracking-widest opacity-70">Livro Bingo</div>
+      {!entry ? (
+        <div className="flex-1 flex items-center justify-center text-xs opacity-60">
+          Nenhum ninja registrado.
+        </div>
+      ) : (
+        <div className="flex-1 mt-2 flex flex-col">
+          <div className="flex gap-4">
+            <div className="w-[46%] aspect-[3/4] border-[3px] border-[hsl(30_35%_30%)] shrink-0 overflow-hidden flex items-center justify-center">
+              {entry.imagem_url ? (
+                <img src={entry.imagem_url} alt={`Fotografia de ${entry.nome}`} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-[10px] opacity-60">Sem foto</span>
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-2xl font-bold leading-tight break-words">{entry.nome}</div>
+              {entry.alcunha && <div className="text-sm italic">"{entry.alcunha}"</div>}
+              <div className="text-sm mt-2">Rank de Ameaça: <b>{entry.rank_ameaca || "—"}</b></div>
+              <div className="text-sm">Recompensa: <b>{entry.recompensa || "—"}</b></div>
+              <div className="text-sm">Nível de Sigilo: <b>{entry.nivel_sigilo || "—"}</b></div>
+              <div className="text-sm">Vila de Origem: <b>{entry.vila_origem || "—"}</b></div>
+              <div className="text-sm">Afiliação: <b>{entry.afiliacao_atual || "—"}</b></div>
+              <div className="text-sm">Última Localização: <b>{entry.ultima_localizacao || "—"}</b></div>
+            </div>
+          </div>
+
+          <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1.5 flex-1 content-start">
+            {FIELDS.filter((f) => !["nome", "alcunha", "rank_ameaca", "recompensa", "nivel_sigilo", "vila_origem", "afiliacao_atual", "ultima_localizacao"].includes(f.key as string)).map((f) => (
+              <div key={f.key} className={`text-[12px] leading-snug ${f.long ? "col-span-2" : ""}`}>
+                <span className="uppercase tracking-wide opacity-70">{f.label}: </span>
+                <span className="whitespace-pre-wrap">{(entry[f.key] as string) || "—"}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      <div className="text-center text-[11px] opacity-70 mt-2">
+        Página {Math.min(num + 1, totalPages)} / {totalPages}
+      </div>
+    </div>
+  );
+
+  const basePage = flipping === "next" ? Math.min(page + 1, totalPages - 1) : page;
+  const baseEntry = entries[basePage];
+
+
   return (
     <div className="retro-panel p-4">
       <div className="retro-section-title">Livro Bingo</div>
