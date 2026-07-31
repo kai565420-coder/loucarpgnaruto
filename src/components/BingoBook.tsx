@@ -244,7 +244,7 @@ const BingoBook = () => {
     </div>
   );
 
-  const basePage = flipping === "next" ? Math.min(page + 1, totalPages - 1) : page;
+  const basePage = flipping ? Math.min(page + 1, totalPages - 1) : page;
   const baseEntry = entries[basePage];
 
 
