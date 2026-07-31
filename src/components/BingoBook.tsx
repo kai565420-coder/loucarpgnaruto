@@ -259,7 +259,7 @@ const BingoBook = () => {
         </div>
       )}
 
-      <div className="relative mx-auto w-full max-w-[560px]" style={{ perspective: "1600px" }}>
+      <div className="relative mx-auto w-full max-w-[760px]" style={{ perspective: "1600px" }}>
         <div
           className="relative w-full aspect-[3/4] border border-border overflow-hidden"
           style={{ transformStyle: "preserve-3d", ...pageStyle }}
