@@ -65,18 +65,29 @@ const pageStyle: React.CSSProperties = {
 
 const CapturedMark = ({ label }: { label: string }) => (
   <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 w-full h-full opacity-80">
-      <path d="M8,6 L92,94" stroke="hsl(0 75% 40%)" strokeWidth="6" strokeLinecap="round" fill="none" />
-      <path d="M92,6 L8,94" stroke="hsl(0 75% 40%)" strokeWidth="6" strokeLinecap="round" fill="none" />
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 w-full h-full opacity-75">
+      <defs>
+        <filter id="bingo-brush">
+          <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="3" seed="7" result="n" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </defs>
+      <g filter="url(#bingo-brush)" fill="none" stroke="hsl(0 72% 34%)" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M10,7 C24,26 38,41 52,54 C63,66 76,80 90,95" strokeWidth="7.5" opacity="0.9" />
+        <path d="M11,10 C27,27 40,44 55,57 C66,68 78,82 88,92" strokeWidth="3" opacity="0.55" />
+        <path d="M91,6 C77,24 64,40 49,53 C37,64 22,79 9,94" strokeWidth="8.5" opacity="0.9" />
+        <path d="M89,10 C74,27 62,43 47,56 C35,67 21,81 11,91" strokeWidth="2.6" opacity="0.5" />
+      </g>
     </svg>
     <span
-      className="relative text-[hsl(0_75%_35%)] font-bold uppercase tracking-widest text-xl border-4 border-[hsl(0_75%_35%)] px-3 py-1 -rotate-12"
+      className="relative text-[hsl(0_75%_35%)] font-bold uppercase tracking-widest text-2xl border-4 border-[hsl(0_75%_35%)] px-4 py-1 -rotate-[14deg]"
       style={{ background: "hsl(0 0% 100% / 0.25)" }}
     >
       {label}
     </span>
   </div>
 );
+
 
 const BingoBook = () => {
   const { isAdminMode } = useAdmin();
@@ -248,7 +259,7 @@ const BingoBook = () => {
         </div>
       )}
 
-      <div className="relative mx-auto w-full max-w-[560px]" style={{ perspective: "1600px" }}>
+      <div className="relative mx-auto w-full max-w-[760px]" style={{ perspective: "1600px" }}>
         <div
           className="relative w-full aspect-[3/4] border border-border overflow-hidden"
           style={{ transformStyle: "preserve-3d", ...pageStyle }}
@@ -261,33 +272,37 @@ const BingoBook = () => {
                 Nenhum ninja registrado.
               </div>
             ) : (
-              <div className="flex-1 mt-2">
-                <div className="flex gap-3">
-                  <div className="w-24 h-28 border-2 border-[hsl(30_35%_30%)] shrink-0 overflow-hidden flex items-center justify-center">
+              <div className="flex-1 mt-2 flex flex-col">
+                <div className="flex gap-4">
+                  <div className="w-[46%] aspect-[3/4] border-[3px] border-[hsl(30_35%_30%)] shrink-0 overflow-hidden flex items-center justify-center">
                     {current.imagem_url ? (
                       <img src={current.imagem_url} alt={`Fotografia de ${current.nome}`} className="w-full h-full object-cover" />
                     ) : (
                       <span className="text-[10px] opacity-60">Sem foto</span>
                     )}
                   </div>
-                  <div className="min-w-0">
-                    <div className="text-lg font-bold leading-tight break-words">{current.nome}</div>
-                    {current.alcunha && <div className="text-xs italic">"{current.alcunha}"</div>}
-                    <div className="text-xs mt-1">Rank de Ameaça: <b>{current.rank_ameaca || "—"}</b></div>
-                    <div className="text-xs">Recompensa: <b>{current.recompensa || "—"}</b></div>
-                    <div className="text-xs">Nível de Sigilo: <b>{current.nivel_sigilo || "—"}</b></div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-2xl font-bold leading-tight break-words">{current.nome}</div>
+                    {current.alcunha && <div className="text-sm italic">"{current.alcunha}"</div>}
+                    <div className="text-sm mt-2">Rank de Ameaça: <b>{current.rank_ameaca || "—"}</b></div>
+                    <div className="text-sm">Recompensa: <b>{current.recompensa || "—"}</b></div>
+                    <div className="text-sm">Nível de Sigilo: <b>{current.nivel_sigilo || "—"}</b></div>
+                    <div className="text-sm">Vila de Origem: <b>{current.vila_origem || "—"}</b></div>
+                    <div className="text-sm">Afiliação: <b>{current.afiliacao_atual || "—"}</b></div>
+                    <div className="text-sm">Última Localização: <b>{current.ultima_localizacao || "—"}</b></div>
                   </div>
                 </div>
 
-                <div className="mt-3 space-y-1">
-                  {FIELDS.filter((f) => !["nome", "alcunha", "rank_ameaca", "recompensa", "nivel_sigilo"].includes(f.key as string)).map((f) => (
-                    <div key={f.key} className="text-[11px] leading-snug">
+                <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1.5 flex-1 content-start">
+                  {FIELDS.filter((f) => !["nome", "alcunha", "rank_ameaca", "recompensa", "nivel_sigilo", "vila_origem", "afiliacao_atual", "ultima_localizacao"].includes(f.key as string)).map((f) => (
+                    <div key={f.key} className={`text-[12px] leading-snug ${f.long ? "col-span-2" : ""}`}>
                       <span className="uppercase tracking-wide opacity-70">{f.label}: </span>
                       <span className="whitespace-pre-wrap">{(current[f.key] as string) || "—"}</span>
                     </div>
                   ))}
                 </div>
               </div>
+
             )}
 
             <div className="text-center text-[11px] opacity-70 mt-2">
