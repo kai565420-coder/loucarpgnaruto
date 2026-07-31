@@ -14,6 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
+      bingo_entries: {
+        Row: {
+          afiliacao_atual: string
+          afinidades_elementais: string
+          alcunha: string
+          created_at: string
+          crimes_conhecidos: string
+          estilo_combate: string
+          id: string
+          imagem_url: string | null
+          instrucoes_captura: string
+          invocacoes: string
+          kekkei_genkai: string
+          nivel_sigilo: string
+          nome: string
+          pontos_fortes: string
+          pontos_fracos: string
+          rank_ameaca: string
+          recompensa: string
+          situacao: string
+          tecnicas_conhecidas: string
+          ultima_localizacao: string
+          updated_at: string
+          vila_origem: string
+          vila_registro: string
+        }
+        Insert: {
+          afiliacao_atual?: string
+          afinidades_elementais?: string
+          alcunha?: string
+          created_at?: string
+          crimes_conhecidos?: string
+          estilo_combate?: string
+          id?: string
+          imagem_url?: string | null
+          instrucoes_captura?: string
+          invocacoes?: string
+          kekkei_genkai?: string
+          nivel_sigilo?: string
+          nome: string
+          pontos_fortes?: string
+          pontos_fracos?: string
+          rank_ameaca?: string
+          recompensa?: string
+          situacao?: string
+          tecnicas_conhecidas?: string
+          ultima_localizacao?: string
+          updated_at?: string
+          vila_origem?: string
+          vila_registro?: string
+        }
+        Update: {
+          afiliacao_atual?: string
+          afinidades_elementais?: string
+          alcunha?: string
+          created_at?: string
+          crimes_conhecidos?: string
+          estilo_combate?: string
+          id?: string
+          imagem_url?: string | null
+          instrucoes_captura?: string
+          invocacoes?: string
+          kekkei_genkai?: string
+          nivel_sigilo?: string
+          nome?: string
+          pontos_fortes?: string
+          pontos_fracos?: string
+          rank_ameaca?: string
+          recompensa?: string
+          situacao?: string
+          tecnicas_conhecidas?: string
+          ultima_localizacao?: string
+          updated_at?: string
+          vila_origem?: string
+          vila_registro?: string
+        }
+        Relationships: []
+      }
       character_bag_items: {
         Row: {
           bag_type: string

@@ -1,14 +1,114 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useAdmin } from "@/contexts/AdminContext";
 
-const TOTAL_PAGES = 8;
+interface BingoEntry {
+  id: string;
+  nome: string;
+  alcunha: string;
+  imagem_url: string | null;
+  vila_origem: string;
+  vila_registro: string;
+  afiliacao_atual: string;
+  rank_ameaca: string;
+  recompensa: string;
+  instrucoes_captura: string;
+  crimes_conhecidos: string;
+  ultima_localizacao: string;
+  tecnicas_conhecidas: string;
+  afinidades_elementais: string;
+  kekkei_genkai: string;
+  invocacoes: string;
+  estilo_combate: string;
+  pontos_fortes: string;
+  pontos_fracos: string;
+  nivel_sigilo: string;
+  situacao: string;
+}
+
+const FIELDS: { key: keyof BingoEntry; label: string; long?: boolean }[] = [
+  { key: "nome", label: "Nome" },
+  { key: "alcunha", label: "Alcunha" },
+  { key: "vila_origem", label: "Vila de Origem" },
+  { key: "vila_registro", label: "Registrado por qual vila" },
+  { key: "afiliacao_atual", label: "Afiliação Atual" },
+  { key: "rank_ameaca", label: "Rank de Ameaça" },
+  { key: "recompensa", label: "Recompensa Oferecida" },
+  { key: "instrucoes_captura", label: "Instruções de Captura", long: true },
+  { key: "crimes_conhecidos", label: "Crimes Conhecidos", long: true },
+  { key: "ultima_localizacao", label: "Última Localização" },
+  { key: "tecnicas_conhecidas", label: "Técnicas Conhecidas", long: true },
+  { key: "afinidades_elementais", label: "Afinidades Elementais" },
+  { key: "kekkei_genkai", label: "Kekkei Genkai" },
+  { key: "invocacoes", label: "Invocações" },
+  { key: "estilo_combate", label: "Estilo de Combate" },
+  { key: "pontos_fortes", label: "Pontos Fortes conhecidos", long: true },
+  { key: "pontos_fracos", label: "Pontos Fracos conhecidos", long: true },
+  { key: "nivel_sigilo", label: "Nível de Sigilo" },
+];
+
+const emptyForm = (): Partial<BingoEntry> => ({
+  nome: "", alcunha: "", imagem_url: "", vila_origem: "", vila_registro: "",
+  afiliacao_atual: "", rank_ameaca: "", recompensa: "", instrucoes_captura: "",
+  crimes_conhecidos: "", ultima_localizacao: "", tecnicas_conhecidas: "",
+  afinidades_elementais: "", kekkei_genkai: "", invocacoes: "", estilo_combate: "",
+  pontos_fortes: "", pontos_fracos: "", nivel_sigilo: "", situacao: "ativo",
+});
+
+const pageStyle: React.CSSProperties = {
+  background:
+    "linear-gradient(135deg, hsl(43 55% 84%) 0%, hsl(40 45% 76%) 55%, hsl(36 40% 68%) 100%)",
+  boxShadow: "inset 0 0 40px hsl(32 45% 45% / 0.45)",
+  color: "hsl(30 35% 22%)",
+};
+
+const CapturedMark = ({ label }: { label: string }) => (
+  <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 w-full h-full opacity-80">
+      <path d="M8,6 L92,94" stroke="hsl(0 75% 40%)" strokeWidth="6" strokeLinecap="round" fill="none" />
+      <path d="M92,6 L8,94" stroke="hsl(0 75% 40%)" strokeWidth="6" strokeLinecap="round" fill="none" />
+    </svg>
+    <span
+      className="relative text-[hsl(0_75%_35%)] font-bold uppercase tracking-widest text-xl border-4 border-[hsl(0_75%_35%)] px-3 py-1 -rotate-12"
+      style={{ background: "hsl(0 0% 100% / 0.25)" }}
+    >
+      {label}
+    </span>
+  </div>
+);
 
 const BingoBook = () => {
+  const { isAdminMode } = useAdmin();
+  const [entries, setEntries] = useState<BingoEntry[]>([]);
   const [page, setPage] = useState(0);
   const [flipping, setFlipping] = useState<"next" | "prev" | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState<Partial<BingoEntry>>(emptyForm());
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const fetchEntries = useCallback(async () => {
+    const { data } = await (supabase as any)
+      .from("bingo_entries")
+      .select("*")
+      .order("nome");
+    setEntries((data || []) as BingoEntry[]);
+  }, []);
+
+  useEffect(() => { fetchEntries(); }, [fetchEntries]);
+
+  const totalPages = Math.max(1, entries.length);
+  const current = entries[page];
+
+  useEffect(() => {
+    if (page > totalPages - 1) setPage(totalPages - 1);
+  }, [page, totalPages]);
 
   const go = (dir: "next" | "prev") => {
     if (flipping) return;
-    if (dir === "next" && page >= TOTAL_PAGES - 1) return;
+    if (dir === "next" && page >= totalPages - 1) return;
     if (dir === "prev" && page <= 0) return;
     setFlipping(dir);
     if (dir === "prev") setPage((p) => p - 1);
@@ -22,50 +122,183 @@ const BingoBook = () => {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
       if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
-      if (e.key === "ArrowRight") {
-        e.preventDefault();
-        go("next");
-      } else if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        go("prev");
-      }
+      if (e.key === "ArrowRight") { e.preventDefault(); go("next"); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); go("prev"); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   });
 
-
-  const pageStyle: React.CSSProperties = {
-    background:
-      "linear-gradient(135deg, hsl(43 55% 84%) 0%, hsl(40 45% 76%) 55%, hsl(36 40% 68%) 100%)",
-    boxShadow: "inset 0 0 40px hsl(32 45% 45% / 0.45)",
-    color: "hsl(30 35% 22%)",
+  const uploadFoto = async (file: File) => {
+    setUploading(true);
+    const path = `bingo/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
+    const { error } = await supabase.storage.from("character-images").upload(path, file);
+    if (error) { toast.error("Erro ao enviar imagem"); setUploading(false); return; }
+    const { data } = supabase.storage.from("character-images").getPublicUrl(path);
+    setForm((f) => ({ ...f, imagem_url: data.publicUrl }));
+    setUploading(false);
   };
+
+  const save = async () => {
+    if (!form.nome?.trim()) { toast.error("Informe o nome do ninja"); return; }
+    if (editingId) {
+      const { error } = await (supabase as any).from("bingo_entries").update(form).eq("id", editingId);
+      if (error) { toast.error("Erro ao salvar"); return; }
+      toast.success("Registro atualizado");
+    } else {
+      const { error } = await (supabase as any).from("bingo_entries").insert(form);
+      if (error) { toast.error("Erro ao registrar"); return; }
+      toast.success("Ninja registrado no Livro Bingo");
+    }
+    setShowForm(false); setEditingId(null); setForm(emptyForm());
+    fetchEntries();
+  };
+
+  const removeEntry = async (id: string) => {
+    await (supabase as any).from("bingo_entries").delete().eq("id", id);
+    toast.success("Registro removido");
+    fetchEntries();
+  };
+
+  const setSituacao = async (id: string, situacao: string) => {
+    setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, situacao } : e)));
+    await (supabase as any).from("bingo_entries").update({ situacao }).eq("id", id);
+  };
+
+  const startEdit = (e: BingoEntry) => {
+    setForm({ ...e }); setEditingId(e.id); setShowForm(true);
+  };
+
+  const field = (key: keyof BingoEntry, label: string, long?: boolean) => (
+    <div key={key} className={long ? "col-span-2" : ""}>
+      <label className="block text-[10px] uppercase tracking-wide mb-0.5">{label}</label>
+      {long ? (
+        <textarea
+          className="retro-input w-full text-xs min-h-[60px]"
+          value={(form[key] as string) || ""}
+          onChange={(ev) => setForm((f) => ({ ...f, [key]: ev.target.value }))}
+        />
+      ) : (
+        <input
+          className="retro-input w-full text-xs"
+          value={(form[key] as string) || ""}
+          onChange={(ev) => setForm((f) => ({ ...f, [key]: ev.target.value }))}
+        />
+      )}
+    </div>
+  );
 
   return (
     <div className="retro-panel p-4">
       <div className="retro-section-title">Livro Bingo</div>
 
-      <div
-        className="relative mx-auto w-full max-w-[560px]"
-        style={{ perspective: "1600px" }}
-      >
+      {isAdminMode && (
+        <div className="flex flex-wrap gap-2 mb-3">
+          <button
+            className="retro-button text-xs"
+            onClick={() => {
+              setShowForm((s) => !s);
+              if (!showForm) { setForm(emptyForm()); setEditingId(null); }
+            }}
+          >
+            {showForm ? "✕ Cancelar" : "➕ Registrar Ninja"}
+          </button>
+          {current && !showForm && (
+            <>
+              <button className="retro-button text-xs" onClick={() => startEdit(current)}>✏️ Editar</button>
+              <button className="retro-button text-xs" onClick={() => removeEntry(current.id)}>🗑️ Excluir</button>
+              <select
+                className="retro-input text-xs"
+                value={current.situacao}
+                onChange={(e) => setSituacao(current.id, e.target.value)}
+              >
+                <option value="ativo">Em Atividade</option>
+                <option value="capturado">✗ Capturado</option>
+                <option value="morto">✗ Morto</option>
+              </select>
+            </>
+          )}
+        </div>
+      )}
+
+      {showForm && isAdminMode && (
+        <div className="retro-panel p-3 mb-4">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="col-span-2">
+              <label className="block text-[10px] uppercase tracking-wide mb-0.5">Fotografia / Desenho</label>
+              <div className="flex items-center gap-2">
+                {form.imagem_url ? (
+                  <img src={form.imagem_url} alt="Prévia da fotografia do ninja" className="w-16 h-16 object-cover border border-border" />
+                ) : null}
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/*"
+                  className="text-[10px]"
+                  onChange={(e) => e.target.files?.[0] && uploadFoto(e.target.files[0])}
+                />
+                {uploading && <span className="text-[10px] text-muted-foreground">Enviando...</span>}
+              </div>
+            </div>
+            {FIELDS.map((f) => field(f.key, f.label, f.long))}
+          </div>
+          <button className="retro-button text-xs mt-3" onClick={save}>
+            {editingId ? "💾 Salvar Alterações" : "📕 Registrar no Livro"}
+          </button>
+        </div>
+      )}
+
+      <div className="relative mx-auto w-full max-w-[560px]" style={{ perspective: "1600px" }}>
         <div
-          className="relative w-full aspect-[3/4] border border-border"
+          className="relative w-full aspect-[3/4] border border-border overflow-hidden"
           style={{ transformStyle: "preserve-3d", ...pageStyle }}
         >
-          {/* Static current page */}
-          <div className="absolute inset-0 p-6 flex flex-col" style={pageStyle}>
-            <div className="text-[11px] uppercase tracking-widest opacity-70">
-              Livro Bingo
-            </div>
-            <div className="flex-1" />
-            <div className="text-center text-[11px] opacity-70">
-              Página {page + 1} / {TOTAL_PAGES}
+          <div className="absolute inset-0 p-5 flex flex-col overflow-y-auto" style={pageStyle}>
+            <div className="text-[11px] uppercase tracking-widest opacity-70">Livro Bingo</div>
+
+            {!current ? (
+              <div className="flex-1 flex items-center justify-center text-xs opacity-60">
+                Nenhum ninja registrado.
+              </div>
+            ) : (
+              <div className="flex-1 mt-2">
+                <div className="flex gap-3">
+                  <div className="w-24 h-28 border-2 border-[hsl(30_35%_30%)] shrink-0 overflow-hidden flex items-center justify-center">
+                    {current.imagem_url ? (
+                      <img src={current.imagem_url} alt={`Fotografia de ${current.nome}`} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-[10px] opacity-60">Sem foto</span>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-lg font-bold leading-tight break-words">{current.nome}</div>
+                    {current.alcunha && <div className="text-xs italic">"{current.alcunha}"</div>}
+                    <div className="text-xs mt-1">Rank de Ameaça: <b>{current.rank_ameaca || "—"}</b></div>
+                    <div className="text-xs">Recompensa: <b>{current.recompensa || "—"}</b></div>
+                    <div className="text-xs">Nível de Sigilo: <b>{current.nivel_sigilo || "—"}</b></div>
+                  </div>
+                </div>
+
+                <div className="mt-3 space-y-1">
+                  {FIELDS.filter((f) => !["nome", "alcunha", "rank_ameaca", "recompensa", "nivel_sigilo"].includes(f.key as string)).map((f) => (
+                    <div key={f.key} className="text-[11px] leading-snug">
+                      <span className="uppercase tracking-wide opacity-70">{f.label}: </span>
+                      <span className="whitespace-pre-wrap">{(current[f.key] as string) || "—"}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="text-center text-[11px] opacity-70 mt-2">
+              Página {Math.min(page + 1, totalPages)} / {totalPages}
             </div>
           </div>
 
-          {/* Flipping page (always hinged on the left, like a real book) */}
+          {current && current.situacao !== "ativo" && (
+            <CapturedMark label={current.situacao === "morto" ? "Morto" : "Capturado"} />
+          )}
+
           {flipping && (
             <div
               key={`${page}-${flipping}`}
@@ -73,15 +306,11 @@ const BingoBook = () => {
               style={{
                 ...pageStyle,
                 transformOrigin: "left center",
-                animation: `${
-                  flipping === "next" ? "bingo-flip-next" : "bingo-flip-prev"
-                } 0.55s ease-in-out forwards`,
+                animation: `${flipping === "next" ? "bingo-flip-next" : "bingo-flip-prev"} 0.55s ease-in-out forwards`,
                 backfaceVisibility: "hidden",
               }}
             >
-              <div className="text-[11px] uppercase tracking-widest opacity-70">
-                Livro Bingo
-              </div>
+              <div className="text-[11px] uppercase tracking-widest opacity-70">Livro Bingo</div>
             </div>
           )}
         </div>
@@ -96,25 +325,14 @@ const BingoBook = () => {
             to { transform: rotateY(0deg); filter: brightness(1); }
           }
         `}</style>
-
       </div>
 
       <div className="flex items-center justify-center gap-3 mt-4">
-        <button
-          className="retro-button text-xs disabled:opacity-40"
-          onClick={() => go("prev")}
-          disabled={page === 0 || !!flipping}
-        >
+        <button className="retro-button text-xs disabled:opacity-40" onClick={() => go("prev")} disabled={page === 0 || !!flipping}>
           ◀ Anterior
         </button>
-        <span className="text-xs text-muted-foreground">
-          {page + 1} / {TOTAL_PAGES}
-        </span>
-        <button
-          className="retro-button text-xs disabled:opacity-40"
-          onClick={() => go("next")}
-          disabled={page === TOTAL_PAGES - 1 || !!flipping}
-        >
+        <span className="text-xs text-muted-foreground">{Math.min(page + 1, totalPages)} / {totalPages}</span>
+        <button className="retro-button text-xs disabled:opacity-40" onClick={() => go("next")} disabled={page >= totalPages - 1 || !!flipping}>
           Próxima ▶
         </button>
       </div>
