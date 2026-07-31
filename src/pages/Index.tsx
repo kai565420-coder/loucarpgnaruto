@@ -132,6 +132,8 @@ const Index = () => {
                 ip={ip || "unknown"}
                 onOpenItem={(item) => openWindow("item", item.id, item)}
               />
+            ) : activeTab === "bingo" ? (
+              <BingoBook />
             ) : activeTab === "personalizados" && isAdminMode ? (
               <PersonalizadoList
                 ip={ip || "unknown"}
