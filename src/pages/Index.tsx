@@ -7,6 +7,7 @@ import CharacterForm from "@/components/CharacterForm";
 import JutsuForm from "@/components/JutsuForm";
 import ItemList from "@/components/ItemList";
 import PersonalizadoList from "@/components/PersonalizadoList";
+import BingoBook from "@/components/BingoBook";
 import JutsuWindow, { type JutsuTaticaContext } from "@/components/JutsuWindow";
 import ItemWindow from "@/components/ItemWindow";
 import { useUserIp } from "@/hooks/useUserIp";
@@ -131,6 +132,8 @@ const Index = () => {
                 ip={ip || "unknown"}
                 onOpenItem={(item) => openWindow("item", item.id, item)}
               />
+            ) : activeTab === "bingo" ? (
+              <BingoBook />
             ) : activeTab === "personalizados" && isAdminMode ? (
               <PersonalizadoList
                 ip={ip || "unknown"}
