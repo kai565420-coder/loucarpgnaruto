@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const TOTAL_PAGES = 8;
 
@@ -11,11 +11,29 @@ const BingoBook = () => {
     if (dir === "next" && page >= TOTAL_PAGES - 1) return;
     if (dir === "prev" && page <= 0) return;
     setFlipping(dir);
+    if (dir === "prev") setPage((p) => p - 1);
     window.setTimeout(() => {
-      setPage((p) => (dir === "next" ? p + 1 : p - 1));
+      if (dir === "next") setPage((p) => p + 1);
       setFlipping(null);
     }, 550);
   };
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        go("next");
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        go("prev");
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
 
   const pageStyle: React.CSSProperties = {
     background:
@@ -47,14 +65,14 @@ const BingoBook = () => {
             </div>
           </div>
 
-          {/* Flipping page */}
+          {/* Flipping page (always hinged on the left, like a real book) */}
           {flipping && (
             <div
               key={`${page}-${flipping}`}
               className="absolute inset-0 p-6"
               style={{
                 ...pageStyle,
-                transformOrigin: flipping === "next" ? "left center" : "right center",
+                transformOrigin: "left center",
                 animation: `${
                   flipping === "next" ? "bingo-flip-next" : "bingo-flip-prev"
                 } 0.55s ease-in-out forwards`,
@@ -71,13 +89,14 @@ const BingoBook = () => {
         <style>{`
           @keyframes bingo-flip-next {
             from { transform: rotateY(0deg); filter: brightness(1); }
-            to { transform: rotateY(-170deg); filter: brightness(0.75); }
+            to { transform: rotateY(-175deg); filter: brightness(0.7); }
           }
           @keyframes bingo-flip-prev {
-            from { transform: rotateY(0deg); filter: brightness(1); }
-            to { transform: rotateY(170deg); filter: brightness(0.75); }
+            from { transform: rotateY(-175deg); filter: brightness(0.7); }
+            to { transform: rotateY(0deg); filter: brightness(1); }
           }
         `}</style>
+
       </div>
 
       <div className="flex items-center justify-center gap-3 mt-4">
