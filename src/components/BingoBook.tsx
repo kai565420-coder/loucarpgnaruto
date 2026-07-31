@@ -65,14 +65,14 @@ const BingoBook = () => {
             </div>
           </div>
 
-          {/* Flipping page */}
+          {/* Flipping page (always hinged on the left, like a real book) */}
           {flipping && (
             <div
               key={`${page}-${flipping}`}
               className="absolute inset-0 p-6"
               style={{
                 ...pageStyle,
-                transformOrigin: flipping === "next" ? "left center" : "right center",
+                transformOrigin: "left center",
                 animation: `${
                   flipping === "next" ? "bingo-flip-next" : "bingo-flip-prev"
                 } 0.55s ease-in-out forwards`,
@@ -89,13 +89,14 @@ const BingoBook = () => {
         <style>{`
           @keyframes bingo-flip-next {
             from { transform: rotateY(0deg); filter: brightness(1); }
-            to { transform: rotateY(-170deg); filter: brightness(0.75); }
+            to { transform: rotateY(-175deg); filter: brightness(0.7); }
           }
           @keyframes bingo-flip-prev {
-            from { transform: rotateY(0deg); filter: brightness(1); }
-            to { transform: rotateY(170deg); filter: brightness(0.75); }
+            from { transform: rotateY(-175deg); filter: brightness(0.7); }
+            to { transform: rotateY(0deg); filter: brightness(1); }
           }
         `}</style>
+
       </div>
 
       <div className="flex items-center justify-center gap-3 mt-4">
