@@ -139,18 +139,6 @@ const Index = () => {
                 ip={ip || "unknown"}
                 onOpenItem={(item) => openWindow("item", item.id, item)}
               />
-            ) : activeTab === "sobre" ? (
-              <div className="retro-panel p-4">
-                <div className="retro-section-title">📖 Sobre o Sistema</div>
-                <p className="text-xs text-foreground leading-relaxed">
-                  Sistema de fichas para RPG de Naruto. Cada jogador pode criar fichas de personagem
-                  com atributos, perícias e imagem. O sistema identifica jogadores pelo IP,
-                  então não é necessário criar conta.
-                </p>
-                <p className="text-xs text-muted-foreground mt-3">
-                  Personagens e universo © Masashi Kishimoto
-                </p>
-              </div>
             ) : null}
           </main>
         </div>
