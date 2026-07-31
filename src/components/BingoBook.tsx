@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const TOTAL_PAGES = 8;
 
@@ -11,11 +11,29 @@ const BingoBook = () => {
     if (dir === "next" && page >= TOTAL_PAGES - 1) return;
     if (dir === "prev" && page <= 0) return;
     setFlipping(dir);
+    if (dir === "prev") setPage((p) => p - 1);
     window.setTimeout(() => {
-      setPage((p) => (dir === "next" ? p + 1 : p - 1));
+      if (dir === "next") setPage((p) => p + 1);
       setFlipping(null);
     }, 550);
   };
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        go("next");
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        go("prev");
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
 
   const pageStyle: React.CSSProperties = {
     background:
