@@ -80,7 +80,7 @@ const CapturedMark = ({ label }: { label: string }) => (
       </g>
     </svg>
     <span
-      className="relative text-[hsl(0_75%_35%)] font-bold uppercase tracking-widest text-2xl border-4 border-[hsl(0_75%_35%)] px-4 py-1 -rotate-[14deg]"
+      className="relative text-[hsl(0_75%_35%)] font-bold uppercase tracking-widest text-lg md:text-2xl border-4 border-[hsl(0_75%_35%)] px-4 py-1 -rotate-[14deg]"
       style={{ background: "hsl(0 0% 100% / 0.25)" }}
     >
       {label}
