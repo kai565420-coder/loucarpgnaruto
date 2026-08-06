@@ -167,6 +167,10 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
     if (expanded) fetchJutsus();
   }, [expanded, fetchJutsus]);
 
+  useEffect(() => {
+    setForm({ ...sheet });
+  }, [sheet]);
+
   const handleNumberChange = (key: string, value: string) => {
     setForm((prev) => ({ ...prev, [key]: parseInt(value) || 0 }));
   };
