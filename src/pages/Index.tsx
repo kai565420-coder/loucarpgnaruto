@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import RetroHeader from "@/components/RetroHeader";
 import RetroSidebar from "@/components/RetroSidebar";
 import RetroFooter from "@/components/RetroFooter";
@@ -13,6 +13,7 @@ import ItemWindow from "@/components/ItemWindow";
 import { useUserIp } from "@/hooks/useUserIp";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Jutsu {
   id: string;
@@ -47,6 +48,30 @@ const Index = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [openWindows, setOpenWindows] = useState<WindowEntry[]>([]);
   const [minimizedWindows, setMinimizedWindows] = useState<MinimizedEntry[]>([]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("schema-db-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "character_sheets" },
+        () => {
+          setRefreshKey((k) => k + 1);
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "character_jutsus" },
+        () => {
+          setRefreshKey((k) => k + 1);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const handleCreated = () => {
     setRefreshKey((k) => k + 1);

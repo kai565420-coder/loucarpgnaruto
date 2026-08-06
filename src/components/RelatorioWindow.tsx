@@ -53,6 +53,10 @@ const RelatorioWindow = ({ sheet, onClose, onUpdated }: RelatorioWindowProps) =>
   const [form, setForm] = useState<Record<string, any>>({ ...sheet });
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    setForm({ ...sheet });
+  }, [sheet]);
+
   const total = MISSOES.reduce((acc, m) => acc + (Number(form[m.key]) || 0), 0);
 
   const handleSave = async () => {

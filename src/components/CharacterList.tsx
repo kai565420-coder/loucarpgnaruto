@@ -33,8 +33,8 @@ const CharacterList = ({ ip, refreshKey, onOpenJutsu, onOpenItem }: CharacterLis
   const [sheets, setSheets] = useState<Tables<"character_sheets">[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchSheets = async () => {
-    setLoading(true);
+  const fetchSheets = async (silent = false) => {
+    if (!silent) setLoading(true);
     const { data, error } = await supabase
       .from("character_sheets")
       .select("*")
@@ -45,11 +45,11 @@ const CharacterList = ({ ip, refreshKey, onOpenJutsu, onOpenItem }: CharacterLis
     } else {
       setSheets(data || []);
     }
-    setLoading(false);
+    if (!silent) setLoading(false);
   };
 
   useEffect(() => {
-    fetchSheets();
+    fetchSheets(refreshKey > 0);
   }, [refreshKey]);
 
   const handleDelete = async (id: string) => {

@@ -36,6 +36,14 @@ const InvocacaoCard = ({
     inv_sanidade: sanidade ?? jutsu.inv_sanidade_max ?? 0,
     inv_chakra: chakra ?? jutsu.inv_chakra_max ?? 0,
   });
+
+  useEffect(() => {
+    setStatus({
+      inv_vida: vida ?? jutsu.inv_vida_max ?? 0,
+      inv_sanidade: sanidade ?? jutsu.inv_sanidade_max ?? 0,
+      inv_chakra: chakra ?? jutsu.inv_chakra_max ?? 0,
+    });
+  }, [vida, sanidade, chakra, jutsu]);
   const [subs, setSubs] = useState<SubLink[]>([]);
   const [showSelector, setShowSelector] = useState(false);
   const [allJutsus, setAllJutsus] = useState<Record<string, any>[]>([]);
