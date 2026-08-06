@@ -80,7 +80,7 @@ const CapturedMark = ({ label }: { label: string }) => (
       </g>
     </svg>
     <span
-      className="relative text-[hsl(0_75%_35%)] font-bold uppercase tracking-widest text-2xl border-4 border-[hsl(0_75%_35%)] px-4 py-1 -rotate-[14deg]"
+      className="relative text-[hsl(0_75%_35%)] font-bold uppercase tracking-widest text-lg md:text-2xl border-4 border-[hsl(0_75%_35%)] px-4 py-1 -rotate-[14deg]"
       style={{ background: "hsl(0 0% 100% / 0.25)" }}
     >
       {label}
@@ -200,7 +200,7 @@ const BingoBook = () => {
   );
 
   const renderPage = (entry: BingoEntry | undefined, num: number) => (
-    <div className="absolute inset-0 p-5 flex flex-col overflow-y-auto" style={pageStyle}>
+    <div className="absolute inset-0 p-5 flex flex-col md:overflow-y-auto overflow-hidden" style={pageStyle}>
       <div className="text-[11px] uppercase tracking-widest opacity-70">Livro Bingo</div>
       {!entry ? (
         <div className="flex-1 flex items-center justify-center text-xs opacity-60">
@@ -217,21 +217,21 @@ const BingoBook = () => {
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="text-2xl font-bold leading-tight break-words">{entry.nome}</div>
-              {entry.alcunha && <div className="text-sm italic">"{entry.alcunha}"</div>}
-              <div className="text-sm mt-2">Rank de Ameaça: <b>{entry.rank_ameaca || "—"}</b></div>
-              <div className="text-sm">Recompensa: <b>{entry.recompensa || "—"}</b></div>
-              <div className="text-sm">Nível de Sigilo: <b>{entry.nivel_sigilo || "—"}</b></div>
-              <div className="text-sm">Vila de Origem: <b>{entry.vila_origem || "—"}</b></div>
-              <div className="text-sm">Afiliação: <b>{entry.afiliacao_atual || "—"}</b></div>
-              <div className="text-sm">Última Localização: <b>{entry.ultima_localizacao || "—"}</b></div>
+              <div className="text-xl md:text-2xl font-bold leading-tight break-words">{entry.nome}</div>
+              {entry.alcunha && <div className="text-xs md:sm italic">"{entry.alcunha}"</div>}
+              <div className="text-[10px] md:text-sm mt-1 md:mt-2">Rank: <b>{entry.rank_ameaca || "—"}</b></div>
+              <div className="text-[10px] md:text-sm">Recompensa: <b>{entry.recompensa || "—"}</b></div>
+              <div className="text-[10px] md:text-sm">Sigilo: <b>{entry.nivel_sigilo || "—"}</b></div>
+              <div className="text-[10px] md:text-sm">Origem: <b>{entry.vila_origem || "—"}</b></div>
+              <div className="text-[10px] md:text-sm">Afiliação: <b>{entry.afiliacao_atual || "—"}</b></div>
+              <div className="text-[10px] md:text-sm">Local: <b>{entry.ultima_localizacao || "—"}</b></div>
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1.5 flex-1 content-start">
+          <div className="mt-2 md:mt-4 grid grid-cols-2 gap-x-2 md:gap-x-4 gap-y-0.5 md:gap-y-1.5 flex-1 content-start overflow-hidden">
             {FIELDS.filter((f) => !["nome", "alcunha", "rank_ameaca", "recompensa", "nivel_sigilo", "vila_origem", "afiliacao_atual", "ultima_localizacao"].includes(f.key as string)).map((f) => (
-              <div key={f.key} className={`text-[12px] leading-snug ${f.long ? "col-span-2" : ""}`}>
-                <span className="uppercase tracking-wide opacity-70">{f.label}: </span>
+              <div key={f.key} className={`text-[9px] md:text-[12px] leading-tight md:leading-snug ${f.long ? "col-span-2" : ""}`}>
+                <span className="uppercase tracking-wide opacity-70 font-bold">{f.label}: </span>
                 <span className="whitespace-pre-wrap">{(entry[f.key] as string) || "—"}</span>
               </div>
             ))}
@@ -310,7 +310,7 @@ const BingoBook = () => {
 
       <div className="relative mx-auto w-full max-w-[760px]" style={{ perspective: "1600px" }}>
         <div
-          className="relative w-full aspect-[3/4] border border-border overflow-hidden"
+          className="relative w-full aspect-[4/5] md:aspect-[3/4] border border-border overflow-hidden"
           style={{ transformStyle: "preserve-3d", ...pageStyle }}
         >
           <div className="absolute inset-0" style={pageStyle}>
