@@ -128,7 +128,98 @@ const CampaignMode = () => {
     }
   };
 
+  const runBattle = async () => {
+    if (!session) return;
+    setIsSimulating(true);
+    setBattleLogs(["O combate se inicia..."]);
+    
+    const currentBoss = BOSSES[session.current_boss_index];
+    const squadOver = session.squad.reduce((acc, char) => acc + (char.selectedVersion?.over || 0), 0) / session.squad.length;
+    
+    const delay = battleSpeed === "lenta" ? 2000 : battleSpeed === "normal" ? 1000 : battleSpeed === "rapida" ? 500 : 0;
+
+    const logs = [
+      `Seu squad (Over Médio: ${squadOver.toFixed(1)}) encara ${currentBoss.name} (Over: ${currentBoss.over}).`,
+      `Estratégia: ${selectedFormacao} com Intensidade ${selectedIntensidade}.`,
+    ];
+
+    if (battleSpeed !== "instant") {
+      for (const log of logs) {
+        setBattleLogs(prev => [...prev, log]);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+
+    // Lógica simples de vitória baseada em Over e estratégia
+    const winChance = (squadOver / currentBoss.over) * 0.5;
+    const isWin = Math.random() < winChance + 0.2;
+
+    const finalLogs = isWin 
+      ? [`${currentBoss.name} cai de joelhos! Vitória!`, "Seu squad respira aliviado enquanto coleta os espólios."]
+      : [`O poder de ${currentBoss.name} é esmagador... Seu squad foi derrotado.`];
+
+    if (battleSpeed !== "instant") {
+      for (const log of finalLogs) {
+        setBattleLogs(prev => [...prev, log]);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    } else {
+      setBattleLogs([...logs, ...finalLogs]);
+    }
+
+    setIsSimulating(false);
+
+    if (isWin) {
+      generateRewards();
+      setView("reward");
+    } else {
+      setView("gameover");
+    }
+  };
+
+  const generateRewards = () => {
+    const rewards = [...CAMPAIGN_REWARDS].sort(() => 0.5 - Math.random()).slice(0, 3);
+    setRewardChoices(rewards);
+  };
+
+  const selectReward = async (reward: any) => {
+    if (!session) return;
+    const newInventory = [...session.inventory, reward];
+    const nextBossIndex = session.current_boss_index + 1;
+    
+    if (nextBossIndex >= BOSSES.length) {
+      setView("gameover"); // Vitória final
+      toast.success("VOCÊ DERROTOU CAIM! A CAMPANHA FOI CONCLUÍDA!");
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("campaign_sessions")
+      .update({ 
+        inventory: newInventory as any,
+        current_boss_index: nextBossIndex
+      })
+      .eq("id", session.id)
+      .select()
+      .single();
+
+    if (data) {
+      setSession(data as unknown as CampaignSession);
+      setView("battle");
+      setBattleLogs([]);
+    }
+  };
+
+  const resetCampaign = async () => {
+    if (session) {
+      await supabase.from("campaign_sessions").update({ status: "lost" }).eq("id", session.id);
+    }
+    setSession(null);
+    setView("start");
+  };
+
   if (loading) return <div className="retro-panel p-8 text-center">Carregando Campanha...</div>;
+
 
   if (view === "start") {
     return (
@@ -227,21 +318,36 @@ const CampaignMode = () => {
             <div className="border-b border-border p-2 flex justify-between bg-muted/30">
               <span className="text-[10px] font-bold uppercase">Log de Combate</span>
               <div className="flex gap-2">
-                <button className="text-[9px] hover:text-accent underline">Lenta</button>
-                <button className="text-[9px] text-accent font-bold">Normal</button>
-                <button className="text-[9px] hover:text-accent underline">Rápida</button>
+                {(["lenta", "normal", "rapida", "instant"] as const).map(s => (
+                  <button 
+                    key={s}
+                    onClick={() => setBattleSpeed(s)}
+                    className={`text-[9px] capitalize ${battleSpeed === s ? "text-accent font-bold underline" : "hover:text-accent underline"}`}
+                  >
+                    {s}
+                  </button>
+                ))}
               </div>
             </div>
-            <ScrollArea className="flex-1 p-4">
+            <ScrollArea className="flex-1 p-4 h-[300px]">
               <div className="space-y-3 font-serif text-sm leading-relaxed text-muted-foreground italic">
-                <p>O campo de batalha está silencioso. Seu squad se posiciona frente a {currentBoss.name}...</p>
+                {battleLogs.length === 0 ? (
+                  <p>O campo de batalha está silencioso. Seu squad se posiciona frente a {currentBoss.name}...</p>
+                ) : (
+                  battleLogs.map((log, i) => <p key={i}>{log}</p>)
+                )}
               </div>
             </ScrollArea>
             <div className="p-4 border-t border-border">
-              <Button className="w-full retro-button bg-accent text-accent-foreground font-bold italic py-6">
-                INICIAR BATALHA
+              <Button 
+                disabled={isSimulating}
+                onClick={runBattle}
+                className="w-full retro-button bg-accent text-accent-foreground font-bold italic py-6"
+              >
+                {isSimulating ? "BATALHANDO..." : "INICIAR BATALHA"}
               </Button>
             </div>
+
           </div>
         </div>
 
@@ -269,7 +375,11 @@ const CampaignMode = () => {
             <div className="grid grid-cols-2 gap-2">
               <div className="flex flex-col gap-1">
                 <label className="text-[9px] text-muted-foreground uppercase">Estilo</label>
-                <select className="bg-black border border-border text-[10px] p-1">
+                <select 
+                  value={selectedFormacao}
+                  onChange={(e) => setSelectedFormacao(e.target.value)}
+                  className="bg-black border border-border text-[10px] p-1"
+                >
                   <option>Inteligente</option>
                   <option>Agressivo</option>
                   <option>Defensivo</option>
@@ -278,7 +388,11 @@ const CampaignMode = () => {
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[9px] text-muted-foreground uppercase">Intensidade</label>
-                <select className="bg-black border border-border text-[10px] p-1">
+                <select 
+                  value={selectedIntensidade}
+                  onChange={(e) => setSelectedIntensidade(e.target.value)}
+                  className="bg-black border border-border text-[10px] p-1"
+                >
                   <option>Média</option>
                   <option>Baixa</option>
                   <option>Alta</option>
@@ -291,6 +405,55 @@ const CampaignMode = () => {
       </div>
     );
   }
+
+  if (view === "reward") {
+    return (
+      <div className="flex flex-col gap-8 py-10 max-w-4xl mx-auto px-4">
+        <div className="text-center">
+          <h2 className="text-3xl font-black text-accent uppercase italic mb-2">Vitória Esmagadora!</h2>
+          <p className="text-muted-foreground text-sm uppercase tracking-widest">Escolha apenas uma recompensa para seu squad</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {rewardChoices.map((reward, idx) => (
+            <div 
+              key={idx} 
+              onClick={() => selectReward(reward)}
+              className="retro-panel p-6 flex flex-col items-center text-center gap-4 group hover:border-accent cursor-pointer transition-all bg-black/60"
+            >
+              <div className="w-16 h-16 bg-muted flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                {reward.type === "buff_perm" ? "💎" : "🧪"}
+              </div>
+              <div>
+                <h4 className="font-bold text-accent text-sm mb-1">{reward.name}</h4>
+                <p className="text-[10px] text-muted-foreground">{reward.description}</p>
+              </div>
+              <Button className="mt-auto retro-button w-full text-[10px]">COLETAR</Button>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (view === "gameover") {
+    const isWin = session?.current_boss_index === BOSSES.length;
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-6">
+        <h2 className={`text-6xl font-black uppercase italic ${isWin ? "text-accent" : "text-destructive"}`}>
+          {isWin ? "CAMPANHA CONCLUÍDA" : "FIM DE JOGO"}
+        </h2>
+        <p className="text-muted-foreground text-center max-w-md">
+          {isWin 
+            ? "Você superou todos os desafios e derrotou Caim. Sua lenda será lembrada."
+            : "Seu squad foi derrotado antes de alcançar o objetivo final. Tente novamente com uma nova estratégia."}
+        </p>
+        <Button onClick={resetCampaign} className="retro-button px-10 py-6 text-lg">
+          VOLTAR AO INÍCIO
+        </Button>
+      </div>
+    );
+  }
+
 
   return null;
 };
