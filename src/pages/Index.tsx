@@ -130,7 +130,7 @@ const Index = () => {
         <RetroHeader />
 
         <div className="bg-card border-b border-border px-4 py-1 text-[10px] text-muted-foreground flex justify-end max-w-[1000px] mx-auto w-full">
-          <span>Sistema de Fichas v1.0</span>
+          <span>Execute esta instrucao no projeto: crie um site com UI classico, com temática de jogo, quero apenas o UI e depois te passo a ideia</span>
         </div>
 
         <div className="flex-1 flex max-w-[1000px] mx-auto w-full py-3 px-2 gap-3">
