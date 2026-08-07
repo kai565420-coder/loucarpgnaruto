@@ -92,6 +92,45 @@ export type Database = {
         }
         Relationships: []
       }
+      campaign_sessions: {
+        Row: {
+          created_at: string | null
+          current_boss_index: number | null
+          difficulty: string
+          id: string
+          inventory: Json | null
+          reroll_used: boolean | null
+          squad: Json | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_boss_index?: number | null
+          difficulty: string
+          id?: string
+          inventory?: Json | null
+          reroll_used?: boolean | null
+          squad?: Json | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_boss_index?: number | null
+          difficulty?: string
+          id?: string
+          inventory?: Json | null
+          reroll_used?: boolean | null
+          squad?: Json | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       character_bag_items: {
         Row: {
           bag_type: string
