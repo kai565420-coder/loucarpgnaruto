@@ -102,6 +102,23 @@ const CampaignMode = () => {
     setCurrentCards(cards);
   };
 
+  const useReroll = async () => {
+    if (!session || session.reroll_used) return;
+    const { data, error } = await supabase
+      .from("campaign_sessions")
+      .update({ reroll_used: true })
+      .eq("id", session.id)
+      .select()
+      .single();
+
+    if (data) {
+      setSession(data as unknown as CampaignSession);
+      generateCards();
+      toast.info("Reroll utilizado!");
+    }
+  };
+
+
   const selectCharacter = async (char: any) => {
     if (!session) return;
     const newSquad = [...session.squad, char];
