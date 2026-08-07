@@ -404,7 +404,11 @@ const CampaignMode = () => {
                 <label className="text-[9px] text-muted-foreground uppercase">Estilo</label>
                 <select 
                   value={selectedFormacao}
-                  onChange={(e) => setSelectedFormacao(e.target.value)}
+                  onChange={async (e) => {
+                    const val = e.target.value;
+                    setSelectedFormacao(val);
+                    if (session) await supabase.from("campaign_sessions").update({ formacao: val }).eq("id", session.id);
+                  }}
                   className="bg-black border border-border text-[10px] p-1"
                 >
                   <option>Inteligente</option>
@@ -417,7 +421,11 @@ const CampaignMode = () => {
                 <label className="text-[9px] text-muted-foreground uppercase">Intensidade</label>
                 <select 
                   value={selectedIntensidade}
-                  onChange={(e) => setSelectedIntensidade(e.target.value)}
+                  onChange={async (e) => {
+                    const val = e.target.value;
+                    setSelectedIntensidade(val);
+                    if (session) await supabase.from("campaign_sessions").update({ intensidade: val }).eq("id", session.id);
+                  }}
                   className="bg-black border border-border text-[10px] p-1"
                 >
                   <option>Média</option>
