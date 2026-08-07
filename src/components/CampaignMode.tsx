@@ -24,6 +24,13 @@ const CampaignMode = () => {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<"start" | "recruitment" | "battle" | "reward" | "gameover">("start");
   const [currentCards, setCurrentCards] = useState<any[]>([]);
+  const [battleLogs, setBattleLogs] = useState<string[]>([]);
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [battleSpeed, setBattleSpeed] = useState<"lenta" | "normal" | "rapida" | "instant">("normal");
+  const [rewardChoices, setRewardChoices] = useState<any[]>([]);
+  const [selectedFormacao, setSelectedFormacao] = useState("Inteligente");
+  const [selectedIntensidade, setSelectedIntensidade] = useState("Média");
+
 
   useEffect(() => {
     fetchSession();
