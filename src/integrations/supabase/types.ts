@@ -97,7 +97,9 @@ export type Database = {
           created_at: string | null
           current_boss_index: number | null
           difficulty: string
+          formacao: string | null
           id: string
+          intensidade: string | null
           inventory: Json | null
           reroll_used: boolean | null
           squad: Json | null
@@ -109,7 +111,9 @@ export type Database = {
           created_at?: string | null
           current_boss_index?: number | null
           difficulty: string
+          formacao?: string | null
           id?: string
+          intensidade?: string | null
           inventory?: Json | null
           reroll_used?: boolean | null
           squad?: Json | null
@@ -121,7 +125,9 @@ export type Database = {
           created_at?: string | null
           current_boss_index?: number | null
           difficulty?: string
+          formacao?: string | null
           id?: string
+          intensidade?: string | null
           inventory?: Json | null
           reroll_used?: boolean | null
           squad?: Json | null

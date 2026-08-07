@@ -14,6 +14,8 @@ interface CampaignSession {
   reroll_used: boolean;
   squad: any[];
   inventory: any[];
+  formacao: string;
+  intensidade: string;
   created_at: string;
   updated_at: string;
 }
@@ -49,6 +51,8 @@ const CampaignMode = () => {
         const normalizedSession = { ...typedData, squad, inventory };
         
         setSession(normalizedSession);
+        setSelectedFormacao(typedData.formacao || "Inteligente");
+        setSelectedIntensidade(typedData.intensidade || "Média");
         if (squad.length < 5) {
           setView("recruitment");
           generateCards();
