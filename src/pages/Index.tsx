@@ -14,6 +14,7 @@ import { useUserIp } from "@/hooks/useUserIp";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
+import CampaignMode from "@/components/CampaignMode";
 
 interface Jutsu {
   id: string;
@@ -164,6 +165,8 @@ const Index = () => {
                 ip={ip || "unknown"}
                 onOpenItem={(item) => openWindow("item", item.id, item)}
               />
+            ) : activeTab === "campanha" ? (
+              <CampaignMode />
             ) : null}
           </main>
         </div>

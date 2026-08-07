@@ -3,17 +3,27 @@ import { BOSSES, CAMPAIGN_CHARACTERS, CAMPAIGN_REWARDS } from "@/data/campaignDa
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAdmin } from "@/contexts/AdminContext";
 
+interface CampaignSession {
+  id: string;
+  user_id: string | null;
+  difficulty: "normal" | "hard";
+  current_boss_index: number;
+  status: "active" | "won" | "lost";
+  reroll_used: boolean;
+  squad: any[];
+  inventory: any[];
+  created_at: string;
+  updated_at: string;
+}
+
 const CampaignMode = () => {
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<CampaignSession | null>(null);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<"start" | "recruitment" | "battle" | "reward" | "gameover">("start");
-  const [recruitmentStep, setRecruitmentStep] = useState(0);
   const [currentCards, setCurrentCards] = useState<any[]>([]);
-  const [difficulty, setDifficulty] = useState<"normal" | "hard">("normal");
 
   useEffect(() => {
     fetchSession();
@@ -28,8 +38,14 @@ const CampaignMode = () => {
         .maybeSingle();
 
       if (data) {
-        setSession(data);
-        if (data.squad.length < 5) {
+        const typedData = data as unknown as CampaignSession;
+        // Ensure JSON fields are treated as arrays
+        const squad = Array.isArray(typedData.squad) ? typedData.squad : [];
+        const inventory = Array.isArray(typedData.inventory) ? typedData.inventory : [];
+        const normalizedSession = { ...typedData, squad, inventory };
+        
+        setSession(normalizedSession);
+        if (squad.length < 5) {
           setView("recruitment");
           generateCards();
         } else {
@@ -44,7 +60,6 @@ const CampaignMode = () => {
   };
 
   const startCampaign = async (diff: "normal" | "hard") => {
-    setDifficulty(diff);
     setLoading(true);
     const { data, error } = await supabase
       .from("campaign_sessions")
@@ -57,7 +72,12 @@ const CampaignMode = () => {
       .single();
 
     if (data) {
-      setSession(data);
+      const typedData = data as unknown as CampaignSession;
+      setSession({
+        ...typedData,
+        squad: Array.isArray(typedData.squad) ? typedData.squad : [],
+        inventory: Array.isArray(typedData.inventory) ? typedData.inventory : []
+      });
       setView("recruitment");
       generateCards();
     }
@@ -76,17 +96,24 @@ const CampaignMode = () => {
   };
 
   const selectCharacter = async (char: any) => {
+    if (!session) return;
     const newSquad = [...session.squad, char];
     const { data, error } = await supabase
       .from("campaign_sessions")
-      .update({ squad: newSquad })
+      .update({ squad: newSquad as any })
       .eq("id", session.id)
       .select()
       .single();
 
     if (data) {
-      setSession(data);
-      if (newSquad.length < 5) {
+      const typedData = data as unknown as CampaignSession;
+      const normalized = {
+        ...typedData,
+        squad: Array.isArray(typedData.squad) ? typedData.squad : [],
+        inventory: Array.isArray(typedData.inventory) ? typedData.inventory : []
+      };
+      setSession(normalized);
+      if (normalized.squad.length < 5) {
         generateCards();
       } else {
         setView("battle");
@@ -121,7 +148,7 @@ const CampaignMode = () => {
     );
   }
 
-  if (view === "recruitment") {
+  if (view === "recruitment" && session) {
     return (
       <div className="flex flex-col gap-6 py-4">
         <div className="flex justify-between items-center px-4">
@@ -171,7 +198,7 @@ const CampaignMode = () => {
     );
   }
 
-  if (view === "battle") {
+  if (view === "battle" && session) {
     const currentBoss = BOSSES[session.current_boss_index];
     return (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
@@ -201,7 +228,6 @@ const CampaignMode = () => {
             <ScrollArea className="flex-1 p-4">
               <div className="space-y-3 font-serif text-sm leading-relaxed text-muted-foreground italic">
                 <p>O campo de batalha está silencioso. Seu squad se posiciona frente a {currentBoss.name}...</p>
-                {/* Narrativa será implementada aqui */}
               </div>
             </ScrollArea>
             <div className="p-4 border-t border-border">
@@ -225,7 +251,7 @@ const CampaignMode = () => {
                       <div className="h-full bg-green-500 w-[100%]"></div>
                     </div>
                   </div>
-                  <div className="text-[10px] font-mono text-accent">{char.selectedVersion.over}</div>
+                  <div className="text-[10px] font-mono text-accent">{char.selectedVersion?.over || "???"}</div>
                 </div>
               ))}
             </div>
