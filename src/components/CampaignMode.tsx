@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useAdmin } from "@/contexts/AdminContext";
 
 interface CampaignSession {
   id: string;
@@ -31,7 +30,6 @@ const CampaignMode = () => {
   const [selectedFormacao, setSelectedFormacao] = useState("Inteligente");
   const [selectedIntensidade, setSelectedIntensidade] = useState("Média");
 
-
   useEffect(() => {
     fetchSession();
   }, []);
@@ -46,7 +44,6 @@ const CampaignMode = () => {
 
       if (data) {
         const typedData = data as unknown as CampaignSession;
-        // Ensure JSON fields are treated as arrays
         const squad = Array.isArray(typedData.squad) ? typedData.squad : [];
         const inventory = Array.isArray(typedData.inventory) ? typedData.inventory : [];
         const normalizedSession = { ...typedData, squad, inventory };
@@ -82,7 +79,7 @@ const CampaignMode = () => {
       const typedData = data as unknown as CampaignSession;
       setSession({
         ...typedData,
-        squad: Array.isArray(typedData.squad) ? typedData.squad : [],
+        squad: [],
         inventory: Array.isArray(typedData.inventory) ? typedData.inventory : []
       });
       setView("recruitment");
@@ -97,7 +94,7 @@ const CampaignMode = () => {
     for (let i = 0; i < 3; i++) {
       const char = shuffled[i];
       const version = char.versions[Math.floor(Math.random() * char.versions.length)];
-      cards.push({ ...char, selectedVersion: version });
+      cards.push({ ...char, selectedVersion: version, currentHp: 100 });
     }
     setCurrentCards(cards);
   };
@@ -117,7 +114,6 @@ const CampaignMode = () => {
       toast.info("Reroll utilizado!");
     }
   };
-
 
   const selectCharacter = async (char: any) => {
     if (!session) return;
@@ -158,6 +154,8 @@ const CampaignMode = () => {
     const logs = [
       `Seu squad (Over Médio: ${squadOver.toFixed(1)}) encara ${currentBoss.name} (Over: ${currentBoss.over}).`,
       `Estratégia: ${selectedFormacao} com Intensidade ${selectedIntensidade}.`,
+      "A luta se intensifica... Golpes são trocados em alta velocidade.",
+      "As habilidades colidem, criando explosões no campo de batalha."
     ];
 
     if (battleSpeed !== "instant") {
@@ -167,9 +165,14 @@ const CampaignMode = () => {
       }
     }
 
-    // Lógica simples de vitória baseada em Over e estratégia
     const winChance = (squadOver / currentBoss.over) * 0.5;
-    const isWin = Math.random() < winChance + 0.2;
+    const isWin = Math.random() < winChance + 0.3;
+
+    const updatedSquad = session.squad.map(char => {
+      const damage = isWin ? Math.random() * 15 : Math.random() * 40;
+      const currentHp = char.currentHp !== undefined ? char.currentHp : 100;
+      return { ...char, currentHp: Math.max(0, currentHp - damage) };
+    });
 
     const finalLogs = isWin 
       ? [`${currentBoss.name} cai de joelhos! Vitória!`, "Seu squad respira aliviado enquanto coleta os espólios."]
@@ -187,6 +190,8 @@ const CampaignMode = () => {
     setIsSimulating(false);
 
     if (isWin) {
+      const { data } = await supabase.from("campaign_sessions").update({ squad: updatedSquad as any }).eq("id", session.id).select().single();
+      if (data) setSession(data as unknown as CampaignSession);
       generateRewards();
       setView("reward");
     } else {
@@ -205,12 +210,13 @@ const CampaignMode = () => {
     const nextBossIndex = session.current_boss_index + 1;
     
     if (nextBossIndex >= BOSSES.length) {
-      setView("gameover"); // Vitória final
+      await supabase.from("campaign_sessions").update({ status: "won", current_boss_index: nextBossIndex }).eq("id", session.id);
+      setView("gameover");
       toast.success("VOCÊ DERROTOU CAIM! A CAMPANHA FOI CONCLUÍDA!");
       return;
     }
 
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("campaign_sessions")
       .update({ 
         inventory: newInventory as any,
@@ -237,7 +243,6 @@ const CampaignMode = () => {
 
   if (loading) return <div className="retro-panel p-8 text-center">Carregando Campanha...</div>;
 
-
   if (view === "start") {
     return (
       <div className="flex flex-col gap-4 max-w-2xl mx-auto py-10">
@@ -246,7 +251,7 @@ const CampaignMode = () => {
         </h1>
         <div className="retro-panel p-6 flex flex-col gap-4 bg-black/60">
           <p className="text-sm leading-relaxed text-muted-foreground">
-            Bem-vindo ao Modo Campanha. Monte seu squad de 5 combatentes através de recrutamento por cartas e derrote todos os 18 chefes até chegar ao lendário Caim.
+            Monte seu squad de 5 combatentes através de recrutamento por cartas e derrote todos os 18 chefes até chegar ao lendário Caim.
           </p>
           <div className="grid grid-cols-2 gap-4 mt-4">
             <button onClick={() => startCampaign("normal")} className="retro-button p-4 text-sm flex flex-col gap-2">
@@ -271,7 +276,6 @@ const CampaignMode = () => {
           {session.difficulty === "normal" && !session.reroll_used && (
             <button onClick={useReroll} className="retro-button px-3 py-1 text-xs">Usar Reroll</button>
           )}
-
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4">
@@ -316,6 +320,8 @@ const CampaignMode = () => {
 
   if (view === "battle" && session) {
     const currentBoss = BOSSES[session.current_boss_index];
+    if (!currentBoss) return null;
+
     return (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
         <div className="lg:col-span-2 flex flex-col gap-4">
@@ -365,7 +371,6 @@ const CampaignMode = () => {
                 {isSimulating ? "BATALHANDO..." : "INICIAR BATALHA"}
               </Button>
             </div>
-
           </div>
         </div>
 
@@ -379,7 +384,7 @@ const CampaignMode = () => {
                   <div className="flex-1 min-w-0">
                     <div className="text-[10px] font-bold truncate uppercase">{char.name}</div>
                     <div className="h-1 bg-muted mt-1 overflow-hidden rounded-full">
-                      <div className="h-full bg-green-500 w-[100%]"></div>
+                      <div className="h-full bg-green-500 transition-all duration-500" style={{ width: `${char.currentHp || 0}%` }}></div>
                     </div>
                   </div>
                   <div className="text-[10px] font-mono text-accent">{char.selectedVersion?.over || "???"}</div>
@@ -387,22 +392,6 @@ const CampaignMode = () => {
               ))}
             </div>
           </div>
-
-          <div className="retro-panel p-4">
-            <h4 className="text-[10px] font-bold uppercase mb-3 text-accent border-b border-accent/30 pb-1">Inventário</h4>
-            <div className="grid grid-cols-5 gap-1">
-              {session.inventory.length === 0 ? (
-                <div className="col-span-5 text-[9px] text-muted-foreground text-center py-2">Vazio</div>
-              ) : (
-                session.inventory.map((item, i) => (
-                  <div key={i} className="aspect-square bg-black/40 border border-border flex items-center justify-center text-sm cursor-help hover:border-accent" title={item.name}>
-                    {item.type === "buff_perm" ? "💎" : "🧪"}
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
 
           <div className="retro-panel p-4">
             <h4 className="text-[10px] font-bold uppercase mb-3 text-accent border-b border-accent/30 pb-1">Estratégia</h4>
@@ -433,6 +422,21 @@ const CampaignMode = () => {
                   <option>Super Alta</option>
                 </select>
               </div>
+            </div>
+          </div>
+
+          <div className="retro-panel p-4">
+            <h4 className="text-[10px] font-bold uppercase mb-3 text-accent border-b border-accent/30 pb-1">Inventário</h4>
+            <div className="grid grid-cols-5 gap-1">
+              {session.inventory.length === 0 ? (
+                <div className="col-span-5 text-[9px] text-muted-foreground text-center py-2">Vazio</div>
+              ) : (
+                session.inventory.map((item, i) => (
+                  <div key={i} className="aspect-square bg-black/40 border border-border flex items-center justify-center text-sm cursor-help hover:border-accent" title={item.name}>
+                    {item.type === "buff_perm" ? "💎" : "🧪"}
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -487,7 +491,6 @@ const CampaignMode = () => {
       </div>
     );
   }
-
 
   return null;
 };
