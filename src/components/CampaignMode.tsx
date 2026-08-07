@@ -269,8 +269,9 @@ const CampaignMode = () => {
         <div className="flex justify-between items-center px-4">
           <h2 className="retro-title text-xl">Recrutamento ({session.squad.length}/5)</h2>
           {session.difficulty === "normal" && !session.reroll_used && (
-            <button className="retro-button px-3 py-1 text-xs">Usar Reroll</button>
+            <button onClick={useReroll} className="retro-button px-3 py-1 text-xs">Usar Reroll</button>
           )}
+
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4">
@@ -386,6 +387,22 @@ const CampaignMode = () => {
               ))}
             </div>
           </div>
+
+          <div className="retro-panel p-4">
+            <h4 className="text-[10px] font-bold uppercase mb-3 text-accent border-b border-accent/30 pb-1">Inventário</h4>
+            <div className="grid grid-cols-5 gap-1">
+              {session.inventory.length === 0 ? (
+                <div className="col-span-5 text-[9px] text-muted-foreground text-center py-2">Vazio</div>
+              ) : (
+                session.inventory.map((item, i) => (
+                  <div key={i} className="aspect-square bg-black/40 border border-border flex items-center justify-center text-sm cursor-help hover:border-accent" title={item.name}>
+                    {item.type === "buff_perm" ? "💎" : "🧪"}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
 
           <div className="retro-panel p-4">
             <h4 className="text-[10px] font-bold uppercase mb-3 text-accent border-b border-accent/30 pb-1">Estratégia</h4>
