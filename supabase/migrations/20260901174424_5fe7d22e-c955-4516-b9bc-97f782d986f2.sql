@@ -1,0 +1,1 @@
+ALTER TABLE public.character_sheets ADD COLUMN IF NOT EXISTS arquivada boolean NOT NULL DEFAULT false;

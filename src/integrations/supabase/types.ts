@@ -236,6 +236,7 @@ export type Database = {
           afinidade_vento: number
           alcunha: string
           analise_combate: number
+          arquivada: boolean
           bolsa_traseira_tamanho: string
           chakra: number
           chakra_max: number
@@ -336,6 +337,7 @@ export type Database = {
           afinidade_vento?: number
           alcunha?: string
           analise_combate?: number
+          arquivada?: boolean
           bolsa_traseira_tamanho?: string
           chakra?: number
           chakra_max?: number
@@ -436,6 +438,7 @@ export type Database = {
           afinidade_vento?: number
           alcunha?: string
           analise_combate?: number
+          arquivada?: boolean
           bolsa_traseira_tamanho?: string
           chakra?: number
           chakra_max?: number
