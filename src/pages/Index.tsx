@@ -148,10 +148,19 @@ const Index = () => {
                 onOpenJutsu={(jutsu, tatica) => openWindow("jutsu", tatica ? `${jutsu.id}-${tatica.personagem}` : jutsu.id, jutsu, tatica)}
                 onOpenItem={(item) => openWindow("item", item.id, item)}
               />
+            ) : activeTab === "arquivados" && isAdminMode ? (
+              <CharacterList
+                ip={ip || "unknown"}
+                refreshKey={refreshKey}
+                archived
+                onOpenJutsu={(jutsu, tatica) => openWindow("jutsu", tatica ? `${jutsu.id}-${tatica.personagem}` : jutsu.id, jutsu, tatica)}
+                onOpenItem={(item) => openWindow("item", item.id, item)}
+              />
             ) : activeTab === "criar" ? (
               <CharacterForm ip={ip || "unknown"} onCreated={handleCreated} />
             ) : activeTab === "criar-jutsu" && isAdminMode ? (
               <JutsuForm ip={ip || "unknown"} onCreated={() => setActiveTab("fichas")} />
+
             ) : activeTab === "itens" ? (
               <ItemList
                 ip={ip || "unknown"}
