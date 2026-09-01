@@ -120,7 +120,7 @@ const pericias = [
   },
 ];
 
-const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOpenItem }: CharacterSheetProps) => {
+const CharacterSheet = ({ sheet, isOwner, onDelete, onArchive, onUpdated, onOpenJutsu, onOpenItem }: CharacterSheetProps) => {
   const { isAdminMode } = useAdmin();
   const canEdit = isOwner || isAdminMode;
   const [expanded, setExpanded] = useState(false);
