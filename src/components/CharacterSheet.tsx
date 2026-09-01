@@ -598,12 +598,18 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
           ) : (
             <>
               <button onClick={() => setEditing(true)} className="retro-button text-xs">✏️ Editar</button>
+              {isAdminMode && onArchive && (
+                <button onClick={onArchive} className="retro-button text-xs">
+                  {sheet.arquivada ? "📤 Desarquivar" : "📦 Arquivar"}
+                </button>
+              )}
               {onDelete && (
                 <button onClick={onDelete} className="retro-button text-xs" style={{ background: "linear-gradient(180deg, hsl(0 70% 45%) 0%, hsl(0 70% 30%) 100%)" }}>
                   🗑️ Deletar
                 </button>
               )}
             </>
+
           )}
         </div>
       )}
