@@ -15,6 +15,8 @@ interface CharacterSheetProps {
   sheet: Tables<"character_sheets">;
   isOwner: boolean;
   onDelete?: () => void;
+  onArchive?: () => void;
+
   onUpdated?: () => void;
   onOpenJutsu?: (jutsu: Jutsu, tatica?: { personagem: string; maestria: string; selosManuais: string; taijutsu?: number; controleChakra?: number }) => void;
   onOpenItem?: (item: { id: string; nome: string; descricao: string; valor: string; peso?: number; imagem_url: string | null }) => void;
