@@ -15,6 +15,8 @@ interface CharacterSheetProps {
   sheet: Tables<"character_sheets">;
   isOwner: boolean;
   onDelete?: () => void;
+  onArchive?: () => void;
+
   onUpdated?: () => void;
   onOpenJutsu?: (jutsu: Jutsu, tatica?: { personagem: string; maestria: string; selosManuais: string; taijutsu?: number; controleChakra?: number }) => void;
   onOpenItem?: (item: { id: string; nome: string; descricao: string; valor: string; peso?: number; imagem_url: string | null }) => void;
@@ -118,7 +120,7 @@ const pericias = [
   },
 ];
 
-const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOpenItem }: CharacterSheetProps) => {
+const CharacterSheet = ({ sheet, isOwner, onDelete, onArchive, onUpdated, onOpenJutsu, onOpenItem }: CharacterSheetProps) => {
   const { isAdminMode } = useAdmin();
   const canEdit = isOwner || isAdminMode;
   const [expanded, setExpanded] = useState(false);
@@ -598,12 +600,18 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onUpdated, onOpenJutsu, onOp
           ) : (
             <>
               <button onClick={() => setEditing(true)} className="retro-button text-xs">✏️ Editar</button>
+              {isAdminMode && onArchive && (
+                <button onClick={onArchive} className="retro-button text-xs">
+                  {sheet.arquivada ? "📤 Desarquivar" : "📦 Arquivar"}
+                </button>
+              )}
               {onDelete && (
                 <button onClick={onDelete} className="retro-button text-xs" style={{ background: "linear-gradient(180deg, hsl(0 70% 45%) 0%, hsl(0 70% 30%) 100%)" }}>
                   🗑️ Deletar
                 </button>
               )}
             </>
+
           )}
         </div>
       )}

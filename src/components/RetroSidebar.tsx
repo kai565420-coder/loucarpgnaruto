@@ -19,6 +19,8 @@ const RetroSidebar = ({ activeTab, onTabChange }: RetroSidebarProps) => {
         { id: "fichas", label: "Ver Fichas", icon: "/images/icon-ver-fichas.png" },
         { id: "criar", label: "Criar Ficha", icon: "/images/icon-criar-ficha.png" },
         ...(isAdminMode ? [{ id: "criar-jutsu", label: "Criar Habilidade", icon: null as string | null }] : []),
+        ...(isAdminMode ? [{ id: "arquivados", label: "Arquivados", icon: null as string | null }] : []),
+
       ],
     },
     {
