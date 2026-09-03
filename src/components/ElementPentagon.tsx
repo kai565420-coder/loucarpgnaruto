@@ -51,6 +51,21 @@ const arcPath = (i: number) => {
   return `M ${x1} ${y1} A ${ARC_R} ${ARC_R} 0 0 1 ${x2} ${y2}`;
 };
 
+const getControleInfo = (valor: number) => {
+  if (valor >= 100) return { titulo: "Suprassumo Shinobi", descricao: "Domínio ou afinidade no nível máximo. Representa o ápice natural daquela característica." };
+  if (valor >= 90) return { titulo: "Mestre Supremo", descricao: "Controle ou aptidão extraordinária, próxima da perfeição." };
+  if (valor >= 80) return { titulo: "Especialista de Elite", descricao: "Shinobi altamente especializado no elemento." };
+  if (valor >= 70) return { titulo: "Especialista", descricao: "Domínio/afinidade muito acima da média." };
+  if (valor >= 60) return { titulo: "Veterano Elemental", descricao: "Grande experiência e excelente capacidade de utilização." };
+  if (valor >= 50) return { titulo: "Adepto Avançado", descricao: "Já possui uma relação sólida com o elemento." };
+  if (valor >= 40) return { titulo: "Adepto", descricao: "Capacidade funcional e consistente." };
+  if (valor >= 30) return { titulo: "Praticante", descricao: "Consegue utilizar o elemento, mas ainda possui limitações." };
+  if (valor >= 20) return { titulo: "Iniciado", descricao: "Conhecimento básico e pouca eficiência." };
+  if (valor >= 10) return { titulo: "Sensível ao Chakra", descricao: "Possui alguma aptidão, mas quase não apresenta especialização." };
+  if (valor >= 1) return { titulo: "Compatibilidade Residual", descricao: "Relação mínima com o elemento." };
+  return { titulo: "Incompatível", descricao: "Nenhuma afinidade ou domínio registrado." };
+};
+
 const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagonProps) => {
   const [view, setView] = useState<"afinidade" | "dominio">("afinidade");
   const [openEl, setOpenEl] = useState<string | null>(null);
