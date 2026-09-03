@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ElementPentagonProps {
   values: Record<string, any>;
@@ -48,6 +49,21 @@ const arcPath = (i: number) => {
   const x2 = CX + Math.cos(a2) * ARC_R;
   const y2 = CY + Math.sin(a2) * ARC_R;
   return `M ${x1} ${y1} A ${ARC_R} ${ARC_R} 0 0 1 ${x2} ${y2}`;
+};
+
+const getControleInfo = (valor: number) => {
+  if (valor >= 100) return { titulo: "Suprassumo Shinobi", descricao: "Domínio ou afinidade no nível máximo. Representa o ápice natural daquela característica." };
+  if (valor >= 90) return { titulo: "Mestre Supremo", descricao: "Controle ou aptidão extraordinária, próxima da perfeição." };
+  if (valor >= 80) return { titulo: "Especialista de Elite", descricao: "Shinobi altamente especializado no elemento." };
+  if (valor >= 70) return { titulo: "Especialista", descricao: "Domínio/afinidade muito acima da média." };
+  if (valor >= 60) return { titulo: "Veterano Elemental", descricao: "Grande experiência e excelente capacidade de utilização." };
+  if (valor >= 50) return { titulo: "Adepto Avançado", descricao: "Já possui uma relação sólida com o elemento." };
+  if (valor >= 40) return { titulo: "Adepto", descricao: "Capacidade funcional e consistente." };
+  if (valor >= 30) return { titulo: "Praticante", descricao: "Consegue utilizar o elemento, mas ainda possui limitações." };
+  if (valor >= 20) return { titulo: "Iniciado", descricao: "Conhecimento básico e pouca eficiência." };
+  if (valor >= 10) return { titulo: "Sensível ao Chakra", descricao: "Possui alguma aptidão, mas quase não apresenta especialização." };
+  if (valor >= 1) return { titulo: "Compatibilidade Residual", descricao: "Relação mínima com o elemento." };
+  return { titulo: "Incompatível", descricao: "Nenhuma afinidade ou domínio registrado." };
 };
 
 const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagonProps) => {
@@ -165,7 +181,7 @@ const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagon
                   Buffs de {atual.label}
                 </DialogTitle>
               </DialogHeader>
-              <div className="text-[11px] flex gap-4 mb-2">
+              <div className="text-[11px] flex flex-wrap gap-3 mb-2">
                 <span>
                   Afinidade: <span className="text-accent font-bold">{clamp(values[`afinidade_${atual.key}`] ?? 0)}%</span>
                 </span>
@@ -175,7 +191,24 @@ const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagon
                     {clamp(values[`dominio_${atual.key}`] ?? 0)}%
                   </span>
                 </span>
+                <span>
+                  Controle: <span className="font-bold text-primary">{Math.round((clamp(values[`afinidade_${atual.key}`] ?? 0) + clamp(values[`dominio_${atual.key}`] ?? 0)) / 2)}%</span>
+                </span>
               </div>
+              <TooltipProvider delayDuration={100}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="inline-flex mb-3 cursor-help">
+                      <span className="retro-label text-[10px] px-2 py-1 border-2 border-primary text-primary">
+                        {getControleInfo(Math.round((clamp(values[`afinidade_${atual.key}`] ?? 0) + clamp(values[`dominio_${atual.key}`] ?? 0)) / 2)).titulo}
+                      </span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="retro-panel max-w-[260px] text-xs">
+                    {getControleInfo(Math.round((clamp(values[`afinidade_${atual.key}`] ?? 0) + clamp(values[`dominio_${atual.key}`] ?? 0)) / 2)).descricao}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               {editing && canEdit ? (
                 <textarea
                   className="retro-input w-full min-h-[160px] text-xs"
