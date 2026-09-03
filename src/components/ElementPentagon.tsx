@@ -51,19 +51,19 @@ const arcPath = (i: number) => {
   return `M ${x1} ${y1} A ${ARC_R} ${ARC_R} 0 0 1 ${x2} ${y2}`;
 };
 
-const getControleInfo = (valor: number) => {
-  if (valor >= 100) return { titulo: "Suprassumo Shinobi", descricao: "Domínio ou afinidade no nível máximo. Representa o ápice natural daquela característica." };
-  if (valor >= 90) return { titulo: "Mestre Supremo", descricao: "Controle ou aptidão extraordinária, próxima da perfeição." };
-  if (valor >= 80) return { titulo: "Especialista de Elite", descricao: "Shinobi altamente especializado no elemento." };
-  if (valor >= 70) return { titulo: "Especialista", descricao: "Domínio/afinidade muito acima da média." };
-  if (valor >= 60) return { titulo: "Veterano Elemental", descricao: "Grande experiência e excelente capacidade de utilização." };
-  if (valor >= 50) return { titulo: "Adepto Avançado", descricao: "Já possui uma relação sólida com o elemento." };
-  if (valor >= 40) return { titulo: "Adepto", descricao: "Capacidade funcional e consistente." };
-  if (valor >= 30) return { titulo: "Praticante", descricao: "Consegue utilizar o elemento, mas ainda possui limitações." };
-  if (valor >= 20) return { titulo: "Iniciado", descricao: "Conhecimento básico e pouca eficiência." };
-  if (valor >= 10) return { titulo: "Sensível ao Chakra", descricao: "Possui alguma aptidão, mas quase não apresenta especialização." };
-  if (valor >= 1) return { titulo: "Compatibilidade Residual", descricao: "Relação mínima com o elemento." };
-  return { titulo: "Incompatível", descricao: "Nenhuma afinidade ou domínio registrado." };
+const getControleInfo = (afinidade: number, dominio: number) => {
+  if (dominio === 0) return { titulo: "Incapaz de Utilizar", descricao: "Domínio igual a 0%. Afinidade sozinha não permite utilizar o elemento." };
+  const efetivo = Math.min(afinidade, dominio);
+  if (efetivo >= 100) return { titulo: "👑 Suprassumo Shinobi", descricao: "Afinidade 100% + Domínio 100%. O ápice natural do elemento." };
+  if (efetivo >= 90) return { titulo: "Mestre Absoluto", descricao: "Ambos os valores são 90% ou mais. Controle extraordinário." };
+  if (efetivo >= 80) return { titulo: "Especialista de Elite", descricao: "Ambos os valores são 80% ou mais. Altamente especializado." };
+  if (efetivo >= 70) return { titulo: "Especialista Superior", descricao: "Ambos os valores são 70% ou mais. Domínio muito acima da média." };
+  if (efetivo >= 60) return { titulo: "Mestre Elemental", descricao: "Ambos os valores são 60% ou mais. Grande experiência e capacidade." };
+  if (efetivo >= 50) return { titulo: "Adepto Avançado", descricao: "Ambos os valores são 50% ou mais. Relação sólida com o elemento." };
+  if (efetivo >= 40) return { titulo: "Adepto Elemental", descricao: "Ambos os valores são 40% ou mais. Capacidade funcional consistente." };
+  if (efetivo >= 30) return { titulo: "Praticante", descricao: "Ambos os valores são 30% ou mais. Consegue usar, mas ainda possui limitações." };
+  if (efetivo >= 20) return { titulo: "Iniciado", descricao: "Ambos os valores são 20% ou mais. Conhecimento básico e eficiência inicial." };
+  return { titulo: "Sensibilidade Elemental", descricao: "Ambos maiores que 0%, mas abaixo de 20%. Aptidão presente, mas sem domínio real." };
 };
 
 const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagonProps) => {
@@ -200,12 +200,12 @@ const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagon
                   <TooltipTrigger asChild>
                     <div className="inline-flex mb-3 cursor-help">
                       <span className="retro-label text-[10px] px-2 py-1 border-2 border-primary text-primary">
-                        {getControleInfo(Math.round((clamp(values[`afinidade_${atual.key}`] ?? 0) + clamp(values[`dominio_${atual.key}`] ?? 0)) / 2)).titulo}
+                        {getControleInfo(clamp(values[`afinidade_${atual.key}`] ?? 0), clamp(values[`dominio_${atual.key}`] ?? 0)).titulo}
                       </span>
                     </div>
                   </TooltipTrigger>
                   <TooltipContent side="bottom" className="retro-panel max-w-[260px] text-xs">
-                    {getControleInfo(Math.round((clamp(values[`afinidade_${atual.key}`] ?? 0) + clamp(values[`dominio_${atual.key}`] ?? 0)) / 2)).descricao}
+                    {getControleInfo(clamp(values[`afinidade_${atual.key}`] ?? 0), clamp(values[`dominio_${atual.key}`] ?? 0)).descricao}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
