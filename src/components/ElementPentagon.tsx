@@ -181,7 +181,7 @@ const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagon
                   Buffs de {atual.label}
                 </DialogTitle>
               </DialogHeader>
-              <div className="text-[11px] flex gap-4 mb-2">
+              <div className="text-[11px] flex flex-wrap gap-3 mb-2">
                 <span>
                   Afinidade: <span className="text-accent font-bold">{clamp(values[`afinidade_${atual.key}`] ?? 0)}%</span>
                 </span>
@@ -191,7 +191,24 @@ const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagon
                     {clamp(values[`dominio_${atual.key}`] ?? 0)}%
                   </span>
                 </span>
+                <span>
+                  Controle: <span className="font-bold text-primary">{Math.round((clamp(values[`afinidade_${atual.key}`] ?? 0) + clamp(values[`dominio_${atual.key}`] ?? 0)) / 2)}%</span>
+                </span>
               </div>
+              <TooltipProvider delayDuration={100}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="inline-flex mb-3 cursor-help">
+                      <span className="retro-label text-[10px] px-2 py-1 border-2 border-primary text-primary">
+                        {getControleInfo(Math.round((clamp(values[`afinidade_${atual.key}`] ?? 0) + clamp(values[`dominio_${atual.key}`] ?? 0)) / 2)).titulo}
+                      </span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="retro-panel max-w-[260px] text-xs">
+                    {getControleInfo(Math.round((clamp(values[`afinidade_${atual.key}`] ?? 0) + clamp(values[`dominio_${atual.key}`] ?? 0)) / 2)).descricao}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               {editing && canEdit ? (
                 <textarea
                   className="retro-input w-full min-h-[160px] text-xs"
