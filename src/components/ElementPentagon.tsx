@@ -200,12 +200,12 @@ const ElementPentagon = ({ values, editing, canEdit, onChange }: ElementPentagon
                   <TooltipTrigger asChild>
                     <div className="inline-flex mb-3 cursor-help">
                       <span className="retro-label text-[10px] px-2 py-1 border-2 border-primary text-primary">
-                        {getControleInfo(Math.round((clamp(values[`afinidade_${atual.key}`] ?? 0) + clamp(values[`dominio_${atual.key}`] ?? 0)) / 2)).titulo}
+                        {getControleInfo(clamp(values[`afinidade_${atual.key}`] ?? 0), clamp(values[`dominio_${atual.key}`] ?? 0)).titulo}
                       </span>
                     </div>
                   </TooltipTrigger>
                   <TooltipContent side="bottom" className="retro-panel max-w-[260px] text-xs">
-                    {getControleInfo(Math.round((clamp(values[`afinidade_${atual.key}`] ?? 0) + clamp(values[`dominio_${atual.key}`] ?? 0)) / 2)).descricao}
+                    {getControleInfo(clamp(values[`afinidade_${atual.key}`] ?? 0), clamp(values[`dominio_${atual.key}`] ?? 0)).descricao}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
