@@ -38,7 +38,6 @@ interface CharacterJutsuLink {
   jutsu_id: string;
   maestria_nivel: string;
   inv_vida: number | null;
-  inv_sanidade: number | null;
   inv_chakra: number | null;
 }
 
@@ -137,7 +136,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onArchive, onUpdated, onOpen
   const fetchJutsus = useCallback(async () => {
     const { data: links } = await supabase
       .from("character_jutsus")
-      .select("id, jutsu_id, maestria_nivel, inv_vida, inv_sanidade, inv_chakra")
+      .select("id, jutsu_id, maestria_nivel, inv_vida, inv_chakra")
       .eq("character_id", sheet.id);
 
     const typedLinks: CharacterJutsuLink[] = (links || []).map((l: any) => ({
@@ -145,7 +144,6 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onArchive, onUpdated, onOpen
       jutsu_id: l.jutsu_id,
       maestria_nivel: l.maestria_nivel || "I",
       inv_vida: l.inv_vida ?? null,
-      inv_sanidade: l.inv_sanidade ?? null,
       inv_chakra: l.inv_chakra ?? null,
     }));
     setJutsuLinks(typedLinks);
