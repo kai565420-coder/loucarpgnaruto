@@ -14,7 +14,7 @@ const defaultValues = {
   elementos: "",
   classe: "",
   talento: "",
-  vida: 0, vida_max: 0, sanidade: 0, sanidade_max: 0, forca_fisica: 0, destreza: 0, deslocamento: 0, chakra: 0, chakra_max: 0,
+  vida: 0, vida_max: 0, forca_fisica: 0, destreza: 0, deslocamento: 0, chakra: 0, chakra_max: 0,
   bolsa_traseira_tamanho: "pequena", dinheiro: 0, selos_manuais: "",
   taijutsu: 0, forca_bruta: 0, imobilizacao: 0,
   acrobacia: 0, furtividade: 0, shurikenjutsu: 0, kenjutsu: 0, reflexos_ninja: 0, iniciativa: 0,
@@ -33,7 +33,6 @@ const atributos = [
 
 const barAtributos = [
   { key: "vida", maxKey: "vida_max", label: "Vida" },
-  { key: "sanidade", maxKey: "sanidade_max", label: "Sanidade" },
   { key: "chakra", maxKey: "chakra_max", label: "Chakra" },
 ];
 
@@ -199,9 +198,9 @@ const CharacterForm = ({ ip, onCreated }: CharacterFormProps) => {
         </div>
       </div>
 
-      {/* Barras Vida/Sanidade/Chakra */}
+      {/* Barras Vida/Chakra */}
       <div className="retro-panel p-3 mb-3">
-        <div className="retro-section-title text-sm">Vida / Sanidade / Chakra</div>
+        <div className="retro-section-title text-sm">Vida / Chakra</div>
         <div className="grid grid-cols-1 gap-2">
           {barAtributos.map(({ key, maxKey, label }) => (
             <div key={key} className="flex items-center gap-2">
