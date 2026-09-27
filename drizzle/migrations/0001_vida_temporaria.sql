@@ -1,2 +1,0 @@
-ALTER TABLE public.character_sheets ADD COLUMN IF NOT EXISTS vida_temp integer NOT NULL DEFAULT 0;
-ALTER TABLE public.character_jutsus ADD COLUMN IF NOT EXISTS inv_vida_temp integer NOT NULL DEFAULT 0;

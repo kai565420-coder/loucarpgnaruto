@@ -12,7 +12,6 @@ interface InvocacaoCardProps {
   maestria: string;
   vida: number | null;
   chakra: number | null;
-  vidaTemp?: number | null;
   canEdit: boolean;
   editing: boolean;
   onMaestriaChange: (jutsuId: string, level: string) => void;
@@ -28,22 +27,20 @@ interface SubLink {
 }
 
 const InvocacaoCard = ({
-  linkId, jutsu, maestria, vida, chakra, vidaTemp, canEdit, editing, onMaestriaChange, onOpenJutsu,
+  linkId, jutsu, maestria, vida, chakra, canEdit, editing, onMaestriaChange, onOpenJutsu,
 }: InvocacaoCardProps) => {
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState({
     inv_vida: vida ?? jutsu.inv_vida_max ?? 0,
     inv_chakra: chakra ?? jutsu.inv_chakra_max ?? 0,
-    inv_vida_temp: vidaTemp ?? 0,
   });
 
   useEffect(() => {
     setStatus({
       inv_vida: vida ?? jutsu.inv_vida_max ?? 0,
-      inv_chakra: chakra ?? jutsu.inv_chakra_max ?? 0,
-      inv_vida_temp: vidaTemp ?? 0,
+        inv_chakra: chakra ?? jutsu.inv_chakra_max ?? 0,
     });
-  }, [vida, chakra, vidaTemp, jutsu]);
+  }, [vida, chakra, jutsu]);
   const [subs, setSubs] = useState<SubLink[]>([]);
   const [showSelector, setShowSelector] = useState(false);
   const [allJutsus, setAllJutsus] = useState<Record<string, any>[]>([]);
@@ -159,21 +156,6 @@ const InvocacaoCard = ({
       {open && (
         <div className="p-2">
           {bar("💖 Vida", "inv_vida", "inv_vida_max", "hsl(0 70% 45%)")}
-          <div className="flex justify-between items-center text-[10px] mb-2 border border-accent/50 px-2 py-1">
-            <span className="retro-label">🛡️ Vida Temporária:</span>
-            {podeEditar ? (
-              <input
-                type="number"
-                min={0}
-                className="retro-input w-12 text-center text-[10px]"
-                value={status.inv_vida_temp}
-                onChange={(e) => setStatus((prev) => ({ ...prev, inv_vida_temp: parseInt(e.target.value) || 0 }))}
-                onBlur={(e) => saveStatus("inv_vida_temp", parseInt(e.target.value) || 0)}
-              />
-            ) : (
-              <span className="text-accent font-bold">+{status.inv_vida_temp}</span>
-            )}
-          </div>
           {bar("🌀 Chakra", "inv_chakra", "inv_chakra_max", "hsl(200 80% 50%)")}
 
           <div className="grid grid-cols-2 gap-2 mt-2 mb-2">
