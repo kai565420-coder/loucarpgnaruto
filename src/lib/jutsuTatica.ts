@@ -84,8 +84,6 @@ export interface TaticaResultado {
   taijutsuValor?: number;
   genjutsu?: boolean;
   controleChakra?: number;
-  dtCaptura?: number;
-  capturaTotal?: number;
   selosBase: number;
   selosEfetivos: number;
   reducao: number;
@@ -104,7 +102,6 @@ export function calcularTatica(params: {
   selosManuais: string;
   taijutsu?: number;
   controleChakra?: number;
-  dtCaptura?: number;
 }): TaticaResultado | null {
   if (params.alcance === "taijutsu") {
     const valor = Math.max(0, params.taijutsu || 0);
@@ -147,16 +144,11 @@ export function calcularTatica(params: {
     const bonusTotal = count.mod + selosManuaisMod;
 
     const controleChakra = Math.max(0, params.controleChakra || 0);
-    const dtCaptura = Math.max(0, params.dtCaptura || 0);
-    // Selos que ajudam o oponente (mod positivo) reduzem a DT final de captura
-    const capturaTotal = controleChakra + dtCaptura - bonusTotal;
 
     return {
       alcanceJutsu: "genjutsu",
       genjutsu: true,
       controleChakra,
-      dtCaptura,
-      capturaTotal,
       selosBase,
       selosEfetivos,
       reducao,

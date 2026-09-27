@@ -11,7 +11,6 @@ interface InvocacaoCardProps {
   jutsu: Record<string, any>;
   maestria: string;
   vida: number | null;
-  sanidade: number | null;
   chakra: number | null;
   canEdit: boolean;
   editing: boolean;
@@ -28,22 +27,20 @@ interface SubLink {
 }
 
 const InvocacaoCard = ({
-  linkId, jutsu, maestria, vida, sanidade, chakra, canEdit, editing, onMaestriaChange, onOpenJutsu,
+  linkId, jutsu, maestria, vida, chakra, canEdit, editing, onMaestriaChange, onOpenJutsu,
 }: InvocacaoCardProps) => {
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState({
     inv_vida: vida ?? jutsu.inv_vida_max ?? 0,
-    inv_sanidade: sanidade ?? jutsu.inv_sanidade_max ?? 0,
     inv_chakra: chakra ?? jutsu.inv_chakra_max ?? 0,
   });
 
   useEffect(() => {
     setStatus({
       inv_vida: vida ?? jutsu.inv_vida_max ?? 0,
-      inv_sanidade: sanidade ?? jutsu.inv_sanidade_max ?? 0,
-      inv_chakra: chakra ?? jutsu.inv_chakra_max ?? 0,
+        inv_chakra: chakra ?? jutsu.inv_chakra_max ?? 0,
     });
-  }, [vida, sanidade, chakra, jutsu]);
+  }, [vida, chakra, jutsu]);
   const [subs, setSubs] = useState<SubLink[]>([]);
   const [showSelector, setShowSelector] = useState(false);
   const [allJutsus, setAllJutsus] = useState<Record<string, any>[]>([]);
@@ -159,7 +156,6 @@ const InvocacaoCard = ({
       {open && (
         <div className="p-2">
           {bar("💖 Vida", "inv_vida", "inv_vida_max", "hsl(0 70% 45%)")}
-          {bar("🧠 Sanidade", "inv_sanidade", "inv_sanidade_max", "hsl(210 70% 45%)")}
           {bar("🌀 Chakra", "inv_chakra", "inv_chakra_max", "hsl(200 80% 50%)")}
 
           <div className="grid grid-cols-2 gap-2 mt-2 mb-2">

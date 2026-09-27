@@ -24,7 +24,6 @@ export const INVOCACAO_ATRIBUTOS = [
 export const INVOCACAO_NUM_FIELDS = [
   "custo_invocacao",
   "inv_vida_max",
-  "inv_sanidade_max",
   "inv_chakra_max",
   ...INVOCACAO_ATRIBUTOS.map((a) => a.key),
   ...INVOCACAO_PERICIAS.map((p) => p.key),

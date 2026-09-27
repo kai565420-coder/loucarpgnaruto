@@ -1,6 +1,8 @@
 import ResizableWindow from "./ResizableWindow";
 import { calcularTatica, fmtMod, ALCANCES, ALCANCE_TAIJUTSU, ALCANCE_GENJUTSU } from "@/lib/jutsuTatica";
 import { getJutsuEmoji } from "@/lib/jutsuEmoji";
+import GenjutsuEfeitosView from "./GenjutsuEfeitosView";
+import { parseEfeitos } from "@/lib/genjutsuEfeitos";
 
 interface Jutsu {
   id: string;
@@ -9,7 +11,9 @@ interface Jutsu {
   imagem_url: string | null;
   qtd_selos?: number | null;
   alcance?: string | null;
-  dt_captura?: number | null;
+  rank?: string | null;
+  efeito_base?: number | null;
+  genjutsu_efeitos?: any;
   categoria?: string | null;
 }
 
@@ -49,7 +53,6 @@ const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition, tatica }: Ju
         selosManuais: tatica.selosManuais,
         taijutsu: tatica.taijutsu,
         controleChakra: tatica.controleChakra,
-        dtCaptura: jutsu.dt_captura ?? 0,
       })
     : null;
 
@@ -74,6 +77,10 @@ const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition, tatica }: Ju
       <div className="text-xs text-foreground whitespace-pre-wrap leading-relaxed">
         {renderBoldText(jutsu.informacoes || "Sem informações.")}
       </div>
+
+      {jutsu.alcance === "genjutsu" && !isInvocacao && (
+        <GenjutsuEfeitosView efeitos={parseEfeitos(jutsu.genjutsu_efeitos)} efeitoBase={jutsu.efeito_base ?? 0} rank={jutsu.rank} />
+      )}
 
       {tatica && !isInvocacao && (
         <div className="mt-4 border-t-2 border-accent/50 pt-2">
@@ -101,18 +108,6 @@ const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition, tatica }: Ju
                     <div>
                       Selos Manuais {tatica.selosManuais || "—"} → {fmtMod(resultado.selosManuaisMod)}
                       {resultado.selosEfetivos === 0 && " (não acumula com 0 selos)"}
-                    </div>
-                    <div className="mt-1">
-                      Controle de Chakra <span className="text-accent font-bold">{resultado.controleChakra}</span> + DT de Captura{" "}
-                      <span className="text-accent font-bold">{resultado.dtCaptura}</span>
-                      {resultado.bonusTotal !== 0 && <> {resultado.bonusTotal > 0 ? "−" : "+"} {Math.abs(resultado.bonusTotal)} (selos)</>}
-                    </div>
-                    <div className="text-accent font-bold text-xs mt-1">
-                      DT total de captura: {resultado.capturaTotal}
-                      {resultado.vantagem && " · oponente com vantagem de roll"}
-                    </div>
-                    <div className="mt-1">
-                      O oponente resiste com <b>Conhecimento Shinobi</b> (ou <b>Conhecimento de Clãs</b>) contra essa DT.
                     </div>
                   </>
                 ) : resultado.taijutsu ? (

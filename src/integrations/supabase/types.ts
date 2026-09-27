@@ -593,6 +593,8 @@ export type Database = {
           created_at: string
           custo_invocacao: number
           dt_captura: number
+          efeito_base: number
+          genjutsu_efeitos: Json
           id: string
           imagem_url: string | null
           informacoes: string
@@ -618,6 +620,7 @@ export type Database = {
           inv_vida_max: number
           nome: string
           qtd_selos: number
+          rank: string
         }
         Insert: {
           alcance?: string
@@ -625,6 +628,8 @@ export type Database = {
           created_at?: string
           custo_invocacao?: number
           dt_captura?: number
+          efeito_base?: number
+          genjutsu_efeitos?: Json
           id?: string
           imagem_url?: string | null
           informacoes?: string
@@ -650,6 +655,7 @@ export type Database = {
           inv_vida_max?: number
           nome: string
           qtd_selos?: number
+          rank?: string
         }
         Update: {
           alcance?: string
@@ -657,6 +663,8 @@ export type Database = {
           created_at?: string
           custo_invocacao?: number
           dt_captura?: number
+          efeito_base?: number
+          genjutsu_efeitos?: Json
           id?: string
           imagem_url?: string | null
           informacoes?: string
@@ -682,6 +690,7 @@ export type Database = {
           inv_vida_max?: number
           nome?: string
           qtd_selos?: number
+          rank?: string
         }
         Relationships: []
       }

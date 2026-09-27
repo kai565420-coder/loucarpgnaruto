@@ -38,7 +38,6 @@ interface CharacterJutsuLink {
   jutsu_id: string;
   maestria_nivel: string;
   inv_vida: number | null;
-  inv_sanidade: number | null;
   inv_chakra: number | null;
 }
 
@@ -51,7 +50,6 @@ const atributos = [
 
 const barAtributos = [
   { key: "vida", maxKey: "vida_max", label: "Vida", color: "hsl(0 70% 45%)" },
-  { key: "sanidade", maxKey: "sanidade_max", label: "Sanidade", color: "hsl(210 70% 45%)" },
   { key: "chakra", maxKey: "chakra_max", label: "Chakra", color: "hsl(200 80% 50%)" },
 ];
 
@@ -138,7 +136,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onArchive, onUpdated, onOpen
   const fetchJutsus = useCallback(async () => {
     const { data: links } = await supabase
       .from("character_jutsus")
-      .select("id, jutsu_id, maestria_nivel, inv_vida, inv_sanidade, inv_chakra")
+      .select("id, jutsu_id, maestria_nivel, inv_vida, inv_chakra")
       .eq("character_id", sheet.id);
 
     const typedLinks: CharacterJutsuLink[] = (links || []).map((l: any) => ({
@@ -146,7 +144,6 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onArchive, onUpdated, onOpen
       jutsu_id: l.jutsu_id,
       maestria_nivel: l.maestria_nivel || "I",
       inv_vida: l.inv_vida ?? null,
-      inv_sanidade: l.inv_sanidade ?? null,
       inv_chakra: l.inv_chakra ?? null,
     }));
     setJutsuLinks(typedLinks);
@@ -188,7 +185,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onArchive, onUpdated, onOpen
       .update({
         nome: form.nome, idade: form.idade, rank_ninja: form.rank_ninja, elementos: form.elementos, classe: form.classe, talento: form.talento,
         imagem_url: form.imagem_url,
-        vida: form.vida, vida_max: form.vida_max, sanidade: form.sanidade, sanidade_max: form.sanidade_max,
+        vida: form.vida, vida_max: form.vida_max,
         chakra: form.chakra, chakra_max: form.chakra_max, forca_fisica: form.forca_fisica, destreza: form.destreza, deslocamento: form.deslocamento,
         bolsa_traseira_tamanho: form.bolsa_traseira_tamanho,
         dinheiro: form.dinheiro,
@@ -269,7 +266,6 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onArchive, onUpdated, onOpen
         <div className="flex gap-3 ml-auto items-center">
           <span className="text-[10px] text-foreground">💖 {(sheet as any).vida ?? 0}/{(sheet as any).vida_max ?? 0}</span>
           <span className="text-[10px] text-foreground">🌀 {(sheet as any).chakra ?? 0}/{(sheet as any).chakra_max ?? 0}</span>
-          <span className="text-[10px] text-foreground">🧠 {(sheet as any).sanidade ?? 0}/{(sheet as any).sanidade_max ?? 0}</span>
           <span className="text-muted-foreground text-[10px]">▼</span>
         </div>
       </div>
@@ -571,7 +567,6 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onArchive, onUpdated, onOpen
                       jutsu={inv}
                       maestria={link.maestria_nivel}
                       vida={link.inv_vida}
-                      sanidade={link.inv_sanidade}
                       chakra={link.inv_chakra}
                       canEdit={canEdit}
                       editing={editing}
