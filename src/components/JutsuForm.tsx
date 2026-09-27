@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import { getJutsuEmoji } from "@/lib/jutsuEmoji";
 import JutsuWindow from "./JutsuWindow";
 import { ALCANCES, ALCANCE_TAIJUTSU, ALCANCE_GENJUTSU } from "@/lib/jutsuTatica";
+import GenjutsuEfeitosEditor from "./GenjutsuEfeitosEditor";
+import { GenjutsuEfeitos, emptyEfeitos, parseEfeitos, MAX_PRIMARIOS } from "@/lib/genjutsuEfeitos";
 import { INVOCACAO_ATRIBUTOS, INVOCACAO_PERICIAS, INVOCACAO_NUM_FIELDS } from "@/lib/invocacao";
 
 interface JutsuFormProps {
@@ -20,7 +22,6 @@ interface Jutsu {
   created_at: string;
   qtd_selos?: number | null;
   alcance?: string | null;
-  dt_captura?: number | null;
   [key: string]: any;
 }
 
@@ -30,7 +31,9 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
   const [categoria, setCategoria] = useState("jutsu");
   const [qtdSelos, setQtdSelos] = useState("0");
   const [alcance, setAlcance] = useState("");
-  const [dtCaptura, setDtCaptura] = useState("0");
+  const [rank, setRank] = useState("C");
+  const [efeitoBase, setEfeitoBase] = useState("0");
+  const [efeitos, setEfeitos] = useState<GenjutsuEfeitos>(emptyEfeitos());
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [jutsus, setJutsus] = useState<Jutsu[]>([]);
@@ -95,7 +98,9 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
     setCategoria(jutsu.categoria || "jutsu");
     setQtdSelos(String(jutsu.qtd_selos ?? 0));
     setAlcance(jutsu.alcance || "");
-    setDtCaptura(String(jutsu.dt_captura ?? 0));
+    setRank(jutsu.rank || "C");
+    setEfeitoBase(String(jutsu.efeito_base ?? 0));
+    setEfeitos(parseEfeitos(jutsu.genjutsu_efeitos));
     setInvStats(Object.fromEntries(INVOCACAO_NUM_FIELDS.map((k) => [k, (jutsu as any)[k] ?? 0])) as Record<string, number>);
     setImageFile(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -108,7 +113,9 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
     setCategoria("jutsu");
     setQtdSelos("0");
     setAlcance("");
-    setDtCaptura("0");
+    setRank("C");
+    setEfeitoBase("0");
+    setEfeitos(emptyEfeitos());
     setInvStats(emptyInv());
     setImageFile(null);
   };
@@ -120,6 +127,11 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
       return;
     }
 
+    if (alcance === ALCANCE_GENJUTSU.id && efeitos.primarios.length > (MAX_PRIMARIOS[rank] ?? 1)) {
+      toast.error(`Rank ${rank} permite no máximo ${MAX_PRIMARIOS[rank]} efeito(s) primário(s).`);
+      return;
+    }
+    const genData = { rank, efeito_base: parseInt(efeitoBase) || 0, genjutsu_efeitos: efeitos as any };
     setSaving(true);
     try {
       let imagem_url = "";
@@ -139,7 +151,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
       }
 
       if (editingId) {
-        const updateData: Record<string, any> = { nome, informacoes, categoria, qtd_selos: categoria === "invocacao" ? 0 : parseInt(qtdSelos) || 0, alcance: categoria === "invocacao" ? "" : alcance, dt_captura: parseInt(dtCaptura) || 0, ...invStats };
+        const updateData: Record<string, any> = { nome, informacoes, categoria, qtd_selos: categoria === "invocacao" ? 0 : parseInt(qtdSelos) || 0, alcance: categoria === "invocacao" ? "" : alcance, ...genData, ...invStats };
         if (imagem_url) updateData.imagem_url = imagem_url;
         const { error } = await supabase.from("jutsus").update(updateData).eq("id", editingId);
         if (error) throw error;
@@ -152,7 +164,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
           categoria,
           qtd_selos: categoria === "invocacao" ? 0 : parseInt(qtdSelos) || 0,
           alcance: categoria === "invocacao" ? "" : alcance,
-          dt_captura: parseInt(dtCaptura) || 0,
+          ...genData,
           ...invStats,
           imagem_url,
 
@@ -166,7 +178,9 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
       setCategoria("jutsu");
       setQtdSelos("0");
       setAlcance("");
-      setDtCaptura("0");
+      setRank("C");
+    setEfeitoBase("0");
+    setEfeitos(emptyEfeitos());
       setInvStats(emptyInv());
       setImageFile(null);
       fetchJutsus();
@@ -247,16 +261,7 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
           )}
 
           {categoria !== "invocacao" && alcance === ALCANCE_GENJUTSU.id && (
-            <div className="mb-3">
-              <label className="retro-label block mb-1">DT de Captura (Genjutsu):</label>
-              <input
-                type="number"
-                min={0}
-                className="retro-input w-full text-xs"
-                value={dtCaptura}
-                onChange={(e) => setDtCaptura(e.target.value)}
-              />
-            </div>
+            <GenjutsuEfeitosEditor rank={rank} setRank={setRank} efeitoBase={efeitoBase} setEfeitoBase={setEfeitoBase} efeitos={efeitos} setEfeitos={setEfeitos} />
           )}
 
           {categoria === "invocacao" && (
@@ -270,10 +275,6 @@ const JutsuForm = ({ ip, onCreated }: JutsuFormProps) => {
                 <div>
                   <label className="retro-label block mb-1 text-[10px]">Vida Máx.:</label>
                   <input type="number" className="retro-input w-full text-xs" value={invStats.inv_vida_max} onChange={(e) => setInv("inv_vida_max", e.target.value)} />
-                </div>
-                <div>
-                  <label className="retro-label block mb-1 text-[10px]">Sanidade Máx.:</label>
-                  <input type="number" className="retro-input w-full text-xs" value={invStats.inv_sanidade_max} onChange={(e) => setInv("inv_sanidade_max", e.target.value)} />
                 </div>
                 <div>
                   <label className="retro-label block mb-1 text-[10px]">Chakra Máx.:</label>
