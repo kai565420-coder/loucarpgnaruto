@@ -109,6 +109,9 @@ const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition, tatica }: Ju
                       Selos Manuais {tatica.selosManuais || "—"} → {fmtMod(resultado.selosManuaisMod)}
                       {resultado.selosEfetivos === 0 && " (não acumula com 0 selos)"}
                     </div>
+                    <div className="text-accent font-bold">
+                      🎯 Buff de Acerto: {fmtMod(resultado.selosCountMod + resultado.selosManuaisMod)}
+                    </div>
                   </>
                 ) : resultado.taijutsu ? (
                   <>

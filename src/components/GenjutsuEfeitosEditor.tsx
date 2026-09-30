@@ -26,8 +26,9 @@ const GenjutsuEfeitosEditor = ({ rank, setRank, efeitoBase, setEfeitoBase, efeit
           + Adicionar
         </button>
       </div>
+      <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.max(1, Math.min(efeitos[grp].length, 2))}, minmax(0, 1fr))` }}>
       {efeitos[grp].map((ef, idx) => (
-        <div key={idx} className="border border-border p-2 mb-2">
+        <div key={idx} className="border border-border p-2">
           <div className="flex gap-2 mb-1">
             <select className="retro-input flex-1 text-xs" value={ef.tipo} onChange={(e) => update(grp, idx, { ...ef, tipo: e.target.value })}>
               {TIPOS_EFEITO.map((t) => <option key={t} value={t}>{t}</option>)}
@@ -50,6 +51,7 @@ const GenjutsuEfeitosEditor = ({ rank, setRank, efeitoBase, setEfeitoBase, efeit
           ))}
         </div>
       ))}
+      </div>
     </div>
   );
 
