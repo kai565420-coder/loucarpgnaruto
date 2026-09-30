@@ -286,8 +286,10 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onArchive, onUpdated, onOpen
   };
 
   const renderBar = (key: string, maxKey: string, label: string, color: string) => {
-    const current = editing ? (form[key] ?? 0) : ((sheet as any)[key] ?? 0);
+    const base = editing ? (form[key] ?? 0) : ((sheet as any)[key] ?? 0);
     const max = editing ? (form[maxKey] ?? 0) : ((sheet as any)[maxKey] ?? 0);
+    const vt = key === "vida" ? (editing ? (form.vida_temp ?? 0) : ((sheet as any).vida_temp ?? 0)) : 0;
+    const current = base + vt;
     const pct = max > 0 ? Math.min((current / max) * 100, 100) : 0;
 
     return (
