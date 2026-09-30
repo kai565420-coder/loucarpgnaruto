@@ -110,7 +110,8 @@ const JutsuWindow = ({ jutsu, onClose, onMinimize, initialPosition, tatica }: Ju
                       {resultado.selosEfetivos === 0 && " (não acumula com 0 selos)"}
                     </div>
                     <div className="text-accent font-bold">
-                      🎯 Buff de Acerto: {fmtMod(resultado.selosCountMod + resultado.selosManuaisMod)}
+                      🎯 Buff de Acerto: {fmtMod(-(resultado.selosCountMod + resultado.selosManuaisMod) + (tatica.controleChakra ?? 0))}
+                      <span className="text-[9px] text-muted-foreground font-normal"> (sinais invertidos + Controle de Chakra {tatica.controleChakra ?? 0})</span>
                     </div>
                   </>
                 ) : resultado.taijutsu ? (

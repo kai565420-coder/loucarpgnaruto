@@ -105,7 +105,8 @@ const InvocacaoCard = ({
 
   const bar = (label: string, key: string, maxKey: string, color: string) => {
     const max = jutsu[maxKey] ?? 0;
-    const cur = (status as any)[key] ?? 0;
+    const base = (status as any)[key] ?? 0;
+    const cur = key === "inv_vida" ? base + vt : base;
     const pct = max > 0 ? Math.min(100, Math.max(0, (cur / max) * 100)) : 0;
     return (
       <div className="mb-2">
