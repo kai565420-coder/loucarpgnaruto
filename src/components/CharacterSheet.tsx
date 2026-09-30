@@ -39,6 +39,7 @@ interface CharacterJutsuLink {
   maestria_nivel: string;
   inv_vida: number | null;
   inv_chakra: number | null;
+  inv_vida_temp: number;
 }
 
 const MAESTRIA_LEVELS = ["Nula", "I", "II", "III", "IV", "V"];
@@ -136,7 +137,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onArchive, onUpdated, onOpen
   const fetchJutsus = useCallback(async () => {
     const { data: links } = await supabase
       .from("character_jutsus")
-      .select("id, jutsu_id, maestria_nivel, inv_vida, inv_chakra")
+      .select("id, jutsu_id, maestria_nivel, inv_vida, inv_chakra, inv_vida_temp")
       .eq("character_id", sheet.id);
 
     const typedLinks: CharacterJutsuLink[] = (links || []).map((l: any) => ({
@@ -145,6 +146,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onArchive, onUpdated, onOpen
       maestria_nivel: l.maestria_nivel || "I",
       inv_vida: l.inv_vida ?? null,
       inv_chakra: l.inv_chakra ?? null,
+      inv_vida_temp: l.inv_vida_temp ?? 0,
     }));
     setJutsuLinks(typedLinks);
 
@@ -185,7 +187,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onArchive, onUpdated, onOpen
       .update({
         nome: form.nome, idade: form.idade, rank_ninja: form.rank_ninja, elementos: form.elementos, classe: form.classe, talento: form.talento,
         imagem_url: form.imagem_url,
-        vida: form.vida, vida_max: form.vida_max,
+        vida: form.vida, vida_max: form.vida_max, vida_temp: form.vida_temp ?? 0,
         chakra: form.chakra, chakra_max: form.chakra_max, forca_fisica: form.forca_fisica, destreza: form.destreza, deslocamento: form.deslocamento,
         bolsa_traseira_tamanho: form.bolsa_traseira_tamanho,
         dinheiro: form.dinheiro,
@@ -416,6 +418,19 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onArchive, onUpdated, onOpen
           {barAtributos.map(({ key, maxKey, label, color }) => (
             <div key={key}>{renderBar(key, maxKey, label, color)}</div>
           ))}
+          {(() => {
+            const vt = editing ? (form.vida_temp ?? 0) : ((sheet as any).vida_temp ?? 0);
+            return (
+              <div className="flex justify-between items-center text-[11px] mb-2 border border-border px-2 py-1">
+                <span className="retro-label font-bold">🩹 Vida Temporária</span>
+                {editing && canEdit ? (
+                  <input type="number" className="retro-input w-16 text-center text-[10px]" value={form.vida_temp ?? 0} onChange={(e) => handleNumberChange("vida_temp", e.target.value)} />
+                ) : (
+                  <span className={`font-bold ${vt > 0 ? "text-green-400" : vt < 0 ? "text-destructive" : "text-muted-foreground"}`}>{vt > 0 ? `+${vt}` : vt}</span>
+                )}
+              </div>
+            );
+          })()}
         </div>
       </div>
 
@@ -567,6 +582,7 @@ const CharacterSheet = ({ sheet, isOwner, onDelete, onArchive, onUpdated, onOpen
                       jutsu={inv}
                       maestria={link.maestria_nivel}
                       vida={link.inv_vida}
+                      vidaTemp={link.inv_vida_temp}
                       chakra={link.inv_chakra}
                       canEdit={canEdit}
                       editing={editing}
