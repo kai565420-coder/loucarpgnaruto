@@ -186,6 +186,7 @@ export type Database = {
           inv_chakra: number | null
           inv_sanidade: number | null
           inv_vida: number | null
+          inv_vida_temp: number
           jutsu_id: string
           maestria_nivel: string
         }
@@ -196,6 +197,7 @@ export type Database = {
           inv_chakra?: number | null
           inv_sanidade?: number | null
           inv_vida?: number | null
+          inv_vida_temp?: number
           jutsu_id: string
           maestria_nivel?: string
         }
@@ -206,6 +208,7 @@ export type Database = {
           inv_chakra?: number | null
           inv_sanidade?: number | null
           inv_vida?: number | null
+          inv_vida_temp?: number
           jutsu_id?: string
           maestria_nivel?: string
         }
@@ -326,6 +329,7 @@ export type Database = {
           user_id: string | null
           vida: number
           vida_max: number
+          vida_temp: number
           vontade_ninja: number
         }
         Insert: {
@@ -427,6 +431,7 @@ export type Database = {
           user_id?: string | null
           vida?: number
           vida_max?: number
+          vida_temp?: number
           vontade_ninja?: number
         }
         Update: {
@@ -528,6 +533,7 @@ export type Database = {
           user_id?: string | null
           vida?: number
           vida_max?: number
+          vida_temp?: number
           vontade_ninja?: number
         }
         Relationships: []
