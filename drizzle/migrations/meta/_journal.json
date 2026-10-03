@@ -8,6 +8,13 @@
       "when": 1790469649508,
       "tag": "0000_genjutsu_efeitos",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791052034050,
+      "tag": "0001_character_notas",
+      "breakpoints": true
     }
   ]
 }

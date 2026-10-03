@@ -1,0 +1,1 @@
+ALTER TABLE public.character_sheets ADD COLUMN IF NOT EXISTS notas jsonb NOT NULL DEFAULT '[]'::jsonb;
