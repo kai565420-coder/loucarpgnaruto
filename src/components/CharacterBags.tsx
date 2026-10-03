@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import BlocoNotas from "./BlocoNotas";
 
 interface BagItem {
   id: string;
@@ -517,6 +518,9 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
           ) : (
             <span className="text-foreground font-bold text-sm">{dinheiro.toLocaleString("pt-BR")}</span>
           )}
+          <div className="ml-auto">
+            <BlocoNotas characterId={characterId} canEdit={canEdit} />
+          </div>
         </div>
       </div>
     </div>

@@ -306,6 +306,7 @@ export type Database = {
           moldagem_elemental: number
           ninjutsu_medico: number
           nome: string
+          notas: Json
           pontos_acao: number
           rank_ninja: string
           reconhecimento: string
@@ -408,6 +409,7 @@ export type Database = {
           moldagem_elemental?: number
           ninjutsu_medico?: number
           nome: string
+          notas?: Json
           pontos_acao?: number
           rank_ninja?: string
           reconhecimento?: string
@@ -510,6 +512,7 @@ export type Database = {
           moldagem_elemental?: number
           ninjutsu_medico?: number
           nome?: string
+          notas?: Json
           pontos_acao?: number
           rank_ninja?: string
           reconhecimento?: string
