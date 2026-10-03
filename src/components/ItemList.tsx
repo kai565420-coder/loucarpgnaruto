@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import LojaItens from "./LojaItens";
 
 
 interface Item {
@@ -27,6 +28,7 @@ const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [shopOpen, setShopOpen] = useState(false);
 
   // Form state
   const [showForm, setShowForm] = useState(false);
@@ -284,15 +286,19 @@ const ItemList = ({ ip, onOpenItem }: ItemListProps) => {
         </form>
       )}
 
-      <div className="mb-2">
+      <div className="mb-2 flex gap-2">
         <input
           type="text"
-          className="retro-input w-full text-xs"
+          className="retro-input flex-1 text-xs"
           placeholder="🔍 Buscar item..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
+        <button type="button" className="retro-button px-3 text-xs whitespace-nowrap" onClick={() => setShopOpen(true)}>
+          🛒 Comprar
+        </button>
       </div>
+      <LojaItens open={shopOpen} onOpenChange={setShopOpen} items={items} />
 
       {/* Preços de Bolsas Traseiras */}
       <div className="retro-panel p-2 mb-3 border-2 border-accent/60">
