@@ -167,7 +167,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
   };
 
   const isLateralEligible = (nome: string) => {
-    const n = nome.toLowerCase();
+    const n = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     if (n.includes("fuma")) return false;
     return n.includes("kunai") || n.includes("shuriken");
   };
@@ -217,6 +217,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
     }
 
     // equipado items have weight 0, no space check needed
+    if (bagType !== "equipado" && addAsPapelLacrado && !(await consumirPergaminhos(addQtd))) return;
 
     const existing = bagItems.find((b) => b.item_id === selectedItemId && b.bag_type === bagType && b.is_papel_lacrado === addAsPapelLacrado);
     if (existing) {
@@ -278,8 +279,31 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
     fetchBagItems();
   };
 
+  // Consome N pergaminhos das bolsas (não selados). Retorna false se faltar.
+  const consumirPergaminhos = async (n: number) => {
+    const isPerg = (nome: string) => nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().startsWith("pergaminho");
+    const rows = bagItems.filter((b) => !b.is_papel_lacrado && b.bag_type !== "equipado" && isPerg(b.item.nome));
+    const total = rows.reduce((s, b) => s + b.quantidade, 0);
+    if (total < n) {
+      toast.error(`Sem pergaminhos suficientes! Precisa de ${n}, tem ${total}. Compre pergaminhos na loja.`);
+      return false;
+    }
+    let falta = n;
+    for (const r of rows) {
+      if (falta <= 0) break;
+      const usa = Math.min(falta, r.quantidade);
+      falta -= usa;
+      const { error } = r.quantidade - usa <= 0
+        ? await supabase.from("character_bag_items").delete().eq("id", r.id)
+        : await supabase.from("character_bag_items").update({ quantidade: r.quantidade - usa }).eq("id", r.id);
+      if (error) { toast.error("Erro ao descontar pergaminhos"); return false; }
+    }
+    return true;
+  };
+
   const handleTogglePapelLacrado = async (bi: BagItem) => {
     const newVal = !bi.is_papel_lacrado;
+    if (newVal && !(await consumirPergaminhos(bi.quantidade))) return;
     if (!newVal && bi.bag_type === "traseira") {
       const newWeight = bi.item.peso * bi.quantidade;
       const oldWeight = PAPEL_LACRADO_PESO * bi.quantidade;
@@ -293,7 +317,7 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
       .update({ is_papel_lacrado: newVal })
       .eq("id", bi.id);
     if (error) { toast.error("Erro ao atualizar"); return; }
-    toast.success(newVal ? "Item selado em papel!" : "Item desselado!");
+    toast.success(newVal ? `Item selado! ${bi.quantidade} pergaminho(s) usado(s).` : "Item desselado!");
     fetchBagItems();
   };
 
