@@ -161,6 +161,24 @@ const LojaItens = ({ open, onOpenChange, items }: { open: boolean; onOpenChange:
           {sheet && <div className="text-xs">Saldo: <b className="text-accent">{fmt(saldo)} 両</b></div>}
         </div>
 
+        {sheet && (
+          <div className="retro-panel p-2">
+            <div className="text-xs font-bold text-accent mb-1">🎒 Inventário atual de {sheet.nome}</div>
+            {ownedList.length === 0 ? (
+              <div className="text-[11px] text-muted-foreground">Inventário vazio.</div>
+            ) : (
+              <div className="max-h-28 overflow-y-auto grid sm:grid-cols-2 gap-x-3 text-[11px]">
+                {ownedList.map((o, idx) => (
+                  <div key={idx} className="flex justify-between border-b border-border/50 py-0.5">
+                    <span className="truncate">{o.selado ? "📜 " : ""}{o.nome}</span>
+                    <span className="text-muted-foreground ml-2 shrink-0">x{o.qtd} · {o.bag === "lateral" ? "📌" : o.bag === "traseira" ? "🎒" : "⚔️"}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="grid md:grid-cols-2 gap-3">
           <div className="retro-panel p-2">
             <input className="retro-input w-full text-xs mb-2" placeholder="🔍 Buscar item..." value={busca} onChange={(e) => setBusca(e.target.value)} />
