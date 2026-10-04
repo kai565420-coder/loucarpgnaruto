@@ -35,6 +35,7 @@ const LojaItens = ({ open, onOpenChange, items }: { open: boolean; onOpenChange:
   const [cart, setCart] = useState<Record<string, number>>({});
   const [used, setUsed] = useState({ lateral: 0, traseira: 0 });
   const [owned, setOwned] = useState<Record<string, number>>({});
+  const [ownedList, setOwnedList] = useState<{ nome: string; qtd: number; bag: string; selado: boolean }[]>([]);
   const [busca, setBusca] = useState("");
   const [buying, setBuying] = useState(false);
 
@@ -45,20 +46,26 @@ const LojaItens = ({ open, onOpenChange, items }: { open: boolean; onOpenChange:
   }, [open]);
 
   const loadUsed = async (id: string) => {
-    if (!id) { setOwned({}); return setUsed({ lateral: 0, traseira: 0 }); }
+    if (!id) { setOwned({}); setOwnedList([]); return setUsed({ lateral: 0, traseira: 0 }); }
     const { data } = await supabase.from("character_bag_items").select("bag_type,quantidade,is_papel_lacrado,item_id").eq("character_id", id);
     const ids = [...new Set((data || []).map((b) => b.item_id))];
     const pesos: Record<string, number> = {};
+    const nomes: Record<string, string> = {};
     if (ids.length) {
       const [{ data: a }, { data: p }] = await Promise.all([
-        supabase.from("items").select("id,peso").in("id", ids),
-        supabase.from("personalizados").select("id,peso").in("id", ids),
+        supabase.from("items").select("id,peso,nome").in("id", ids),
+        supabase.from("personalizados").select("id,peso,nome").in("id", ids),
       ]);
-      [...(a || []), ...(p || [])].forEach((x: any) => (pesos[x.id] = Number(x.peso) || 0));
+      [...(a || []), ...(p || [])].forEach((x: any) => { pesos[x.id] = Number(x.peso) || 0; nomes[x.id] = x.nome; });
     }
     const o: Record<string, number> = {};
     (data || []).forEach((b) => (o[b.item_id] = (o[b.item_id] || 0) + b.quantidade));
     setOwned(o);
+    setOwnedList(
+      (data || [])
+        .map((b) => ({ nome: nomes[b.item_id] || "?", qtd: b.quantidade, bag: b.bag_type, selado: b.is_papel_lacrado }))
+        .sort((x, y) => x.nome.localeCompare(y.nome))
+    );
     const u = { lateral: 0, traseira: 0 };
     (data || []).forEach((b) => {
       if (b.bag_type !== "lateral" && b.bag_type !== "traseira") return;
@@ -153,6 +160,24 @@ const LojaItens = ({ open, onOpenChange, items }: { open: boolean; onOpenChange:
           </select>
           {sheet && <div className="text-xs">Saldo: <b className="text-accent">{fmt(saldo)} 両</b></div>}
         </div>
+
+        {sheet && (
+          <div className="retro-panel p-2">
+            <div className="text-xs font-bold text-accent mb-1">🎒 Inventário atual de {sheet.nome}</div>
+            {ownedList.length === 0 ? (
+              <div className="text-[11px] text-muted-foreground">Inventário vazio.</div>
+            ) : (
+              <div className="max-h-28 overflow-y-auto grid sm:grid-cols-2 gap-x-3 text-[11px]">
+                {ownedList.map((o, idx) => (
+                  <div key={idx} className="flex justify-between border-b border-border/50 py-0.5">
+                    <span className="truncate">{o.selado ? "📜 " : ""}{o.nome}</span>
+                    <span className="text-muted-foreground ml-2 shrink-0">x{o.qtd} · {o.bag === "lateral" ? "📌" : o.bag === "traseira" ? "🎒" : "⚔️"}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="grid md:grid-cols-2 gap-3">
           <div className="retro-panel p-2">
