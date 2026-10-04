@@ -302,22 +302,67 @@ const CharacterBags = ({ characterId, bolsaTraseiraTamanho, editing, canEdit, di
   };
 
   const handleTogglePapelLacrado = async (bi: BagItem) => {
-    const newVal = !bi.is_papel_lacrado;
-    if (newVal && !(await consumirPergaminhos(bi.quantidade))) return;
-    if (!newVal && bi.bag_type === "traseira") {
-      const newWeight = bi.item.peso * bi.quantidade;
-      const oldWeight = PAPEL_LACRADO_PESO * bi.quantidade;
-      if (traseiraUsed - oldWeight + newWeight > traseiraMax) {
-        toast.error("Não há espaço suficiente para desselar o item!");
+    const selando = !bi.is_papel_lacrado;
+    const input = window.prompt(
+      `Quantas unidades de "${bi.item.nome}" deseja ${selando ? "selar" : "desselar"}? (máx: ${bi.quantidade})`,
+      String(bi.quantidade)
+    );
+    if (input === null) return;
+    const n = parseInt(input);
+    if (isNaN(n) || n < 1 || n > bi.quantidade) {
+      toast.error("Quantidade inválida! Operação cancelada.");
+      return;
+    }
+
+    if (selando) {
+      if (!(await consumirPergaminhos(n))) return;
+    } else {
+      // Desselar: o item volta ao peso normal — checar espaço na bolsa
+      const delta = (bi.item.peso - PAPEL_LACRADO_PESO) * n;
+      if (bi.bag_type === "traseira" && traseiraUsed + delta > traseiraMax) {
+        toast.error(`Sem espaço na bolsa traseira para desselar! Faltam ${(traseiraUsed + delta - traseiraMax).toFixed(1)} de peso. Operação cancelada.`);
+        return;
+      }
+      if (bi.bag_type === "lateral" && lateralUsed + delta > lateralMax) {
+        toast.error(`Sem espaço na bolsa lateral para desselar! Operação cancelada.`);
         return;
       }
     }
-    const { error } = await supabase
-      .from("character_bag_items")
-      .update({ is_papel_lacrado: newVal })
-      .eq("id", bi.id);
-    if (error) { toast.error("Erro ao atualizar"); return; }
-    toast.success(newVal ? `Item selado! ${bi.quantidade} pergaminho(s) usado(s).` : "Item desselado!");
+
+    // Junta com uma linha existente do mesmo item no estado de destino, se houver
+    const counterpart = bagItems.find(
+      (b) => b.id !== bi.id && b.item_id === bi.item_id && b.bag_type === bi.bag_type && b.is_papel_lacrado === selando
+    );
+
+    if (n === bi.quantidade) {
+      if (counterpart) {
+        const { error } = await supabase.from("character_bag_items").update({ quantidade: counterpart.quantidade + n }).eq("id", counterpart.id);
+        if (error) { toast.error("Erro ao atualizar"); return; }
+        await supabase.from("character_bag_items").delete().eq("id", bi.id);
+      } else {
+        const { error } = await supabase.from("character_bag_items").update({ is_papel_lacrado: selando }).eq("id", bi.id);
+        if (error) { toast.error("Erro ao atualizar"); return; }
+      }
+    } else {
+      const { error } = await supabase.from("character_bag_items").update({ quantidade: bi.quantidade - n }).eq("id", bi.id);
+      if (error) { toast.error("Erro ao atualizar"); return; }
+      if (counterpart) {
+        const { error: e2 } = await supabase.from("character_bag_items").update({ quantidade: counterpart.quantidade + n }).eq("id", counterpart.id);
+        if (e2) { toast.error("Erro ao atualizar"); return; }
+      } else {
+        const { error: e2 } = await supabase.from("character_bag_items").insert({
+          character_id: characterId,
+          item_id: bi.item_id,
+          bag_type: bi.bag_type,
+          quantidade: n,
+          is_papel_lacrado: selando,
+          durabilidade: bi.durabilidade,
+        });
+        if (e2) { toast.error("Erro ao atualizar"); return; }
+      }
+    }
+
+    toast.success(selando ? `${n} item(ns) selado(s)! ${n} pergaminho(s) usado(s).` : `${n} item(ns) desselado(s)!`);
     fetchBagItems();
   };
 
